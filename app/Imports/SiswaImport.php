@@ -24,78 +24,88 @@ class SiswaImport implements ToModel, WithStartRow
     */
     public function model(array $row)
     {
-        // Skip if name is empty
-        if (empty($row[0])) {
+        // Skip if name is empty (Nama is in Column B, index 1)
+        if (empty($row[1]) || $row[1] == 'Nama') {
             return null;
         }
 
-        return new Siswa([
-            'nama'                       => $row[0],
-            'nipd'                       => $row[1],
-            'jk'                         => $row[2],
-            'nisn'                       => $row[3],
-            'tempat_lahir'               => $row[4],
-            'tanggal_lahir'              => $this->transformDate($row[5]),
-            'nik'                        => $row[6],
-            'agama'                      => $row[7],
-            'alamat'                     => $row[8],
-            'rt'                         => $row[9],
-            'rw'                         => $row[10],
-            'dusun'                      => $row[11],
-            'kelurahan'                  => $row[12],
-            'kecamatan'                  => $row[13],
-            'kode_pos'                   => $row[14],
-            'jenis_tinggal'              => $row[15],
-            'alat_transportasi'          => $row[16],
-            'telepon'                    => $row[17],
-            'hp'                         => $row[18],
-            'email'                      => $row[19],
-            'skhun'                      => $row[20],
-            'penerima_kps'               => $row[21],
-            'no_kps'                     => $row[22],
-            'nama_ayah'                  => $row[23],
-            'tahun_lahir_ayah'           => $row[24],
-            'jenjang_pendidikan_ayah'    => $row[25],
-            'pekerjaan_ayah'             => $row[26],
-            'penghasilan_ayah'           => $row[27],
-            'nik_ayah'                   => $row[28],
-            'nama_ibu'                   => $row[29],
-            'tahun_lahir_ibu'            => $row[30],
-            'jenjang_pendidikan_ibu'     => $row[31],
-            'pekerjaan_ibu'              => $row[32],
-            'penghasilan_ibu'            => $row[33],
-            'nik_ibu'                    => $row[34],
-            'nama_wali'                  => $row[35],
-            'tahun_lahir_wali'           => $row[36],
-            'jenjang_pendidikan_wali'    => $row[37],
-            'pekerjaan_wali'             => $row[38],
-            'penghasilan_wali'           => $row[39],
-            'nik_wali'                   => $row[40],
-            'rombel_saat_ini'            => $row[41],
-            'no_peserta_un'              => $row[42],
-            'no_seri_ijazah'             => $row[43],
-            'penerima_kip'               => $row[44],
-            'nomor_kip'                  => $row[45],
-            'nama_di_kip'                => $row[46],
-            'nomor_kks'                  => $row[47],
-            'no_registrasi_akta_lahir'   => $row[48],
-            'bank'                       => $row[49],
-            'nomor_rekening_bank'        => $row[50],
-            'rekening_atas_nama'         => $row[51],
-            'layak_pip'                  => $row[52],
-            'alasan_layak_pip'           => $row[53],
-            'kebutuhan_khusus'           => $row[54],
-            'sekolah_asal'               => $row[55],
-            'anak_ke_berapa'             => $row[56],
-            'lintang'                    => $row[57],
-            'bujur'                      => $row[58],
-            'no_kk'                      => $row[59],
-            'berat_badan'                => $row[60],
-            'tinggi_badan'               => $row[61],
-            'lingkar_kepala'             => $row[62],
-            'jml_saudara_kandung'        => $row[63],
-            'jarak_rumah_ke_sekolah_km'  => $row[64],
-        ]);
+        \Illuminate\Support\Facades\Log::info('Importing Siswa: ' . $row[1]);
+
+        try {
+            return new Siswa([
+                'nama'                       => $row[1] ?? null,
+                'nipd'                       => $row[2] ?? null,
+                'jk'                         => $row[3] ?? null,
+                'nisn'                       => $row[4] ?? null,
+                'tempat_lahir'               => $row[5] ?? null,
+                'tanggal_lahir'              => $this->transformDate($row[6] ?? null),
+                'nik'                        => $row[7] ?? null,
+                'agama'                      => $row[8] ?? null,
+                'alamat'                     => $row[9] ?? null,
+                'rt'                         => $row[10] ?? null,
+                'rw'                         => $row[11] ?? null,
+                'dusun'                      => $row[12] ?? null,
+                'kelurahan'                  => $row[13] ?? null,
+                'kecamatan'                  => $row[14] ?? null,
+                'kode_pos'                   => $row[15] ?? null,
+                'jenis_tinggal'              => $row[16] ?? null,
+                'alat_transportasi'          => $row[17] ?? null,
+                'telepon'                    => $row[18] ?? null,
+                'hp'                         => $row[19] ?? null,
+                'email'                      => $row[20] ?? null,
+                'skhun'                      => $row[21] ?? null,
+                'penerima_kps'               => $row[22] ?? null,
+                'no_kps'                     => $row[23] ?? null,
+                'nama_ayah'                  => $row[24] ?? null,
+                'tahun_lahir_ayah'           => is_numeric($row[25] ?? null) ? $row[25] : null,
+                'jenjang_pendidikan_ayah'    => $row[26] ?? null,
+                'pekerjaan_ayah'             => $row[27] ?? null,
+                'penghasilan_ayah'           => $row[28] ?? null,
+                'nik_ayah'                   => $row[29] ?? null,
+                'nama_ibu'                   => $row[30] ?? null,
+                'tahun_lahir_ibu'            => is_numeric($row[31] ?? null) ? $row[31] : null,
+                'jenjang_pendidikan_ibu'     => $row[32] ?? null,
+                'pekerjaan_ibu'              => $row[33] ?? null,
+                'penghasilan_ibu'            => $row[34] ?? null,
+                'nik_ibu'                    => $row[35] ?? null,
+                'nama_wali'                  => $row[36] ?? null,
+                'tahun_lahir_wali'           => is_numeric($row[37] ?? null) ? $row[37] : null,
+                'jenjang_pendidikan_wali'    => $row[38] ?? null,
+                'pekerjaan_wali'             => $row[39] ?? null,
+                'penghasilan_wali'           => $row[40] ?? null,
+                'nik_wali'                   => $row[41] ?? null,
+                'rombel_saat_ini'            => $row[42] ?? null,
+                'no_peserta_un'              => $row[43] ?? null,
+                'no_seri_ijazah'             => $row[44] ?? null,
+                'penerima_kip'               => $row[45] ?? null,
+                'nomor_kip'                  => $row[46] ?? null,
+                'nama_di_kip'                => $row[47] ?? null,
+                'nomor_kks'                  => $row[48] ?? null,
+                'no_registrasi_akta_lahir'   => $row[49] ?? null,
+                'bank'                       => $row[50] ?? null,
+                'nomor_rekening_bank'        => $row[51] ?? null,
+                'rekening_atas_nama'         => $row[52] ?? null,
+                'layak_pip'                  => $row[53] ?? null,
+                'alasan_layak_pip'           => $row[54] ?? null,
+                'kebutuhan_khusus'           => $row[55] ?? null,
+                'sekolah_asal'               => $row[56] ?? null,
+                'anak_ke_berapa'             => is_numeric($row[57] ?? null) ? $row[57] : null,
+                'lintang'                    => $row[58] ?? null,
+                'bujur'                      => $row[59] ?? null,
+                'no_kk'                      => $row[60] ?? null,
+                'berat_badan'                => $row[61] ?? null,
+                'tinggi_badan'               => $row[62] ?? null,
+                'lingkar_kepala'             => $row[63] ?? null,
+                'jml_saudara_kandung'        => is_numeric($row[64] ?? null) ? $row[64] : null,
+                'jarak_rumah_ke_sekolah_km'  => $row[65] ?? null,
+
+
+
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Row import failed for ' . ($row[1] ?? 'Unknown') . ': ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -105,10 +115,22 @@ class SiswaImport implements ToModel, WithStartRow
     {
         if (empty($value)) return null;
 
+        // If it's already a numeric Excel date, transform it
+        if (is_numeric($value)) {
+            try {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
+            } catch (\Throwable $t) {
+                // fall through to Carbon parse
+            }
+        }
+
+        // If it's a string date (e.g. '2018-05-18') or other format
         try {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
-        } catch (\ErrorException $e) {
             return Carbon::parse($value);
+        } catch (\Throwable $ce) {
+            \Illuminate\Support\Facades\Log::warning('Date parsing failed for: ' . $value);
+            return null;
         }
     }
+
 }

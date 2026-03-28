@@ -7,6 +7,9 @@ use App\Imports\SiswaImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 
 class SiswaController extends Controller
 {
@@ -18,21 +21,56 @@ class SiswaController extends Controller
 
     public function import(Request $request)
     {
+        $file = $request->file('file');
+        Log::info('Import request received', [
+            'has_file' => $request->hasFile('file'),
+            'file_is_valid' => $file ? $file->isValid() : 'no file',
+            'file_error' => $file ? $file->getError() : 'no file',
+            'user' => auth()->user()->id
+        ]);
+
+
+
         // Check Role
         if (!auth()->user()->hasAnyRole(['Super Admin', 'Operator', 'Tata Usaha'])) {
+            Log::warning('Unauthorized import attempt', ['user' => auth()->user()->email]);
             return redirect()->back()->with('error', 'Anda tidak memiliki hak akses untuk melakukan import data.');
         }
 
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'file' => 'required'
         ]);
 
         try {
-            Excel::import(new SiswaImport, $request->file('file'));
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $tempDir = storage_path('app/private/temp');
+            
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $file->move($tempDir, $filename);
+            $path = 'temp/' . $filename;
+            
+            Excel::import(new SiswaImport, $path);
+            
+            Storage::delete($path);
+
+            
             return redirect()->route('siswas.index')->with('success', 'Data siswa berhasil diimport dari Dapodik.');
         } catch (\Exception $e) {
+            // Clean up if something went wrong but we have a path
+            if (isset($path)) {
+                Storage::delete($path);
+            }
+            
+            Log::error('Import failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user' => auth()->user()->id
+            ]);
             return redirect()->back()->with('error', 'Gagal melakukan import: ' . $e->getMessage());
         }
+
     }
 
     public function show(Siswa $siswa)
