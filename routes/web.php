@@ -13,3 +13,7 @@ Route::get('/tentang', function () {
 Route::get('/kontak', function () {
     return view('kontak');
 });
+
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
