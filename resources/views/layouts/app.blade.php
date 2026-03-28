@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'Dashboard') - Buku Induk SD Muhammadiyah Gisting</title>
+    
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    @endif
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body { font-family: 'Instrument Sans', sans-serif; }
+        [x-cloak] { display: none !important; }
+        
+        /* Custom Scrollbar for modern look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-hidden">
+    
+    <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="sidebarOpen = window.innerWidth >= 1024" class="flex h-screen w-full">
+
+        <!-- Mobile sidebar backdrop -->
+        <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-20 bg-slate-900/60 lg:hidden backdrop-blur-sm" @click="sidebarOpen = false" x-cloak></div>
+
+        <!-- Sidebar Navigation (With custom blue/yellow theme) -->
+        <aside :class="sidebarOpen ? 'translate-x-0 lg:ml-0' : '-translate-x-full lg:-ml-64'" class="fixed inset-y-0 left-0 z-30 w-64 bg-[#0c4a6e] text-slate-300 transition-all duration-300 lg:static flex flex-col h-full shadow-2xl shrink-0">
+            
+            <!-- Sidebar Header -->
+            <div class="flex items-center justify-between h-16 px-6 bg-[#08334d] shrink-0 border-b border-sky-900/50">
+                <a href="{{ url('/') }}" class="flex items-center gap-3 font-bold text-[1.15rem] tracking-tight text-white">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center text-[#08334d] text-xs shadow-md shadow-yellow-500/20">BI</div>
+                    Buku Induk<span class="text-yellow-400">.</span>
+                </a>
+                <button @click="sidebarOpen = false" class="lg:hidden text-sky-200 hover:text-white focus:outline-none cursor-pointer p-1.5 rounded-lg hover:bg-sky-800 transition-colors">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation Links -->
+            <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+                <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-sky-800/80 text-white font-semibold transition-colors border border-sky-700/50 shadow-inner">
+                    <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </a>
+
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
+                    <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Data Pokok Siswa
+                </a>
+
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
+                    <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Eksport & Laporan
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
+                    <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Riwayat Status
+                </a>
+
+                <div class="pt-5 mt-5 border-t border-sky-800">
+                    <p class="px-3 text-[0.7rem] font-bold text-sky-400 uppercase tracking-widest mb-2">Pengaturan</p>
+                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
+                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Konfigurasi Sistem
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-sky-900 shrink-0 bg-[#08334d]">
+                <a href="{{ url('/') }}" class="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-rose-300 hover:bg-rose-500 hover:text-white font-semibold transition-colors w-full border border-rose-900/50">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Logout Sesi
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex flex-1 flex-col overflow-hidden bg-slate-50 relative">
+            
+            <!-- Top Header -->
+            <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white/70 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-10 w-full shrink-0 shadow-sm">
+                <!-- Hamburger Menu for both Desktop and Mobile -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-[#0ea5e9] bg-white border border-slate-200 hover:border-sky-200 p-2 rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 cursor-pointer">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                        </svg>
+                    </button>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        @yield('header_title', 'Dashboard')
+                    </h1>
+                </div>
+
+                <!-- Header Actions (Right) -->
+                <div class="flex items-center gap-3 sm:gap-5">
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors hidden sm:block cursor-pointer">
+                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </button>
+
+                    <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+                    <!-- Profile Dropdown Menu -->
+                    <div x-data="{ dropdownOpen: false }" class="relative">
+                        <!-- Profile Trigger Button -->
+                        <button @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false" class="cursor-pointer flex items-center gap-2.5 rounded-full p-1 pl-1.5 border hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-sky-500/20 bg-white shadow-sm">
+                            <img class="w-8 h-8 rounded-full object-cover ring-2 ring-white" src="https://ui-avatars.com/api/?name=Admin+Sistem&background=0284c7&color=fff&bold=true" alt="UserAvatar">
+                            <span class="hidden sm:block text-sm font-semibold text-slate-700 pr-1">Admin TU</span>
+                            <svg class="hidden sm:block w-4 h-4 text-slate-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+
+                        <!-- Dropdown Panel -->
+                        <div x-show="dropdownOpen" 
+                             x-transition:enter="transition ease-out duration-150" 
+                             x-transition:enter-start="transform opacity-0 scale-95 translate-y-2" 
+                             x-transition:enter-end="transform opacity-100 scale-100 translate-y-0" 
+                             x-transition:leave="transition ease-in duration-100" 
+                             x-transition:leave-start="transform opacity-100 scale-100" 
+                             x-transition:leave-end="transform opacity-0 scale-95" 
+                             class="absolute right-0 mt-3 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 py-2 z-50 text-sm" x-cloak>
+                            
+                            <div class="px-4 py-3 border-b border-slate-100 mb-1">
+                                <p class="font-bold text-slate-800 text-base">Kepala Tata Usaha</p>
+                                <p class="text-slate-500 text-xs mt-0.5 truncate font-medium">admin@sdmuhgisting.sch.id</p>
+                            </div>
+                            <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition-colors">
+                                <svg class="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Profil Pengguna
+                            </a>
+                            <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:bg-sky-50 hover:text-sky-700 font-medium transition-colors">
+                                <svg class="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg> Pengaturan
+                            </a>
+                            <div class="border-t border-slate-100 my-1"></div>
+                            <a href="{{ url('/') }}" class="flex items-center gap-2 px-4 py-2.5 text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-medium transition-colors">
+                                <svg class="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> Keluar Aplikasi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Breadcrumbs -->
+            <div class="px-4 sm:px-6 lg:px-8 py-3 bg-white border-b border-slate-200 shadow-sm sticky top-16 z-0">
+                <nav class="flex text-sm font-medium text-slate-500 whitespace-nowrap overflow-x-auto custom-scrollbar-hide">
+                    <ol class="flex items-center space-x-2">
+                        <li>
+                            <a href="{{ url('/dashboard') }}" class="hover:text-[#0ea5e9] transition-colors flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                Beranda
+                            </a>
+                        </li>
+                        @hasSection('breadcrumb')
+                            <li><span class="text-slate-300 mx-1">/</span></li>
+                            <li class="text-slate-800 font-semibold flex items-center">
+                                @yield('breadcrumb')
+                            </li>
+                        @endif
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto w-full p-4 sm:p-6 lg:p-8">
+                <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8 min-h-[70vh]">
+                    @yield('content')
+                </div>
+                
+                <footer class="py-6 max-w-7xl mx-auto w-full text-center sm:text-left border-t border-slate-200/50 mt-12 mb-4">
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        &copy; {{ date('Y') }} SISTEM INFO BUKU INDUK · SD Muhammadiyah Gisting.
+                    </p>
+                </footer>
+            </main>
+            
+        </div>
+    </div>
+</body>
+</html>
