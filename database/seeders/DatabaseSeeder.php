@@ -15,12 +15,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Admin Sistem',
-            'email' => 'admin@sdmuhgisting.sch.id',
-            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        // Setup initial roles first before assigning
+        $this->call([
+            RoleAndPermissionSeeder::class,
         ]);
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@sdmuhgisting.sch.id'],
+            [
+                'name' => 'Admin Sistem',
+                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            ]
+        );
+
+        // Assign the role
+        if (!$admin->hasRole('Super Admin')) {
+            $admin->assignRole('Super Admin');
+        }
     }
 }

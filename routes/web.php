@@ -22,6 +22,14 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard')->middleware('auth');
+
+Route::middleware(['auth', 'role:Super Admin'])->group(function () {
+    Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
+});
