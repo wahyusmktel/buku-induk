@@ -375,7 +375,16 @@
                     <p>Silakan masuk dengan akun Anda untuk melanjutkan ke sistem administrasi Buku Induk.</p>
                 </div>
 
-                <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Ini masih demonstrasi tampilan tata letak login!');">
+                @if ($errors->any())
+                    <div style="background-color: #fee2e2; border: 1px solid #fccca7; color: #b91c1c; padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.95rem;">
+                        <ul style="margin-left: 1.5rem; list-style-type: disc;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form action="{{ route('login.post') }}" method="POST">
                     @csrf
                     <div class="form-group">
                         <label for="email">Alamat Email / NIP</label>
