@@ -10,15 +10,15 @@ class TahunPelajaranController extends Controller
 {
     public function index()
     {
-        $tahunPelajarans = TahunPelajaran::orderBy('tahun', 'desc')->orderBy('semester', 'desc')->get();
+        $tahunPelajarans = TahunPelajaran::withCount('siswas')->latest()->get();
         return view('tahun-pelajaran.index', compact('tahunPelajarans'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'tahun' => 'required|string|max:10', // e.g., 2025/2026
-            'semester' => 'required|in:Ganjil,Genap',
+            'tahun' => 'required|string|max:20',
+            'semester' => 'required|string|in:Ganjil,Genap',
         ]);
 
         TahunPelajaran::create([
@@ -28,6 +28,58 @@ class TahunPelajaranController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Tahun Pelajaran berhasil ditambahkan.');
+    }
+
+    public function copyData($id)
+    {
+        $targetYear = TahunPelajaran::findOrFail($id);
+        
+        // Find previous year logic:
+        // 2025/2026 Genap -> Source is 2025/2026 Ganjil
+        // 2026/2027 Ganjil -> Source is 2025/2026 Genap
+        $sourceYear = TahunPelajaran::where('id', '!=', $id)
+            ->orderBy('tahun', 'desc')
+            ->orderBy('semester', 'asc') // Ganjil is before Genap alphabetically
+            ->where(function($q) use ($targetYear) {
+                $q->where('tahun', '<', $targetYear->tahun)
+                  ->orWhere(function($sub) use ($targetYear) {
+                      $sub->where('tahun', $targetYear->tahun)
+                          ->where('semester', 'Ganjil');
+                  });
+            })
+            ->first();
+
+        if (!$sourceYear) {
+            return redirect()->back()->with('error', 'Gagal menyalin: Tidak ditemukan data Tahun Pelajaran sebelumnya.');
+        }
+
+        DB::transaction(function () use ($sourceYear, $targetYear) {
+            // 1. Copy Rombels
+            $rombels = \App\Models\Rombel::where('tahun_pelajaran_id', $sourceYear->id)->get();
+            $rombelMapping = [];
+
+            foreach ($rombels as $oldRombel) {
+                $newRombel = \App\Models\Rombel::firstOrCreate([
+                    'nama' => $oldRombel->nama,
+                    'tahun_pelajaran_id' => $targetYear->id
+                ]);
+                $rombelMapping[$oldRombel->id] = $newRombel->id;
+            }
+
+            // 2. Copy Students (Cloning records)
+            $students = \App\Models\Siswa::withoutGlobalScope('tahun_aktif')
+                ->where('tahun_pelajaran_id', $sourceYear->id)
+                ->get();
+
+            foreach ($students as $oldSiswa) {
+                $newSiswa = $oldSiswa->replicate();
+                $newSiswa->tahun_pelajaran_id = $targetYear->id;
+                $newSiswa->rombel_id = isset($oldSiswa->rombel_id) ? ($rombelMapping[$oldSiswa->rombel_id] ?? null) : null;
+                $newSiswa->save();
+            }
+        });
+
+        return redirect()->back()->with('success', "Berhasil menyalin data dari sesi {$sourceYear->tahun} - {$sourceYear->semester}.");
     }
 
     public function activate($id)

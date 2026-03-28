@@ -12,6 +12,7 @@ class Siswa extends Model
 
     protected $fillable = [
         'tahun_pelajaran_id',
+        'rombel_id',
         'nama', 'nipd', 'jk', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'nik', 'agama',
         'alamat', 'rt', 'rw', 'dusun', 'kelurahan', 'kecamatan', 'kode_pos',
         'jenis_tinggal', 'alat_transportasi', 'telepon', 'hp', 'email',
@@ -39,5 +40,10 @@ class Siswa extends Model
     public function tahunPelajaran()
     {
         return $this->belongsTo(TahunPelajaran::class);
+    }
+
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class);
     }
 }

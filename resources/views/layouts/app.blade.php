@@ -55,10 +55,29 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('siswas.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 {{ request()->routeIs('siswas.*') ? 'bg-sky-800/80 text-white font-semibold border border-sky-700/50 shadow-inner' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors' }}">
-                    <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    Data Pokok Siswa
-                </a>
+                <div x-data="{ open: {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'true' : 'false' }} }">
+                    <button @click="open = !open" 
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sky-100 {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'bg-sky-800/80 text-white font-semibold' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors border border-transparent' }} group transition-all">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 opacity-70 group-hover:text-yellow-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            Data Pokok Siswa
+                        </div>
+                        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 -translate-y-2" 
+                         x-transition:enter-end="opacity-100 translate-y-0" 
+                         class="mt-1 ml-4 pl-4 border-l border-sky-800/50 space-y-1" x-cloak>
+                        <a href="{{ route('siswas.index') }}" class="block px-3 py-2 text-sm rounded-lg {{ request()->routeIs('siswas.index') ? 'text-yellow-400 font-bold' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }} transition-colors">
+                            • Daftar Siswa
+                        </a>
+                        <a href="{{ route('rombels.index') }}" class="block px-3 py-2 text-sm rounded-lg {{ request()->routeIs('rombels.index') ? 'text-yellow-400 font-bold' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }} transition-colors">
+                            • Daftar Rombel
+                        </a>
+                    </div>
+                </div>
 
                 <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>

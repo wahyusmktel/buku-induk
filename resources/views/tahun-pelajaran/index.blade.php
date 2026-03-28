@@ -77,6 +77,15 @@
                                     </button>
                                 </form>
                                 
+                                @if($tp->siswas_count == 0)
+                                <form action="{{ route('tahun-pelajaran.copy-data', $tp->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyalin data dari sesi sebelumnya? Semua data rombel dan siswa akan diduplikasi ke sesi ini.')">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                                        Salin Data
+                                    </button>
+                                </form>
+                                @endif
+
                                 <form action="{{ route('tahun-pelajaran.destroy', $tp->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tahun pelajaran ini?')">
                                     @csrf
                                     @method('DELETE')

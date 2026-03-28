@@ -35,12 +35,22 @@ class SiswaImport implements ToModel, WithStartRow
         $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
         $nisn = $row[4] ?? null;
         $nik = $row[7] ?? null;
+        $rombelNama = $row[42] ?? null;
 
-        // Try to find existing student globally (ignoring the academic year filter)
-        // We match by NISN and NIK if provided
+        // Try to handle Rombel synchronization
+        $rombelId = null;
+        if ($rombelNama && $tahunAktif) {
+            $rombel = \App\Models\Rombel::firstOrCreate([
+                'nama' => $rombelNama,
+                'tahun_pelajaran_id' => $tahunAktif->id
+            ]);
+            $rombelId = $rombel->id;
+        }
+
+        // Try to find existing student in the CURRENT active year first (using Global Scope)
         $existingSiswa = null;
         if ($nisn || $nik) {
-            $query = Siswa::withoutGlobalScope('tahun_aktif');
+            $query = Siswa::query(); // Uses active year Global Scope
             if ($nisn && $nik) {
                 $query->where(function($q) use ($nisn, $nik) {
                     $q->where('nisn', $nisn)->orWhere('nik', $nik);
@@ -51,10 +61,26 @@ class SiswaImport implements ToModel, WithStartRow
                 $query->where('nik', $nik);
             }
             $existingSiswa = $query->first();
+
+            // If not found in current year, search globally across all years
+            if (!$existingSiswa) {
+                $queryGlobal = Siswa::withoutGlobalScope('tahun_aktif');
+                if ($nisn && $nik) {
+                    $queryGlobal->where(function($q) use ($nisn, $nik) {
+                        $q->where('nisn', $nisn)->orWhere('nik', $nik);
+                    });
+                } elseif ($nisn) {
+                    $queryGlobal->where('nisn', $nisn);
+                } else {
+                    $queryGlobal->where('nik', $nik);
+                }
+                $existingSiswa = $queryGlobal->first();
+            }
         }
 
         $data = [
             'tahun_pelajaran_id'         => $tahunAktif?->id,
+            'rombel_id'                  => $rombelId,
             'nama'                       => $row[1] ?? null,
             'nipd'                       => $row[2] ?? null,
             'jk'                         => $row[3] ?? null,
@@ -96,7 +122,7 @@ class SiswaImport implements ToModel, WithStartRow
             'pekerjaan_wali'             => $row[39] ?? null,
             'penghasilan_wali'           => $row[40] ?? null,
             'nik_wali'                   => $row[41] ?? null,
-            'rombel_saat_ini'            => $row[42] ?? null,
+            'rombel_saat_ini'            => $rombelNama,
             'no_peserta_un'              => $row[43] ?? null,
             'no_seri_ijazah'             => $row[44] ?? null,
             'penerima_kip'               => $row[45] ?? null,

@@ -26,6 +26,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TahunPelajaranController;
+use App\Http\Controllers\RombelController;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -41,12 +42,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/siswas/import', [SiswaController::class, 'import'])->name('siswas.import');
         Route::get('/siswas/{siswa}/edit', [SiswaController::class, 'edit'])->name('siswas.edit');
         Route::put('/siswas/{siswa}', [SiswaController::class, 'update'])->name('siswas.update');
+        
+        // Rombel Management
+        Route::get('/rombels', [RombelController::class, 'index'])->name('rombels.index');
+        Route::get('/rombels/{id}', [RombelController::class, 'show'])->name('rombels.show');
     });
 
     // Tahun Pelajaran Management
     Route::middleware(['role:Super Admin|Operator'])->group(function () {
         Route::get('/tahun-pelajaran', [TahunPelajaranController::class, 'index'])->name('tahun-pelajaran.index');
         Route::post('/tahun-pelajaran', [TahunPelajaranController::class, 'store'])->name('tahun-pelajaran.store');
+        Route::post('/tahun-pelajaran/{id}/copy-data', [TahunPelajaranController::class, 'copyData'])->name('tahun-pelajaran.copy-data');
         Route::patch('/tahun-pelajaran/{id}/activate', [TahunPelajaranController::class, 'activate'])->name('tahun-pelajaran.activate');
         Route::delete('/tahun-pelajaran/{id}', [TahunPelajaranController::class, 'destroy'])->name('tahun-pelajaran.destroy');
     });
