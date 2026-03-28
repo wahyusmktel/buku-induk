@@ -55,7 +55,7 @@
                     Dashboard
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
+                <a href="{{ route('siswas.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 {{ request()->routeIs('siswas.*') ? 'bg-sky-800/80 text-white font-semibold border border-sky-700/50 shadow-inner' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors' }}">
                     <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     Data Pokok Siswa
                 </a>

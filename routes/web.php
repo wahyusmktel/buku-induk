@@ -24,12 +24,29 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SiswaController;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard')->middleware('auth');
 
-Route::middleware(['auth', 'role:Super Admin'])->group(function () {
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class);
+Route::middleware(['auth'])->group(function () {
+    // Data Pokok Siswa
+    Route::get('/siswas', [SiswaController::class, 'index'])->name('siswas.index');
+    Route::get('/siswas/{siswa}', [SiswaController::class, 'show'])->name('siswas.show');
+    
+    // Restricted Actions (Import & Edit)
+    Route::middleware(['role:Super Admin|Operator|Tata Usaha'])->group(function () {
+        Route::post('/siswas/import', [SiswaController::class, 'import'])->name('siswas.import');
+        Route::get('/siswas/{siswa}/edit', [SiswaController::class, 'edit'])->name('siswas.edit');
+        Route::put('/siswas/{siswa}', [SiswaController::class, 'update'])->name('siswas.update');
+    });
+
+    // Super Admin Only
+    Route::middleware(['role:Super Admin'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('roles', RoleController::class);
+        Route::delete('/siswas/{siswa}', [SiswaController::class, 'destroy'])->name('siswas.destroy');
+    });
 });
+
