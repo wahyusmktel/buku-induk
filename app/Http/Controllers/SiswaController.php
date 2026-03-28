@@ -15,8 +15,9 @@ class SiswaController extends Controller
 {
     public function index()
     {
+        $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
         $siswas = Siswa::latest()->paginate(15);
-        return view('siswas.index', compact('siswas'));
+        return view('siswas.index', compact('siswas', 'tahunAktif'));
     }
 
     public function import(Request $request)
@@ -40,6 +41,12 @@ class SiswaController extends Controller
         $request->validate([
             'file' => 'required'
         ]);
+
+        // Check Active Tahun Pelajaran
+        $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+        if (!$tahunAktif) {
+            return redirect()->back()->with('error', 'Gagal melakukan import: Tidak ada Tahun Pelajaran yang aktif. Silakan aktifkan tahun pelajaran terlebih dahulu di menu Tahun Pelajaran.');
+        }
 
         try {
             $filename = time() . '_' . $file->getClientOriginalName();

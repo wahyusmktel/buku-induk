@@ -81,6 +81,12 @@
                         <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         Manajemen Role
                     </a>
+                    @hasanyrole('Super Admin|Operator')
+                    <a href="{{ route('tahun-pelajaran.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 {{ request()->routeIs('tahun-pelajaran.*') ? 'bg-sky-800 text-white font-semibold' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors' }}">
+                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Tahun Pelajaran
+                    </a>
+                    @endhasanyrole
                 </div>
                 @endhasrole
 
@@ -120,6 +126,21 @@
                     <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                         @yield('header_title', 'Dashboard')
                     </h1>
+
+                    @php
+                        $tpAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+                    @endphp
+                    @if($tpAktif)
+                    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-xl">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                        </span>
+                        <p class="text-[0.7rem] font-black text-sky-700 uppercase tracking-tighter">
+                            Sesi Aktif: {{ $tpAktif->tahun }} - {{ $tpAktif->semester }}
+                        </p>
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Header Actions (Right) -->

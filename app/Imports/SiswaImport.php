@@ -29,10 +29,13 @@ class SiswaImport implements ToModel, WithStartRow
             return null;
         }
 
-        \Illuminate\Support\Facades\Log::info('Importing Siswa: ' . $row[1]);
+        $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+
+        \Illuminate\Support\Facades\Log::info('Importing Siswa: ' . $row[1] . ' (TP Active: ' . ($tahunAktif ? $tahunAktif->tahun : 'None') . ')');
 
         try {
             return new Siswa([
+                'tahun_pelajaran_id'         => $tahunAktif?->id,
                 'nama'                       => $row[1] ?? null,
                 'nipd'                       => $row[2] ?? null,
                 'jk'                         => $row[3] ?? null,

@@ -11,6 +11,7 @@ class Siswa extends Model
     use HasUuids, HasFactory;
 
     protected $fillable = [
+        'tahun_pelajaran_id',
         'nama', 'nipd', 'jk', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'nik', 'agama',
         'alamat', 'rt', 'rw', 'dusun', 'kelurahan', 'kecamatan', 'kode_pos',
         'jenis_tinggal', 'alat_transportasi', 'telepon', 'hp', 'email',
@@ -24,4 +25,19 @@ class Siswa extends Model
         'kebutuhan_khusus', 'sekolah_asal', 'anak_ke_berapa', 'lintang', 'bujur', 'no_kk',
         'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'jml_saudara_kandung', 'jarak_rumah_ke_sekolah_km'
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('tahun_aktif', function (\Illuminate\Database\Eloquent\Builder $builder) {
+            $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+            if ($tahunAktif) {
+                $builder->where('tahun_pelajaran_id', $tahunAktif->id);
+            }
+        });
+    }
+
+    public function tahunPelajaran()
+    {
+        return $this->belongsTo(TahunPelajaran::class);
+    }
 }
