@@ -59,12 +59,16 @@ class SiswaController extends Controller
             $file->move($tempDir, $filename);
             $path = 'temp/' . $filename;
             
-            Excel::import(new SiswaImport, $path);
+            $import = new SiswaImport;
+            Excel::import($import, $path);
             
             Storage::delete($path);
 
+            $message = "Import Dapodik berhasil diselesaikan. ";
+            $message .= "Resume: {$import->createdCount} Siswa Baru ditambahkan, ";
+            $message .= "{$import->updatedCount} Siswa diperbarui.";
             
-            return redirect()->route('siswas.index')->with('success', 'Data siswa berhasil diimport dari Dapodik.');
+            return redirect()->route('siswas.index')->with('success', $message);
         } catch (\Exception $e) {
             // Clean up if something went wrong but we have a path
             if (isset($path)) {
