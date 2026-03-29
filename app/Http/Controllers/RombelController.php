@@ -16,7 +16,12 @@ class RombelController extends Controller
             $rombels = collect();
         } else {
             $rombels = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)
-                ->withCount('siswas')
+                ->whereHas('siswas', function($q) {
+                    $q->where('status', 'Aktif');
+                })
+                ->withCount(['siswas' => function($q) {
+                    $q->where('status', 'Aktif');
+                }])
                 ->get();
         }
 
@@ -26,7 +31,7 @@ class RombelController extends Controller
     public function show($id)
     {
         $rombel = Rombel::with(['siswas' => function($q) {
-            $q->orderBy('nama', 'asc');
+            $q->where('status', 'Aktif')->orderBy('nama', 'asc');
         }])->findOrFail($id);
         
         return view('rombels.show', compact('rombel'));
