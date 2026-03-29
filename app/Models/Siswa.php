@@ -13,7 +13,8 @@ class Siswa extends Model
     protected $fillable = [
         'tahun_pelajaran_id',
         'rombel_id',
-        'nama', 'nipd', 'jk', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'nik', 'agama',
+        'nama', 'nama_panggilan', 'nipd', 'jk', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'nik', 'agama',
+        'kewarganegaraan', 'bahasa_sehari_hari', 'golongan_darah', 'riwayat_penyakit',
         'alamat', 'rt', 'rw', 'dusun', 'kelurahan', 'kecamatan', 'kode_pos',
         'jenis_tinggal', 'alat_transportasi', 'telepon', 'hp', 'email',
         'skhun', 'penerima_kps', 'no_kps',
@@ -36,6 +37,18 @@ class Siswa extends Model
                 $builder->where('tahun_pelajaran_id', $tahunAktif->id);
             }
         });
+
+        // Auto-create a BukuInduk record when a new student with NISN is created
+        static::created(function (self $siswa) {
+            if ($siswa->nisn && !BukuInduk::where('nisn', $siswa->nisn)->exists()) {
+                BukuInduk::create(['nisn' => $siswa->nisn]);
+            }
+        });
+    }
+
+    public function bukuInduk()
+    {
+        return BukuInduk::where('nisn', $this->nisn)->first();
     }
 
     public function tahunPelajaran()
