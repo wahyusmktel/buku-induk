@@ -35,6 +35,17 @@
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $siswa->jk == 'L' ? 'bg-blue-50 text-blue-700' : 'bg-rose-50 text-rose-700' }} border {{ $siswa->jk == 'L' ? 'border-blue-100' : 'border-rose-100' }}">
                         {{ $siswa->jk == 'L' ? 'Laki-laki' : 'Perempuan' }}
                     </span>
+                    @php
+                        $statusBadge = match($siswa->status) {
+                            'Aktif' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                            'Lulus' => 'bg-sky-50 text-sky-700 border-sky-100',
+                            'Keluar/Mutasi' => 'bg-rose-50 text-rose-700 border-rose-100',
+                            default => 'bg-slate-50 text-slate-700 border-slate-100'
+                        };
+                    @endphp
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusBadge }} border">
+                        Status: {{ $siswa->status ?? 'Aktif' }}
+                    </span>
                 </div>
             </div>
             
@@ -77,6 +88,10 @@
                     <div class="space-y-1">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Hubungan Kontak</p>
                         <p class="font-bold text-slate-700">{{ $siswa->hp ?? $siswa->telepon ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Status Siswa</p>
+                        <p class="font-bold text-slate-700">{{ $siswa->status ?? 'Aktif' }}</p>
                     </div>
                     <div class="md:col-span-2 space-y-1">
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Alamat Domisili</p>

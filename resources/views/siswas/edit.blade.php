@@ -44,6 +44,16 @@
                     <label for="rombel" class="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Rombel Saat Ini</label>
                     <input type="text" name="rombel_saat_ini" id="rombel" value="{{ old('rombel_saat_ini', $siswa->rombel_saat_ini) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-700">
                 </div>
+
+                <!-- Status -->
+                <div class="space-y-2">
+                    <label for="status" class="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Status Keaktifan</label>
+                    <select name="status" id="status" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition-all font-bold text-slate-700">
+                        @foreach(['Aktif', 'Lulus', 'Keluar/Mutasi'] as $st)
+                            <option value="{{ $st }}" {{ old('status', $siswa->status) == $st ? 'selected' : '' }}>{{ $st }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="pt-6 border-t border-slate-50 flex gap-3">

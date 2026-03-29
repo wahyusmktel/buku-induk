@@ -122,6 +122,19 @@
                         <td class="py-4 px-6 font-bold text-slate-700">
                             {{ $siswa->rombel_saat_ini ?? '-' }}
                         </td>
+                        <td class="py-4 px-6">
+                            @php
+                                $statusColor = match($siswa->status) {
+                                    'Aktif' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                    'Lulus' => 'bg-sky-50 text-sky-700 border-sky-100',
+                                    'Keluar/Mutasi' => 'bg-rose-50 text-rose-700 border-rose-100',
+                                    default => 'bg-slate-50 text-slate-700 border-slate-100'
+                                };
+                            @endphp
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $statusColor }}">
+                                {{ $siswa->status ?? 'Aktif' }}
+                            </span>
+                        </td>
                         <td class="py-4 px-6 text-slate-500 font-medium">
                             {{ $siswa->tempat_lahir }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d/m/Y') : '-' }}
                         </td>
@@ -140,7 +153,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-16 text-center">
+                        <td colspan="6" class="py-16 text-center">
                             <div class="flex flex-col items-center justify-center text-slate-400">
                                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>

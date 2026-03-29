@@ -213,6 +213,8 @@ class SiswaController extends Controller
             'nama' => 'required|string|max:255',
             'nisn' => 'nullable|string|max:10',
             'nik'  => 'nullable|string|max:16',
+            'rombel_saat_ini' => 'nullable|string|max:255',
+            'status' => 'required|in:Aktif,Lulus,Keluar/Mutasi',
             // Add other core fields as needed
         ]);
 
