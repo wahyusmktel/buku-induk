@@ -11,6 +11,7 @@ class SiswaImport implements ToModel, WithStartRow
 {
     public $createdCount = 0;
     public $updatedCount = 0;
+    public $processedSiswaIds = [];
 
     /**
      * @return int
@@ -152,9 +153,11 @@ class SiswaImport implements ToModel, WithStartRow
             if ($existingSiswa) {
                 $existingSiswa->update($data);
                 $this->updatedCount++;
+                $this->processedSiswaIds[] = $existingSiswa->id;
             } else {
-                Siswa::create($data);
+                $newSiswa = Siswa::create($data);
                 $this->createdCount++;
+                $this->processedSiswaIds[] = $newSiswa->id;
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Row import failed for ' . ($row[1] ?? 'Unknown') . ': ' . $e->getMessage());

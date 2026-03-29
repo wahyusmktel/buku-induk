@@ -22,9 +22,18 @@
     </div>
     @endif
 
+    <div class="mb-4 flex flex-wrap gap-2 px-2">
+        @foreach(['Aktif', 'Lulus', 'Keluar/Mutasi', 'Semua'] as $st)
+            <a href="{{ route('siswas.index', ['status' => $st]) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $status == $st ? 'bg-[#0ea5e9] text-white border-[#0ea5e9] shadow-md shadow-sky-200' : 'bg-white text-slate-500 border-slate-200 hover:border-sky-300 hover:text-sky-600' }}">
+                {{ $st }}
+            </a>
+        @endforeach
+    </div>
+
     <div class="mb-6 flex justify-between items-center px-2">
         <div>
-            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Daftar Siswa</h2>
+            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Daftar Siswa <span class="text-slate-400 font-medium ml-1">({{ $status }})</span></h2>
             <p class="text-sm font-medium text-slate-500 mt-1">
                 @if($tahunAktif)
                     Menampilkan data siswa untuk sesi <span class="text-sky-600 font-bold italic">{{ $tahunAktif->tahun }} - {{ $tahunAktif->semester }}</span>.
@@ -86,6 +95,7 @@
                         <th class="py-4 px-6">Nama Lengkap / NISN</th>
                         <th class="py-4 px-6">Jenis Kelamin</th>
                         <th class="py-4 px-6">Rombel</th>
+                        <th class="py-4 px-6">Status</th>
                         <th class="py-4 px-6">Tempat, Tgl Lahir</th>
                         <th class="py-4 px-6 text-right">Aksi</th>
                     </tr>

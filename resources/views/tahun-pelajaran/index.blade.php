@@ -77,13 +77,22 @@
                                     </button>
                                 </form>
                                 
-                                @if($tp->siswas_count == 0)
-                                <form action="{{ route('tahun-pelajaran.copy-data', $tp->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyalin data dari sesi sebelumnya? Semua data rombel dan siswa akan diduplikasi ke sesi ini.')">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
-                                        Salin Data
-                                    </button>
-                                </form>
+                                @if(!$tp->is_aktif && $tp->siswas_count == 0 && $tp->semester == 'Genap')
+                                    @php
+                                        $canCopy = \App\Models\TahunPelajaran::where('tahun', $tp->tahun)
+                                            ->where('semester', 'Ganjil')
+                                            ->exists();
+                                    @endphp
+                                    
+                                    @if($canCopy)
+                                        <form action="{{ route('tahun-pelajaran.copy-data', $tp->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menyalin data dari semester GANJIL di tahun yang sama? Seluruh rombel dan siswa akan diduplikasi.')">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+                                                Salin dari Ganjil
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
 
                                 <form action="{{ route('tahun-pelajaran.destroy', $tp->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tahun pelajaran ini?')">

@@ -34,23 +34,18 @@ class TahunPelajaranController extends Controller
     {
         $targetYear = TahunPelajaran::findOrFail($id);
         
-        // Find previous year logic:
-        // 2025/2026 Genap -> Source is 2025/2026 Ganjil
-        // 2026/2027 Ganjil -> Source is 2025/2026 Genap
-        $sourceYear = TahunPelajaran::where('id', '!=', $id)
-            ->orderBy('tahun', 'desc')
-            ->orderBy('semester', 'asc') // Ganjil is before Genap alphabetically
-            ->where(function($q) use ($targetYear) {
-                $q->where('tahun', '<', $targetYear->tahun)
-                  ->orWhere(function($sub) use ($targetYear) {
-                      $sub->where('tahun', $targetYear->tahun)
-                          ->where('semester', 'Ganjil');
-                  });
-            })
+        // Restriction: Only allow Copy if Target is Genap and Source is Ganjil in SAME YEAR
+        if ($targetYear->semester !== 'Genap') {
+            return redirect()->back()->with('error', 'Penyalinan data hanya diizinkan untuk semester Genap.');
+        }
+
+        $sourceYear = TahunPelajaran::where('tahun', $targetYear->tahun)
+            ->where('semester', 'Ganjil')
+            ->where('id', '!=', $id)
             ->first();
 
         if (!$sourceYear) {
-            return redirect()->back()->with('error', 'Gagal menyalin: Tidak ditemukan data Tahun Pelajaran sebelumnya.');
+            return redirect()->back()->with('error', 'Gagal menyalin: Tidak ditemukan data semester Ganjil pada tahun ajaran yang sama.');
         }
 
         DB::transaction(function () use ($sourceYear, $targetYear) {

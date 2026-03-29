@@ -24,7 +24,8 @@ class Siswa extends Model
         'bank', 'nomor_rekening_bank', 'rekening_atas_nama',
         'layak_pip', 'alasan_layak_pip',
         'kebutuhan_khusus', 'sekolah_asal', 'anak_ke_berapa', 'lintang', 'bujur', 'no_kk',
-        'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'jml_saudara_kandung', 'jarak_rumah_ke_sekolah_km'
+        'berat_badan', 'tinggi_badan', 'lingkar_kepala', 'jml_saudara_kandung', 'jarak_rumah_ke_sekolah_km',
+        'status',
     ];
 
     protected static function booted()

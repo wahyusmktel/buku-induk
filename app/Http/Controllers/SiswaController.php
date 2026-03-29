@@ -13,11 +13,19 @@ use Illuminate\Support\Facades\Storage;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $status = $request->get('status', 'Aktif');
         $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
-        $siswas = Siswa::latest()->paginate(15);
-        return view('siswas.index', compact('siswas', 'tahunAktif'));
+        
+        $query = Siswa::query();
+        if ($status !== 'Semua') {
+            $query->where('status', $status);
+        }
+
+        $siswas = $query->latest()->paginate(15)->withQueryString();
+        
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status'));
     }
 
     public function import(Request $request)
@@ -64,9 +72,106 @@ class SiswaController extends Controller
             
             Storage::delete($path);
 
+            // --- AUTOMATIC GRADUATION / ARCHIVING LOGIC ---
+            
+            // 1. Current Session Students (just processed)
+            $currentSessionIds = $import->processedSiswaIds;
+            $currentSessionNisnNik = Siswa::whereIn('id', $currentSessionIds)
+                ->get(['nisn', 'nik'])
+                ->map(fn($s) => [$s->nisn, $s->nik])
+                ->flatten()
+                ->filter()
+                ->toArray();
+
+            // 2. Find Previous Session
+            $previousSession = \App\Models\TahunPelajaran::where('id', '!=', $tahunAktif->id)
+                ->where(function($q) use ($tahunAktif) {
+                    $q->where('tahun', '<', $tahunAktif->tahun)
+                      ->orWhere(function($sub) use ($tahunAktif) {
+                          $sub->where('tahun', $tahunAktif->tahun)
+                              ->where('semester', 'Ganjil'); // If current is Genap, previous is Ganjil
+                      });
+                })
+                ->orderBy('tahun', 'desc')
+                ->orderBy('semester', 'desc') // Genap (E) < Ganjil (A) in sorting? Wait, Ga-njil vs Ge-nap. Ga < Ge. So desc for Genap.
+                ->first();
+
+            $graduatedPrevCount = 0;
+            $departedPrevCount = 0;
+
+            if ($previousSession) {
+                // Find students who were Aktif in the previous session
+                $prevStudents = Siswa::withoutGlobalScope('tahun_aktif')
+                    ->where('tahun_pelajaran_id', $previousSession->id)
+                    ->where('status', 'Aktif')
+                    ->get();
+
+                foreach ($prevStudents as $oldSiswa) {
+                    // Check if this student exists in the CURRENT session
+                    $existsInCurrent = false;
+                    if ($oldSiswa->nisn && in_array($oldSiswa->nisn, $currentSessionNisnNik)) {
+                        $existsInCurrent = true;
+                    } elseif ($oldSiswa->nik && in_array($oldSiswa->nik, $currentSessionNisnNik)) {
+                        $existsInCurrent = true;
+                    }
+
+                    if (!$existsInCurrent) {
+                        // They are gone in the new session. Mark them in the PREVIOUS session.
+                        if ($this->isJenjangAkhir($oldSiswa->rombel_saat_ini)) {
+                            // 1. Mark as Lulus in the PREVIOUS session for archive
+                            $oldSiswa->update(['status' => 'Lulus']);
+                            $graduatedPrevCount++;
+
+                            // 2. Also register them as Lulus in the CURRENT session (Tahun Terbaru)
+                            // check if they already exist in current session (unlikely if missing from Excel)
+                            $currentDuplicate = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)
+                                ->where(function($q) use ($oldSiswa) {
+                                    if ($oldSiswa->nisn) $q->where('nisn', $oldSiswa->nisn);
+                                    if ($oldSiswa->nik) $q->orWhere('nik', $oldSiswa->nik);
+                                })->first();
+
+                            if (!$currentDuplicate) {
+                                $newLulusRecord = $oldSiswa->replicate();
+                                $newLulusRecord->tahun_pelajaran_id = $tahunAktif->id;
+                                $newLulusRecord->status = 'Lulus';
+                                $newLulusRecord->save();
+                            } else {
+                                $currentDuplicate->update(['status' => 'Lulus']);
+                            }
+                        } else {
+                            $oldSiswa->update(['status' => 'Keluar/Mutasi']);
+                            $departedPrevCount++;
+                        }
+                    }
+                }
+            }
+
+            // 3. Current Session "Missing" (for cases like manual import/copy data)
+            $unprocessedInCurrent = Siswa::whereNotIn('id', $currentSessionIds)->get();
+            $graduatedCurrCount = 0;
+            $departedCurrCount = 0;
+
+            foreach ($unprocessedInCurrent as $siswa) {
+                if ($this->isJenjangAkhir($siswa->rombel_saat_ini)) {
+                    $siswa->update(['status' => 'Lulus']);
+                    $graduatedCurrCount++;
+                } else {
+                    $siswa->update(['status' => 'Keluar/Mutasi']);
+                    $departedCurrCount++;
+                }
+            }
+
             $message = "Import Dapodik berhasil diselesaikan. ";
-            $message .= "Resume: {$import->createdCount} Siswa Baru ditambahkan, ";
-            $message .= "{$import->updatedCount} Siswa diperbarui.";
+            $message .= "Resume: {$import->createdCount} Siswa Baru, ";
+            $message .= "{$import->updatedCount} Siswa diperbarui. ";
+            
+            if ($graduatedPrevCount > 0 || $departedPrevCount > 0) {
+                $message .= "Arsip Sesi Lalu ({$previousSession->tahun}): {$graduatedPrevCount} Lulus, {$departedPrevCount} Keluar.";
+            }
+            
+            if ($graduatedCurrCount > 0 || $departedCurrCount > 0) {
+                $message .= " Arsip Sesi Ini: {$graduatedCurrCount} Lulus, {$departedCurrCount} Keluar.";
+            }
             
             return redirect()->route('siswas.index')->with('success', $message);
         } catch (\Exception $e) {
@@ -124,5 +229,36 @@ class SiswaController extends Controller
 
         $siswa->delete();
         return redirect()->route('siswas.index')->with('success', 'Data siswa berhasil dihapus.');
+    }
+    /**
+     * Helper to detect if a Rombel is a final grade (Lulus)
+     */
+    private function isJenjangAkhir($rombelNama)
+    {
+        if (!$rombelNama) return false;
+        
+        $name = strtolower($rombelNama);
+        
+        // Patterns for Grade 6 (SD), 9 (SMP), 12 (SMK/SMA)
+        $patterns = [
+            '12', 'xii', 'kelas xii', 'kelas 12',
+            '9', 'ix', 'kelas ix', 'kelas 9',
+            '6', 'vi', 'kelas vi', 'kelas 6',
+            'lulus', 'alumni', 'tamat'
+        ];
+
+        foreach ($patterns as $pattern) {
+            // Case insensitive match for exact pattern
+            if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $name)) {
+                return true;
+            }
+            
+            // Fallback for concatenated names
+            if (str_contains($name, strtolower($pattern))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
