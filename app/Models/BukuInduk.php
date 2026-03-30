@@ -17,8 +17,15 @@ class BukuInduk extends Model
         'tgl_masuk_sekolah', 'asal_masuk_sekolah', 'nama_tk_asal',
         'pindah_dari', 'kelas_pindah_masuk', 'tgl_pindah_masuk',
         'tgl_keluar', 'alasan_keluar', 'tgl_lulus', 'no_ijazah', 'lanjut_ke', 'beasiswa',
+        // Data Ayah
+        'nama_ayah',
         'tempat_lahir_ayah', 'tanggal_lahir_ayah', 'agama_ayah', 'kewarganegaraan_ayah', 'alamat_ayah',
+        'pekerjaan_ayah_bi', 'pendidikan_ayah_bi',
+        // Data Ibu
+        'nama_ibu',
         'tempat_lahir_ibu', 'tanggal_lahir_ibu', 'agama_ibu', 'kewarganegaraan_ibu', 'alamat_ibu',
+        'pekerjaan_ibu_bi', 'pendidikan_ibu_bi',
+        // Data Wali
         'nama_wali_bi', 'hubungan_wali', 'pekerjaan_wali_bi', 'pendidikan_wali_bi', 'alamat_wali_bi', 'telp_wali_bi',
     ];
 
