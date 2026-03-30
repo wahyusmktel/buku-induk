@@ -5,123 +5,374 @@
 @section('breadcrumb', 'Buku Induk')
 
 @section('content')
-<div class="space-y-6">
-    {{-- Header & Search --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="space-y-5">
+
+    {{-- ── Page Header ──────────────────────────────────────────── --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Buku Induk Siswa</h2>
-            <p class="text-sm text-slate-500 mt-1">Arsip digital permanen — tersedia untuk seluruh siswa aktif maupun alumni.</p>
+            <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Buku Induk Siswa</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Arsip digital permanen — tersedia untuk seluruh siswa aktif maupun alumni.</p>
         </div>
-        <div class="flex gap-2 items-center">
+
+        {{-- Stats chips --}}
+        @php
+            $totalBerkas     = collect($bukuIndukMap)->count();
+            $avgKelengkapan  = $totalBerkas ? round(collect($bukuIndukMap)->avg('kelengkapan')) : 0;
+        @endphp
+        <div class="flex gap-2 flex-wrap">
+            <div class="flex items-center gap-1.5 bg-sky-50 border border-sky-100 rounded-lg px-3 py-1.5 text-xs font-bold text-sky-700">
+                <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                {{ $siswas->total() }} Siswa
+            </div>
+            <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-1.5 text-xs font-bold text-emerald-700">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                {{ $totalBerkas }} Berkas
+            </div>
+            <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-100 rounded-lg px-3 py-1.5 text-xs font-bold text-amber-600">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                Rata-rata {{ $avgKelengkapan }}%
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Filter + Search ──────────────────────────────────────── --}}
+    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        {{-- Status filter pills --}}
+        <div class="flex gap-2">
             @foreach(['Aktif', 'Lulus', 'Semua'] as $st)
                 <a href="{{ route('buku-induk.index', ['status' => $st, 'q' => $search]) }}"
-                   class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $statusFilter == $st ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600' }}">
+                   class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all
+                          {{ $statusFilter == $st
+                             ? 'bg-sky-700 text-white border-sky-700 shadow-md shadow-sky-200'
+                             : 'bg-white text-slate-500 border-slate-200 hover:border-sky-400 hover:text-sky-700 hover:bg-sky-50' }}">
                     {{ $st }}
                 </a>
             @endforeach
         </div>
+
+        {{-- Search form --}}
+        <form method="GET" action="{{ route('buku-induk.index') }}" class="flex gap-2 flex-1 w-full sm:w-auto min-w-0">
+            <input type="hidden" name="status" value="{{ $statusFilter }}">
+            <div class="relative flex-1 min-w-0">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="q" id="bi-live-search"
+                       value="{{ $search }}"
+                       placeholder="Cari nama atau NISN…"
+                       class="w-full pl-9 pr-3 py-2 text-sm border-2 border-slate-200 rounded-xl
+                              focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10
+                              text-slate-700 font-medium bg-white transition-all">
+            </div>
+            <button type="submit"
+                    class="px-4 py-2 text-white text-xs font-bold rounded-xl shadow-md transition-all
+                           whitespace-nowrap cursor-pointer hover:-translate-y-0.5"
+                    style="background:#0c4a6e; box-shadow:0 4px 12px rgba(12,74,110,.25);"
+                    onmouseover="this.style.background='#08334d'"
+                    onmouseout="this.style.background='#0c4a6e'">
+                Cari
+            </button>
+        </form>
     </div>
 
-    {{-- Search Bar --}}
-    <form method="GET" action="{{ route('buku-induk.index') }}" class="flex gap-3">
-        <input type="hidden" name="status" value="{{ $statusFilter }}">
-        <div class="relative flex-1">
-            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama siswa atau NISN..."
-                   class="w-full pl-10 pr-4 py-3 rounded-2xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm font-medium text-slate-700">
-        </div>
-        <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl transition-all shadow-lg shadow-indigo-200 hover:-translate-y-0.5 cursor-pointer">
-            Cari
-        </button>
-    </form>
-
+    {{-- ── Flash Message ────────────────────────────────────────── --}}
     @if(session('success'))
     <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center gap-3">
-        <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-        <p class="text-sm font-semibold">{{ session('success') }}</p>
+        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <p class="text-xs font-semibold">{{ session('success') }}</p>
     </div>
     @endif
 
-    {{-- Student Grid --}}
-    @if($siswas->isEmpty())
-    <div class="bg-white border border-slate-200 rounded-3xl p-16 text-center shadow-sm">
-        <div class="w-20 h-20 bg-indigo-50 text-indigo-300 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        </div>
-        <h3 class="text-lg font-bold text-slate-700">Tidak Ada Data</h3>
-        <p class="text-slate-500 mt-1 text-sm">Tidak ada siswa yang cocok dengan pencarian Anda.</p>
-    </div>
-    @else
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        @foreach($siswas as $siswa)
-        @php
-            $bi = $bukuIndukMap[$siswa->nisn] ?? null;
-            $kelengkapan = $bi ? $bi->kelengkapan : 0;
-            $statusColor = match($siswa->status) {
-                'Aktif' => 'bg-emerald-100 text-emerald-700',
-                'Lulus' => 'bg-sky-100 text-sky-700',
-                'Keluar/Mutasi' => 'bg-rose-100 text-rose-700',
-                default => 'bg-slate-100 text-slate-600',
-            };
-            $progressColor = $kelengkapan >= 80 ? 'bg-emerald-500' : ($kelengkapan >= 40 ? 'bg-amber-400' : 'bg-rose-400');
-        @endphp
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-lg transition-all group overflow-hidden">
-            {{-- Top Gradient --}}
-            <div class="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
-            <div class="p-5">
-                {{-- Avatar & Name --}}
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-base shadow-sm flex-shrink-0">
-                        {{ strtoupper(substr($siswa->nama, 0, 2)) }}
-                    </div>
-                    <div class="min-w-0">
-                        <p class="font-bold text-slate-800 leading-tight truncate text-sm">{{ $siswa->nama }}</p>
-                        <p class="text-xs text-slate-400 font-mono mt-0.5">{{ $siswa->nisn ?? 'NISN -' }}</p>
-                        <span class="inline-block mt-1 px-2 py-0.5 text-[0.6rem] font-bold rounded-full {{ $statusColor }}">
-                            {{ $siswa->status ?? 'Aktif' }}
-                        </span>
-                    </div>
-                </div>
+    {{-- ── Data Table ──────────────────────────────────────────── --}}
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
-                {{-- Rombel --}}
-                <p class="text-xs text-slate-500 font-medium mb-3">
-                    <span class="font-bold text-slate-600">{{ $siswa->rombel_saat_ini ?? 'Kelas tidak diketahui' }}</span>
-                </p>
-
-                {{-- Completeness Progress --}}
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-1.5">
-                        <span class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-wider">Kelengkapan Buku Induk</span>
-                        <span class="text-[0.65rem] font-black {{ $kelengkapan >= 80 ? 'text-emerald-600' : ($kelengkapan >= 40 ? 'text-amber-600' : 'text-rose-500') }}">{{ $kelengkapan }}%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-1.5">
-                        <div class="h-1.5 rounded-full {{ $progressColor }} transition-all" style="width: {{ $kelengkapan }}%"></div>
-                    </div>
-                </div>
-
-                {{-- Action --}}
-                @if($bi)
-                <a href="{{ route('buku-induk.show', $siswa->nisn) }}"
-                   class="flex items-center justify-center gap-2 w-full py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white text-xs font-bold rounded-xl transition-all border border-indigo-100 hover:border-indigo-600">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                    Buka Buku Induk
-                </a>
-                @else
-                <span class="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-50 text-slate-400 text-xs font-bold rounded-xl border border-slate-100 cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Belum Ada NISN
-                </span>
-                @endif
+        @if($siswas->isEmpty())
+        {{-- Empty state --}}
+        <div class="py-20 text-center px-6">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-sky-300"
+                 style="background:rgba(12,74,110,.08)">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
             </div>
+            <h3 class="text-sm font-bold text-slate-700">Tidak Ada Data</h3>
+            <p class="text-xs text-slate-400 mt-1">Tidak ada siswa yang cocok dengan filter saat ini.</p>
         </div>
-        @endforeach
-    </div>
 
-    @if($siswas->hasPages())
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4">
-        {{ $siswas->links() }}
-    </div>
-    @endif
-    @endif
+        @else
+        {{-- Table --}}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm" id="bi-table">
+
+                {{-- ── Head ── --}}
+                <thead>
+                    <tr style="background:linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);">
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100/80 w-10">#</th>
+
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
+                                   cursor-pointer select-none transition-colors"
+                            style="white-space:nowrap"
+                            onclick="biSort(0, this)"
+                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
+                            onmouseout="this.style.background=''">
+                            <span class="flex items-center gap-1">
+                                Nama Siswa
+                                <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/>
+                                </svg>
+                            </span>
+                        </th>
+
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
+                                   cursor-pointer select-none transition-colors"
+                            style="white-space:nowrap"
+                            onclick="biSort(1, this)"
+                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
+                            onmouseout="this.style.background=''">
+                            <span class="flex items-center gap-1">
+                                NISN
+                                <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/>
+                                </svg>
+                            </span>
+                        </th>
+
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
+                                   cursor-pointer select-none transition-colors"
+                            style="white-space:nowrap"
+                            onclick="biSort(2, this)"
+                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
+                            onmouseout="this.style.background=''">
+                            <span class="flex items-center gap-1">
+                                Kelas / Rombel Terakhir
+                                <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/>
+                                </svg>
+                            </span>
+                        </th>
+
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100"
+                            style="white-space:nowrap">
+                            Status
+                        </th>
+
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
+                                   cursor-pointer select-none transition-colors"
+                            style="white-space:nowrap"
+                            onclick="biSort(4, this)"
+                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
+                            onmouseout="this.style.background=''">
+                            <span class="flex items-center gap-1">
+                                Kelengkapan Data
+                                <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/>
+                                </svg>
+                            </span>
+                        </th>
+
+                        <th class="py-3.5 px-4 text-center text-[0.62rem] font-bold uppercase tracking-widest text-sky-100"
+                            style="white-space:nowrap">
+                            Aksi
+                        </th>
+                    </tr>
+                </thead>
+
+                {{-- ── Body ── --}}
+                <tbody id="bi-tbody">
+                    @foreach($siswas as $index => $siswa)
+                    @php
+                        $bi          = $bukuIndukMap[$siswa->nisn] ?? null;
+                        $kelengkapan = $bi ? $bi->kelengkapan : 0;
+
+                        // Progress gradient
+                        $progressBg = $kelengkapan >= 80
+                            ? 'background:linear-gradient(90deg,#10b981,#34d399)'
+                            : ($kelengkapan >= 40
+                                ? 'background:linear-gradient(90deg,#f59e0b,#fbbf24)'
+                                : 'background:linear-gradient(90deg,#f43f5e,#fb7185)');
+
+                        // Percentage text color
+                        $pctColor = $kelengkapan >= 80
+                            ? 'color:#059669'
+                            : ($kelengkapan >= 40 ? 'color:#d97706' : 'color:#e11d48');
+
+                        // Status badge colors
+                        $badgeStyle = match($siswa->status) {
+                            'Aktif'         => 'background:#d1fae5;color:#065f46',
+                            'Lulus'         => 'background:#e0f2fe;color:#0369a1',
+                            'Keluar/Mutasi' => 'background:#ffe4e6;color:#9f1239',
+                            default         => 'background:#f1f5f9;color:#475569',
+                        };
+
+                        // Avatar bg — sky blue tone matching sidebar
+                        $avatarStyle = 'background:linear-gradient(135deg,#e0f2fe,#bae6fd);color:#0369a1';
+                    @endphp
+
+                    <tr class="border-b border-slate-100 transition-colors bi-row"
+                        style="border-left:3px solid transparent;"
+                        onmouseover="this.style.background='#f0f9ff';this.style.borderLeftColor='#0c4a6e'"
+                        onmouseout="this.style.background='';this.style.borderLeftColor='transparent'">
+
+                        {{-- No --}}
+                        <td class="py-3 px-4 text-xs text-slate-400 font-bold">
+                            {{ $siswas->firstItem() + $index }}
+                        </td>
+
+                        {{-- Nama + Avatar --}}
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0"
+                                     style="{{ $avatarStyle }}">
+                                    {{ strtoupper(substr($siswa->nama, 0, 2)) }}
+                                </div>
+                                <span class="font-semibold text-slate-800 text-sm leading-tight">
+                                    {{ $siswa->nama }}
+                                </span>
+                            </div>
+                        </td>
+
+                        {{-- NISN --}}
+                        <td class="py-3 px-4">
+                            <span class="font-mono text-xs text-slate-500 tracking-wide bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                                {{ $siswa->nisn ?? '—' }}
+                            </span>
+                        </td>
+
+                        {{-- Kelas / Rombel Terakhir --}}
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                <span class="text-sm text-slate-700 font-medium">
+                                    {{ $siswa->rombel_saat_ini ?? 'Tidak diketahui' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        {{-- Status --}}
+                        <td class="py-3 px-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold"
+                                  style="{{ $badgeStyle }}">
+                                {{ $siswa->status ?? 'Aktif' }}
+                            </span>
+                        </td>
+
+                        {{-- Kelengkapan --}}
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-2" style="min-width:130px">
+                                <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full" style="width:{{ $kelengkapan }}%; {{ $progressBg }}"></div>
+                                </div>
+                                <span class="text-[0.7rem] font-black w-8 text-right" style="{{ $pctColor }}">
+                                    {{ $kelengkapan }}%
+                                </span>
+                            </div>
+                        </td>
+
+                        {{-- Aksi --}}
+                        <td class="py-3 px-4 text-center">
+                            @if($bi)
+                                <a href="{{ route('buku-induk.show', $siswa->nisn) }}"
+                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.7rem] font-bold rounded-lg
+                                          border transition-all hover:-translate-y-0.5"
+                                   style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;"
+                                   onmouseover="this.style.background='#0c4a6e';this.style.color='#fff';this.style.borderColor='#0c4a6e';this.style.boxShadow='0 4px 12px rgba(12,74,110,.3)'"
+                                   onmouseout="this.style.background='#e0f2fe';this.style.color='#0369a1';this.style.borderColor='#bae6fd';this.style.boxShadow=''">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"/>
+                                    </svg>
+                                    Buka
+                                </a>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-400
+                                             text-[0.7rem] font-bold rounded-lg border border-slate-100 cursor-not-allowed">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636"/>
+                                    </svg>
+                                    No NISN
+                                </span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        {{-- ── Footer: Pagination + Row count ── --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2
+                    px-5 py-3 bg-slate-50 border-t border-slate-100">
+            <p class="text-xs text-slate-400">
+                Menampilkan
+                <strong class="text-slate-600">{{ $siswas->firstItem() }}</strong>–<strong class="text-slate-600">{{ $siswas->lastItem() }}</strong>
+                dari <strong class="text-slate-600">{{ $siswas->total() }}</strong> siswa
+            </p>
+            @if($siswas->hasPages())
+            <div>
+                {{ $siswas->appends(['q' => $search, 'status' => $statusFilter])->links() }}
+            </div>
+            @endif
+        </div>
+        @endif
+
+    </div>{{-- .table card --}}
+
 </div>
+
+{{-- ── Inline JS: Sorting + Live Search ── --}}
+<script>
+(function () {
+    // Live client-side search filter
+    const liveSearch = document.getElementById('bi-live-search');
+    const tbody      = document.getElementById('bi-tbody');
+
+    if (liveSearch && tbody) {
+        liveSearch.addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+                row.style.display = (!q || row.innerText.toLowerCase().includes(q)) ? '' : 'none';
+            });
+        });
+    }
+
+    // Column sort
+    let _sortCol = -1, _sortAsc = true;
+
+    window.biSort = function (colIndex) {
+        if (!tbody) return;
+        _sortAsc  = (_sortCol === colIndex) ? !_sortAsc : true;
+        _sortCol  = colIndex;
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+            // +1 because first td is row-number column
+            const tdA = a.querySelectorAll('td')[colIndex + 1]?.innerText.trim() ?? '';
+            const tdB = b.querySelectorAll('td')[colIndex + 1]?.innerText.trim() ?? '';
+            const numA = parseFloat(tdA), numB = parseFloat(tdB);
+
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return _sortAsc ? numA - numB : numB - numA;
+            }
+            return _sortAsc
+                ? tdA.localeCompare(tdB, 'id')
+                : tdB.localeCompare(tdA, 'id');
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
+    };
+})();
+</script>
 @endsection
