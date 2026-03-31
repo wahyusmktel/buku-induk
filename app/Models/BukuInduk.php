@@ -58,18 +58,81 @@ class BukuInduk extends Model
     }
 
     /**
+     * Siswa data record attached from the controller (for merged completeness).
+     * Set via $bi->setRelation('siswaPokok', $siswaRow) in the controller.
+     */
+    public function siswaPokok()
+    {
+        return $this->belongsTo(Siswa::class, 'nisn', 'nisn');
+    }
+
+    /**
      * Get completion percentage of this buku induk.
+     *
+     * Kelengkapan dihitung dari gabungan field Buku Induk (pengisian manual)
+     * DAN field Data Pokok Siswa (Dapodik) yang sudah terintegrasi.
+     * Total = 30 field penting, skor 0–100%.
      */
     public function getKelengkapanAttribute(): int
     {
-        $fields = [
-            'no_induk', 'nama_panggilan', 'kewarganegaraan', 'bahasa_sehari_hari',
-            'golongan_darah', 'bertempat_tinggal_dengan', 'tgl_masuk_sekolah',
-            'asal_masuk_sekolah', 'tempat_lahir_ayah', 'tanggal_lahir_ayah',
-            'agama_ayah', 'tempat_lahir_ibu', 'tanggal_lahir_ibu', 'agama_ibu',
+        // ── Group A: Field eksklusif di tabel buku_induks (diisi manual) ──
+        $bukuIndukFields = [
+            'no_induk',                 // Nomor Induk Sekolah
+            'nama_panggilan',           // Nama Panggilan
+            'tgl_masuk_sekolah',        // Tanggal Masuk Sekolah
+            'asal_masuk_sekolah',       // Asal / SD sebelumnya
+            'bertempat_tinggal_dengan', // Tinggal bersama
+            // Data Ayah (buku induk)
+            'nama_ayah',
+            'tempat_lahir_ayah',
+            'tanggal_lahir_ayah',
+            'agama_ayah',
+            'pekerjaan_ayah_bi',
+            'pendidikan_ayah_bi',
+            // Data Ibu (buku induk)
+            'nama_ibu',
+            'tempat_lahir_ibu',
+            'tanggal_lahir_ibu',
+            'agama_ibu',
+            'pekerjaan_ibu_bi',
+            'pendidikan_ibu_bi',
         ];
 
-        $filled = collect($fields)->filter(fn($f) => !empty($this->$f))->count();
-        return (int) round(($filled / count($fields)) * 100);
+        // ── Group B: Field yang bersumber dari Dapodik / Siswa ──
+        $siswaFields = [
+            'nik',              // NIK siswa
+            'tempat_lahir',     // Tempat lahir
+            'tanggal_lahir',    // Tanggal lahir
+            'agama',            // Agama
+            'kewarganegaraan',  // Kewarganegaraan
+            'bahasa_sehari_hari', // Bahasa sehari-hari
+            'golongan_darah',   // Golongan darah
+            'alamat',           // Alamat lengkap
+            'telepon',          // No. HP / Telepon
+            'sekolah_asal',     // Sekolah asal (TK)
+            'no_kk',            // Nomor KK
+            'jml_saudara_kandung', // Jumlah saudara kandung
+            'nik_ayah',
+            'nik_ibu',
+        ];
+
+        // Hitung dari BukuInduk
+        $filledBi = collect($bukuIndukFields)
+            ->filter(fn($f) => !empty($this->$f))
+            ->count();
+
+        // Hitung dari Siswa (jika relasi sudah di-attach)
+        $siswa = $this->getRelation('siswaPokok');
+        $filledSiswa = 0;
+        if ($siswa) {
+            $filledSiswa = collect($siswaFields)
+                ->filter(fn($f) => !empty($siswa->$f))
+                ->count();
+        }
+
+        $total  = count($bukuIndukFields) + count($siswaFields);
+        $filled = $filledBi + $filledSiswa;
+
+        return (int) round(($filled / $total) * 100);
     }
 }

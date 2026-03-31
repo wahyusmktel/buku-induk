@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BukuInduk;
 use App\Models\PrestasiBelajar;
 use App\Models\Siswa;
+use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -15,37 +16,74 @@ class BukuIndukController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->get('q');
+        $search       = $request->get('q', '');
         $statusFilter = $request->get('status', 'Aktif');
+        $tahunId      = $request->get('tahun_id', '');
+        $perPage      = (int) $request->get('per_page', 20);
 
-        // We query through the siswas table (respecting global scope = active year)
-        // but also show archived (Lulus) students if requested
+        // Clamp per_page to allowed values
+        $allowedPerPage = [10, 20, 30, 40, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 20;
+        }
+
+        // All tahun pelajaran for the filter dropdown
+        $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
+
+        // ── Build query: satu baris per NISN (terbaru by created_at) ─────
+        // UUID primary key tidak bisa di-MAX(), jadi kita pakai MAX(created_at).
+        // Subquery menghasilkan: nisn → max created_at dalam scope tahun (jika dipilih).
+
+        $latestSub = Siswa::withoutGlobalScope('tahun_aktif')
+            ->selectRaw('nisn AS s_nisn, MAX(created_at) AS max_ca')
+            ->whereNotNull('nisn');
+
+        if ($tahunId) {
+            $latestSub->where('tahun_pelajaran_id', $tahunId);
+        }
+
+        $latestSub->groupBy('nisn');
+
         $query = Siswa::withoutGlobalScope('tahun_aktif')
-            ->select('nisn', 'nama', 'rombel_saat_ini', 'status', 'tanggal_lahir', 'jk')
-            ->whereNotNull('nisn')
-            ->groupBy('nisn', 'nama', 'rombel_saat_ini', 'status', 'tanggal_lahir', 'jk');
+            ->joinSub($latestSub, 'ls', function ($join) {
+                $join->on('siswas.nisn', '=', 'ls.s_nisn')
+                     ->on('siswas.created_at', '=', 'ls.max_ca');
+            })
+            ->select(
+                'siswas.nisn', 'siswas.nama', 'siswas.rombel_saat_ini',
+                'siswas.status', 'siswas.tanggal_lahir', 'siswas.jk',
+                'siswas.tahun_pelajaran_id'
+            )
+            ->whereNotNull('siswas.nisn');
 
         if ($statusFilter !== 'Semua') {
-            // Get last known status for each NISN
-            $query->where('status', $statusFilter);
+            $query->where('siswas.status', $statusFilter);
         }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%");
+                $q->where('siswas.nama', 'like', "%{$search}%")
+                  ->orWhere('siswas.nisn', 'like', "%{$search}%");
             });
         }
 
-        $siswas = $query->orderBy('nama')->paginate(20)->withQueryString();
+        $siswas = $query->orderBy('siswas.nama')->paginate($perPage)->withQueryString();
 
-        // Build a map of nisn => buku_induk_id for quick linking
-        $nisnList = $siswas->pluck('nisn')->filter()->toArray();
-        $bukuIndukMap = BukuInduk::whereIn('nisn', $nisnList)
-            ->get()
-            ->keyBy('nisn');
+        // Map nisn => BukuInduk record (with kelengkapan accessor)
+        $nisnList     = $siswas->pluck('nisn')->filter()->toArray();
+        $bukuIndukMap = BukuInduk::whereIn('nisn', $nisnList)->get()->keyBy('nisn');
 
-        return view('buku-induk.index', compact('siswas', 'bukuIndukMap', 'search', 'statusFilter'));
+        // Build kelengkapan that merges Siswa data into the calculation
+        // Attach the matched Siswa row onto each BukuInduk so the accessor can use it
+        $siswaByNisn  = $siswas->keyBy('nisn');
+        foreach ($bukuIndukMap as $nisn => $bi) {
+            $bi->setRelation('siswaPokok', $siswaByNisn[$nisn] ?? null);
+        }
+
+        return view('buku-induk.index', compact(
+            'siswas', 'bukuIndukMap', 'search', 'statusFilter',
+            'tahunPelajarans', 'tahunId', 'perPage'
+        ));
     }
 
     /**
