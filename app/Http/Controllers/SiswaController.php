@@ -241,24 +241,34 @@ class SiswaController extends Controller
         
         $name = strtolower($rombelNama);
         
-        // Patterns for Grade 6 (SD), 9 (SMP), 12 (SMK/SMA)
-        $patterns = [
-            '12', 'xii', 'kelas xii', 'kelas 12',
-            '9', 'ix', 'kelas ix', 'kelas 9',
-            '6', 'vi', 'kelas vi', 'kelas 6',
-            'lulus', 'alumni', 'tamat'
-        ];
+        // 1. Cek status eksplisit
+        $explicitPatterns = ['lulus', 'alumni', 'tamat'];
+        foreach ($explicitPatterns as $p) {
+            if (str_contains($name, $p)) return true;
+        }
 
-        foreach ($patterns as $pattern) {
-            // Case insensitive match for exact pattern
-            if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $name)) {
+        /**
+         * 2. Logika Deteksi Angka Jenjang (6, 9, 12)
+         * Regex ini mencari angka 6, 9, atau 12 yang:
+         * - Berada di awal string (^6...)
+         * - Diawali spasi atau titik (.6... / 6...)
+         * - Diikuti huruf, spasi, titik, atau akhir string (6c, 6.a, 6-b, 6 )
+         * - Tapi bukan bagian dari angka lain (misal 16)
+         */
+        $finalGrades = ['6', '9', '12', 'vi', 'ix', 'xii'];
+        foreach ($finalGrades as $grade) {
+            // Regex: \b (word boundary) or start of string
+            // Diikuti oleh $grade
+            // Diikuti oleh karakter non-angka atau akhir string
+            if (preg_match('/(^|[\s\.])' . preg_quote($grade, '/') . '([^0-9]|$)/i', $name)) {
                 return true;
             }
-            
-            // Fallback for concatenated names
-            if (str_contains($name, strtolower($pattern))) {
-                return true;
-            }
+        }
+
+        // 3. Cek frase 'kelas x' (untuk romawi atau angka)
+        $phrases = ['kelas 6', 'kelas vi', 'kelas 9', 'kelas ix', 'kelas 12', 'kelas xii'];
+        foreach ($phrases as $phrase) {
+            if (str_contains($name, $phrase)) return true;
         }
 
         return false;

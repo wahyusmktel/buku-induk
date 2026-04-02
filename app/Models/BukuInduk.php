@@ -38,15 +38,24 @@ class BukuInduk extends Model
         'tanggal_lahir_ibu' => 'date',
     ];
 
-    /**
-     * Get the student's Dapodik record (most recent/active one by NISN).
-     */
     public function siswa()
     {
         return Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $this->nisn)
             ->orderBy('created_at', 'desc')
             ->first();
+    }
+
+    /**
+     * Get all historical records for this student across academic years.
+     */
+    public function riwayatSiswa()
+    {
+        return Siswa::withoutGlobalScope('tahun_aktif')
+            ->where('nisn', $this->nisn)
+            ->with(['tahunPelajaran', 'rombel'])
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     /**

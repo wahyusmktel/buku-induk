@@ -80,6 +80,7 @@
                 'orang_tua' => ['label' => 'Orang Tua / Wali', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
                 'akademik' => ['label' => 'Prestasi Akademik', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
                 'riwayat' => ['label' => 'Riwayat Sekolah', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
+                'jejak' => ['label' => 'Jejak Rombel', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z'],
             ] as $key => $meta)
             <button @click="tab = '{{ $key }}'"
                     :class="tab === '{{ $key }}' ? 'border-b-2 border-indigo-600 text-indigo-700 font-black' : 'text-slate-500 hover:text-slate-700'"
@@ -371,6 +372,57 @@
                         <div class="flex justify-between items-start py-2 border-b border-slate-50">
                             <span class="text-sm font-bold text-slate-400">{{ $label }}</span>
                             <span class="text-sm font-bold text-slate-700 text-right max-w-[60%]">{{ $value ?? '—' }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- TAB: JEJAK ROMBEL --}}
+    <div x-show="tab === 'jejak'" x-transition>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100">
+                <h3 class="text-lg font-black text-slate-800">Jejak Rombel & Tahun Pelajaran</h3>
+                <p class="text-sm text-slate-500 mt-0.5">Riwayat penempatan kelas siswa di setiap sesi akademik aktif</p>
+            </div>
+            <div class="p-8">
+                <div class="relative">
+                    {{-- Vertical Line --}}
+                    <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-slate-100"></div>
+
+                    <div class="space-y-8">
+                        @foreach($bukuInduk->riwayatSiswa() as $history)
+                        <div class="relative pl-12">
+                            {{-- Dot --}}
+                            <div class="absolute left-0 top-1.5 w-8 h-8 rounded-full bg-white border-4 border-indigo-600 shadow-sm z-10 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-indigo-600"></div>
+                            </div>
+
+                            <div class="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 hover:border-indigo-200 transition-colors group">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <p class="text-[0.65rem] font-bold text-indigo-600 uppercase tracking-widest mb-1">Tahun Pelajaran {{ $history->tahunPelajaran->tahun ?? '—' }}</p>
+                                        <h4 class="text-lg font-black text-slate-800">Kelas / Rombel: <span class="text-indigo-700">{{ $history->rombel_saat_ini ?? $history->rombel->nama ?? '—' }}</span></h4>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+                                            <p class="text-[0.65rem] font-bold text-slate-400 uppercase leading-none mb-1">Semester</p>
+                                            <p class="text-sm font-black text-slate-700">{{ $history->tahunPelajaran->semester ?? '—' }}</p>
+                                        </div>
+                                        @php
+                                            $hStatusColor = match($history->status) {
+                                                'Aktif' => 'bg-emerald-100 text-emerald-700',
+                                                'Lulus' => 'bg-sky-100 text-sky-700',
+                                                'Keluar/Mutasi' => 'bg-rose-100 text-rose-700',
+                                                default => 'bg-slate-100 text-slate-600',
+                                            };
+                                        @endphp
+                                        <span class="px-3 py-1.5 text-xs font-bold rounded-lg {{ $hStatusColor }}">{{ $history->status ?? 'Aktif' }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         @endforeach
                     </div>

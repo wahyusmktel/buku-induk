@@ -12,6 +12,7 @@ class SiswaImport implements ToModel, WithStartRow
     public $createdCount = 0;
     public $updatedCount = 0;
     public $processedSiswaIds = [];
+    protected $matchInCurrentYear = false;
 
     /**
      * @return int
@@ -50,6 +51,8 @@ class SiswaImport implements ToModel, WithStartRow
 
         // Try to find existing student in the CURRENT active year first (using Global Scope)
         $existingSiswa = null;
+        $this->matchInCurrentYear = false;
+
         if ($nisn || $nik) {
             $query = Siswa::query(); // Uses active year Global Scope
             if ($nisn && $nik) {
@@ -63,8 +66,11 @@ class SiswaImport implements ToModel, WithStartRow
             }
             $existingSiswa = $query->first();
 
-            // If not found in current year, search globally across all years
-            if (!$existingSiswa) {
+            // If found in current year, we will update it
+            if ($existingSiswa) {
+                $this->matchInCurrentYear = true;
+            } else {
+                // If not found in current year, search globally across all years to maintain history
                 $queryGlobal = Siswa::withoutGlobalScope('tahun_aktif');
                 if ($nisn && $nik) {
                     $queryGlobal->where(function($q) use ($nisn, $nik) {
@@ -76,6 +82,7 @@ class SiswaImport implements ToModel, WithStartRow
                     $queryGlobal->where('nik', $nik);
                 }
                 $existingSiswa = $queryGlobal->first();
+                // If found globally, matchInCurrentYear remains false -> we will create a new record for current year.
             }
         }
 
@@ -150,11 +157,15 @@ class SiswaImport implements ToModel, WithStartRow
         ];
 
         try {
-            if ($existingSiswa) {
+            // Logic: Update if found in current year, otherwise Create new record (even if found globally, to preserve history)
+            if ($existingSiswa && $this->matchInCurrentYear) {
                 $existingSiswa->update($data);
                 $this->updatedCount++;
                 $this->processedSiswaIds[] = $existingSiswa->id;
             } else {
+                // This covers: 
+                // 1. New student entirely
+                // 2. Existing student from previous year (new record created for current year)
                 $newSiswa = Siswa::create($data);
                 $this->createdCount++;
                 $this->processedSiswaIds[] = $newSiswa->id;
