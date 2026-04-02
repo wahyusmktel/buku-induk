@@ -19,16 +19,8 @@ class PrestasiController extends Controller
             'kelas'                => 'required|integer|between:1,6',
             'semester'             => 'required|integer|between:1,2',
             'tahun_pelajaran'      => 'required|string|max:20',
-            'nilai_agama'          => 'nullable|numeric|between:0,100',
-            'nilai_pkn'            => 'nullable|numeric|between:0,100',
-            'nilai_bindo'          => 'nullable|numeric|between:0,100',
-            'nilai_mtk'            => 'nullable|numeric|between:0,100',
-            'nilai_ipa'            => 'nullable|numeric|between:0,100',
-            'nilai_ips'            => 'nullable|numeric|between:0,100',
-            'nilai_sbk'            => 'nullable|numeric|between:0,100',
-            'nilai_pjok'           => 'nullable|numeric|between:0,100',
-            'nilai_mulok'          => 'nullable|numeric|between:0,100',
-            'nilai_mulok2'         => 'nullable|numeric|between:0,100',
+            'nilai'                => 'nullable|array',
+            'nilai.*'              => 'nullable|numeric|between:0,100',
             'peringkat'            => 'nullable|integer|min:1',
             'sikap'                => 'nullable|string|max:50',
             'kerajinan'            => 'nullable|string|max:50',
@@ -43,14 +35,34 @@ class PrestasiController extends Controller
 
         $validated['buku_induk_id'] = $bukuInduk->id;
 
-        PrestasiBelajar::updateOrCreate(
+        $prestasi = PrestasiBelajar::updateOrCreate(
             [
                 'buku_induk_id' => $bukuInduk->id,
                 'kelas'         => $validated['kelas'],
                 'semester'      => $validated['semester'],
             ],
-            $validated
+            \Illuminate\Support\Arr::except($validated, ['nilai'])
         );
+
+        if (!empty($validated['nilai'])) {
+            foreach ($validated['nilai'] as $mapelId => $score) {
+                if (!empty($score) || $score === '0' || $score === 0) {
+                    \App\Models\PrestasiNilai::updateOrCreate(
+                        [
+                            'prestasi_belajar_id' => $prestasi->id,
+                            'mata_pelajaran_id' => $mapelId,
+                        ],
+                        ['nilai' => $score]
+                    );
+                } else {
+                    \App\Models\PrestasiNilai::where('prestasi_belajar_id', $prestasi->id)
+                        ->where('mata_pelajaran_id', $mapelId)
+                        ->delete();
+                }
+            }
+        }
+        
+        $prestasi->recalculateTotals();
 
         return redirect()->route('buku-induk.show', $nisn)
             ->with('success', "Data prestasi Kelas {$validated['kelas']} Semester {$validated['semester']} berhasil disimpan.");

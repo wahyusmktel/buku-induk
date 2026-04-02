@@ -14,9 +14,6 @@ class PrestasiBelajar extends Model
 
     protected $fillable = [
         'buku_induk_id', 'kelas', 'semester', 'tahun_pelajaran',
-        'nilai_agama', 'nilai_pkn', 'nilai_bindo', 'nilai_mtk',
-        'nilai_ipa', 'nilai_ips', 'nilai_sbk', 'nilai_pjok',
-        'nilai_mulok', 'nilai_mulok2',
         'jumlah_nilai', 'rata_rata', 'peringkat',
         'sikap', 'kerajinan', 'kebersihan_kerapian',
         'hadir_sakit', 'hadir_izin', 'hadir_alpha',
@@ -35,37 +32,23 @@ class PrestasiBelajar extends Model
         return $this->belongsTo(BukuInduk::class);
     }
 
-    /**
-     * Get the list of subject score fields.
-     */
-    public static function subjectFields(): array
+    public function nilais()
     {
-        return [
-            'nilai_agama'  => 'Agama',
-            'nilai_pkn'    => 'PKn',
-            'nilai_bindo'  => 'Bahasa Indonesia',
-            'nilai_mtk'    => 'Matematika',
-            'nilai_ipa'    => 'IPA',
-            'nilai_ips'    => 'IPS',
-            'nilai_sbk'    => 'SBK',
-            'nilai_pjok'   => 'PJOK',
-            'nilai_mulok'  => 'Muatan Lokal',
-            'nilai_mulok2' => 'Muatan Lokal 2',
-        ];
+        return $this->hasMany(PrestasiNilai::class, 'prestasi_belajar_id');
     }
 
     /**
-     * Auto-compute jumlah and rata_rata before saving.
+     * Hitung ulang total dan rata-rata
      */
-    protected static function booted()
+    public function recalculateTotals()
     {
-        static::saving(function (self $model) {
-            $subjects = array_keys(self::subjectFields());
-            $values = collect($subjects)->map(fn($f) => $model->$f)->filter(fn($v) => $v !== null);
-            if ($values->count() > 0) {
-                $model->jumlah_nilai = $values->sum();
-                $model->rata_rata = round($values->avg(), 2);
-            }
-        });
+        $sum = $this->nilais()->sum('nilai');
+        $count = $this->nilais()->whereNotNull('nilai')->count();
+        
+        $this->update([
+            'jumlah_nilai' => $sum,
+            'rata_rata' => $count > 0 ? round($sum / $count, 2) : 0,
+        ]);
     }
+
 }

@@ -35,5 +35,6 @@ return new class extends Migration
                 'nama_ibu',
                 'pekerjaan_ibu_bi', 'pendidikan_ibu_bi',
             ]);
+        });
     }
 };

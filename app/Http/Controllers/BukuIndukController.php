@@ -99,7 +99,8 @@ class BukuIndukController extends Controller
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
 
-        $prestasis = $bukuInduk->prestasis;
+        $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
+        $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
         // Build academic grid: kelas 1-6, semester 1-2
         $akademikGrid = [];
@@ -110,7 +111,7 @@ class BukuIndukController extends Controller
             }
         }
 
-        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid'));
+        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans'));
     }
 
     /**
@@ -201,7 +202,8 @@ class BukuIndukController extends Controller
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
 
-        $prestasis = $bukuInduk->prestasis;
+        $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
+        $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
         $akademikGrid = [];
         foreach (range(1, 6) as $kelas) {
@@ -211,6 +213,6 @@ class BukuIndukController extends Controller
             }
         }
 
-        return view('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid'));
+        return view('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans'));
     }
 }

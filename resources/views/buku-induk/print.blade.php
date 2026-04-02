@@ -104,7 +104,7 @@
                     <th rowspan="2">Kls</th>
                     <th rowspan="2">Smt</th>
                     <th rowspan="2">Thn Pelajaran</th>
-                    <th colspan="9">Nilai Mata Pelajaran</th>
+                    <th colspan="{{ $mataPelajarans->count() }}">Nilai Mata Pelajaran</th>
                     <th rowspan="2">Jml</th>
                     <th rowspan="2">Rata²</th>
                     <th rowspan="2">Rank</th>
@@ -112,8 +112,11 @@
                     <th rowspan="2">Naik?</th>
                 </tr>
                 <tr>
-                    <th>Agm</th><th>PKn</th><th>BI</th><th>MTK</th>
-                    <th>IPA</th><th>IPS</th><th>SBK</th><th>PJOK</th><th>ML</th>
+                    @foreach($mataPelajarans as $mapel)
+                    <th style="font-size: 6.5pt; max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $mapel->nama }}">
+                        {{ $mapel->nama }}
+                    </th>
+                    @endforeach
                     <th>S</th><th>I</th><th>A</th>
                 </tr>
             </thead>
@@ -126,18 +129,17 @@
                     <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
                     @endif
                     <td>{{ $semester }}</td>
-                    <td class="left" style="font-size:8pt;">{{ $p?->tahun_pelajaran ?? '' }}</td>
-                    <td>{{ $p?->nilai_agama ?? '' }}</td>
-                    <td>{{ $p?->nilai_pkn ?? '' }}</td>
-                    <td>{{ $p?->nilai_bindo ?? '' }}</td>
-                    <td>{{ $p?->nilai_mtk ?? '' }}</td>
-                    <td>{{ $p?->nilai_ipa ?? '' }}</td>
-                    <td>{{ $p?->nilai_ips ?? '' }}</td>
-                    <td>{{ $p?->nilai_sbk ?? '' }}</td>
-                    <td>{{ $p?->nilai_pjok ?? '' }}</td>
-                    <td>{{ $p?->nilai_mulok ?? '' }}</td>
-                    <td><strong>{{ $p?->jumlah_nilai ?? '' }}</strong></td>
-                    <td>{{ $p?->rata_rata ?? '' }}</td>
+                    <td class="left" style="font-size:7pt; white-space: nowrap;">{{ $p?->tahun_pelajaran ?? '' }}</td>
+                    
+                    @foreach($mataPelajarans as $mapel)
+                    @php
+                        $nilaiVal = $p ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai : null;
+                    @endphp
+                    <td style="font-size: 8.5pt;">{{ $nilaiVal ? number_format($nilaiVal, 0) : '' }}</td>
+                    @endforeach
+                    
+                    <td><strong>{{ $p?->jumlah_nilai ? number_format($p->jumlah_nilai, 0) : '' }}</strong></td>
+                    <td style="font-size: 8pt;">{{ $p?->rata_rata ?? '' }}</td>
                     <td>{{ $p?->peringkat ?? '' }}</td>
                     <td>{{ $p?->hadir_sakit ?? '' }}</td>
                     <td>{{ $p?->hadir_izin ?? '' }}</td>

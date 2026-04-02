@@ -246,20 +246,14 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
-                    <thead class="bg-slate-50/80 text-slate-400 text-[0.65rem] uppercase font-extrabold tracking-widest">
+                    <thead class="bg-slate-50/80 text-slate-400 text-[0.65rem] uppercase font-extrabold tracking-widest text-center">
                         <tr>
-                            <th class="px-6 py-3">Kls</th>
+                            <th class="px-6 py-3 text-left">Kls</th>
                             <th class="px-3 py-3">Smt</th>
-                            <th class="px-3 py-3">T.Pelajaran</th>
-                            <th class="px-3 py-3">Agama</th>
-                            <th class="px-3 py-3">PKn</th>
-                            <th class="px-3 py-3">B.Ind</th>
-                            <th class="px-3 py-3">MTK</th>
-                            <th class="px-3 py-3">IPA</th>
-                            <th class="px-3 py-3">IPS</th>
-                            <th class="px-3 py-3">SBK</th>
-                            <th class="px-3 py-3">PJOK</th>
-                            <th class="px-3 py-3">Mulok</th>
+                            <th class="px-3 py-3">T. Pelajaran</th>
+                            @foreach($mataPelajarans as $mapel)
+                            <th class="px-3 py-3 min-w-[60px]">{{ $mapel->nama }}</th>
+                            @endforeach
                             <th class="px-3 py-3 border-l border-slate-100">Jml</th>
                             <th class="px-3 py-3">Rata</th>
                             <th class="px-3 py-3">Rank</th>
@@ -279,13 +273,18 @@
                                 <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-black">{{ $kelas }}</span>
                                 @endif
                             </td>
-                            <td class="px-3 py-3 text-slate-500 font-medium">{{ $semester }}</td>
-                            <td class="px-3 py-3 text-slate-500 text-xs font-mono">{{ $p?->tahun_pelajaran ?? '—' }}</td>
-                            @foreach(['nilai_agama', 'nilai_pkn', 'nilai_bindo', 'nilai_mtk', 'nilai_ipa', 'nilai_ips', 'nilai_sbk', 'nilai_pjok', 'nilai_mulok'] as $field)
-                            <td class="px-3 py-3 text-center font-bold {{ ($p?->$field ?? 0) < 65 && $p?->$field !== null ? 'text-rose-600' : 'text-slate-700' }}">
-                                {{ $p?->$field ?? '—' }}
-                            </td>
+                            <td class="px-3 py-3 text-slate-500 font-medium text-center">{{ $semester }}</td>
+                            <td class="px-3 py-3 text-slate-500 text-xs font-mono text-center">{{ $p?->tahun_pelajaran ?? '—' }}</td>
+                            
+                            @foreach($mataPelajarans as $mapel)
+                                @php
+                                    $nilai = $p ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai : null;
+                                @endphp
+                                <td class="px-3 py-3 text-center font-bold {{ ($nilai ?? 0) < 65 && $nilai !== null ? 'text-rose-600' : 'text-slate-700' }}">
+                                    {{ $nilai ?? '—' }}
+                                </td>
                             @endforeach
+                            
                             <td class="px-3 py-3 text-center font-black text-slate-800 border-l border-slate-100">{{ $p?->jumlah_nilai ?? '—' }}</td>
                             <td class="px-3 py-3 text-center font-bold text-indigo-700">{{ $p?->rata_rata ?? '—' }}</td>
                             <td class="px-3 py-3 text-center font-black text-slate-700">{{ $p?->peringkat ?? '—' }}</td>
@@ -405,11 +404,11 @@
                 </div>
                 <div>
                     <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Nilai Mata Pelajaran</p>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                        @foreach(\App\Models\PrestasiBelajar::subjectFields() as $field => $label)
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        @foreach($mataPelajarans as $mapel)
                         <div class="space-y-1">
-                            <label class="text-[0.65rem] font-bold text-slate-400">{{ $label }}</label>
-                            <input type="number" name="{{ $field }}" min="0" max="100" step="0.5" placeholder="—"
+                            <label class="text-[0.65rem] font-bold text-slate-400">{{ $mapel->nama }}</label>
+                            <input type="number" name="nilai[{{ $mapel->id }}]" min="0" max="100" step="0.5" placeholder="—"
                                    class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700 text-sm">
                         </div>
                         @endforeach

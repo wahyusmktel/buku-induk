@@ -29,6 +29,7 @@ use App\Http\Controllers\TahunPelajaranController;
 use App\Http\Controllers\RombelController;
 use App\Http\Controllers\BukuIndukController;
 use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\MataPelajaranController;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -70,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/tahun-pelajaran/{id}/copy-data', [TahunPelajaranController::class, 'copyData'])->name('tahun-pelajaran.copy-data');
         Route::patch('/tahun-pelajaran/{id}/activate', [TahunPelajaranController::class, 'activate'])->name('tahun-pelajaran.activate');
         Route::delete('/tahun-pelajaran/{id}', [TahunPelajaranController::class, 'destroy'])->name('tahun-pelajaran.destroy');
+        
+        // Mata Pelajaran Management
+        Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
     });
 
     // Super Admin Only
