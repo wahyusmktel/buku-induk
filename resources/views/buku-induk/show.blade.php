@@ -237,11 +237,18 @@
                     <p class="text-sm text-slate-500 mt-0.5">Catatan nilai, kepribadian, dan kehadiran per semester</p>
                 </div>
                 @hasanyrole('Super Admin|Operator|Tata Usaha')
-                <button x-data x-on:click="$dispatch('open-prestasi-modal')"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Tambah / Update Nilai
-                </button>
+                <div class="flex gap-2">
+                    <button x-data x-on:click="$dispatch('open-import-prestasi-modal')"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer">
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Import Excel
+                    </button>
+                    <button x-data x-on:click="$dispatch('open-prestasi-modal')"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah / Update Nilai
+                    </button>
+                </div>
                 @endhasanyrole
             </div>
             <div class="overflow-x-auto">
@@ -376,7 +383,7 @@
     @hasanyrole('Super Admin|Operator|Tata Usaha')
     <div x-data="{ open: false }" @open-prestasi-modal.window="open = true"
          x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
-        <div @click.away="open = false" class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white rounded-t-3xl flex items-center justify-between">
                 <h3 class="text-xl font-extrabold tracking-tight">Input / Update Nilai Semester</h3>
                 <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -404,7 +411,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Nilai Mata Pelajaran</p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                         @foreach($mataPelajarans as $mapel)
                         <div class="space-y-1">
                             <label class="text-[0.65rem] font-bold text-slate-400">{{ $mapel->nama }}</label>
@@ -439,6 +446,60 @@
                     <button type="submit" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer">Simpan Nilai</button>
                 </div>
             </form>
+        </div>
+    </div>
+    @endhasanyrole
+
+    {{-- MODAL: Import Prestasi --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    <div x-data="{ open: false }" @open-import-prestasi-modal.window="open = true"
+         x-show="open" x-transition class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div class="bg-emerald-600 px-8 py-6 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/10 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Import Nilai Excel</h3>
+                        <p class="text-xs text-white/70 font-bold uppercase tracking-widest">Update massal nilai semester</p>
+                    </div>
+                </div>
+                <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            
+            <div class="p-8 space-y-6">
+                {{-- Download Template Guide --}}
+                <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
+                    <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-emerald-900">Gunakan Template Resmi</p>
+                        <p class="text-xs text-emerald-700 leading-relaxed font-medium">Pastikan format kolom sesuai dengan template agar data berhasil diimpor. Nilai yang sudah ada akan diperbarui.</p>
+                        <a href="{{ route('prestasi.template') }}" class="inline-flex items-center gap-1.5 text-emerald-600 text-xs font-black hover:text-emerald-750 transition-colors mt-2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Unduh Template Format Excel
+                        </a>
+                    </div>
+                </div>
+
+                <form action="{{ route('prestasi.import', $siswa->nisn) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest px-1">Pilih File Excel</label>
+                        <div class="relative group">
+                            <input type="file" name="file" required accept=".xlsx,.xls,.csv"
+                                   class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 font-bold text-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="open = false" class="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">Batal</button>
+                        <button type="submit" class="flex-[2] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-200 transition-all cursor-pointer">Unggah & Proses Data</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     @endhasanyrole

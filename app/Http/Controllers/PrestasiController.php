@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BukuInduk;
 use App\Models\PrestasiBelajar;
 use Illuminate\Http\Request;
+use App\Exports\PrestasiTemplateExport;
+use App\Imports\PrestasiImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PrestasiController extends Controller
 {
@@ -81,5 +84,53 @@ class PrestasiController extends Controller
 
         $prestasi->delete();
         return redirect()->route('buku-induk.show', $nisn)->with('success', 'Data prestasi berhasil dihapus.');
+    }
+
+    /**
+     * Download Template Excel for Prestasi
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new PrestasiTemplateExport, 'template-nilai-akademik.xlsx');
+    }
+
+    /**
+     * Import Prestasi from Excel
+     */
+    public function import(Request $request, string $nisn)
+    {
+        $bukuInduk = BukuInduk::where('nisn', $nisn)->firstOrFail();
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        try {
+            $filename = time() . '_' . $request->file('file')->getClientOriginalName();
+            $tempDir = storage_path('app/private/temp');
+            
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $request->file('file')->move($tempDir, $filename);
+            $path = 'temp/' . $filename;
+            
+            $import = new PrestasiImport($bukuInduk);
+            Excel::import($import, $path);
+            
+            // Hapus file setelah import selesai
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+
+            return redirect()->route('buku-induk.show', $nisn)
+                ->with('success', "Berhasil mengimport {$import->successCount} data nilai semester.");
+        } catch (\Exception $e) {
+            if (isset($path)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+            }
+            \Log::error('Import Excel Error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            return redirect()->back()->withErrors(['file' => 'Terjadi kesalahan saat mengolah file: ' . $e->getMessage()]);
+        }
     }
 }

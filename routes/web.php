@@ -58,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
         // Prestasi Belajar
         Route::post('/buku-induk/{nisn}/prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
         Route::delete('/buku-induk/{nisn}/prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
+        Route::get('/prestasi/template', [PrestasiController::class, 'downloadTemplate'])->name('prestasi.template');
+        Route::post('/buku-induk/{nisn}/prestasi/import', [PrestasiController::class, 'import'])->name('prestasi.import');
 
         // Rombel Management
         Route::get('/rombels', [RombelController::class, 'index'])->name('rombels.index');
