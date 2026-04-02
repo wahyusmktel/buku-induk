@@ -30,6 +30,12 @@
         .signature-box { text-align: center; min-width: 200px; }
         .signature-line { border-bottom: 1px solid #000; margin: 50px auto 5px; width: 180px; }
         .print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-family: Arial; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+
+        /* Photo Styles */
+        .photo-container { position: absolute; top: 40px; right: 0; display: flex; flex-direction: column; gap: 15px; }
+        .photo-box { width: 3cm; height: 4cm; border: 1px solid #000; display: flex; align-items: center; justify-center; overflow: hidden; background: #fff; }
+        .photo-box img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-label { font-size: 7pt; text-align: center; font-weight: bold; margin-top: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -43,7 +49,29 @@
         <p>Tahun Pelajaran {{ $siswa->rombel_saat_ini ?? '' }}</p>
     </div>
 
-    <p class="section-title">I. Keterangan Murid</p>
+    <div style="position: relative;">
+        {{-- Photo side area --}}
+        <div class="photo-container">
+            <div class="photo-box">
+                @if($bukuInduk->foto_1)
+                    <img src="{{ asset('storage/' . $bukuInduk->foto_1) }}">
+                @else
+                    <div style="text-align:center; color:#ccc; font-size:8pt;">Pas Foto<br/>3 x 4</div>
+                @endif
+            </div>
+            <p class="photo-label">Pas Foto 1</p>
+
+            <div class="photo-box">
+                @if($bukuInduk->foto_2)
+                    <img src="{{ asset('storage/' . $bukuInduk->foto_2) }}">
+                @else
+                    <div style="text-align:center; color:#ccc; font-size:8pt;">Pas Foto<br/>3 x 4</div>
+                @endif
+            </div>
+            <p class="photo-label">Pas Foto 2</p>
+        </div>
+
+        <p class="section-title">I. Keterangan Murid</p>
     <table class="data-table">
         <tr><td>Nomor Induk</td><td>:</td><td>{{ $bukuInduk->no_induk ?? '___________' }}</td></tr>
         <tr><td>Nama Lengkap</td><td>:</td><td>{{ $siswa->nama }}</td></tr>
@@ -64,6 +92,7 @@
         <tr><td>Jarak ke Sekolah</td><td>:</td><td>{{ $siswa->jarak_rumah_ke_sekolah_km ?? '—' }} km</td></tr>
         <tr><td>Alat Transportasi</td><td>:</td><td>{{ $siswa->alat_transportasi ?? '—' }}</td></tr>
     </table>
+    </div>
 
     <p class="section-title">II. Keterangan Orang Tua</p>
     <table class="data-table">

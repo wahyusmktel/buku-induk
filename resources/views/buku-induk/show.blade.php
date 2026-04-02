@@ -77,6 +77,7 @@
         <div class="border-t border-slate-100 bg-slate-50/50 px-8 flex gap-1 overflow-x-auto">
             @foreach([
                 'identitas' => ['label' => 'Identitas Murid', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
+                'photo' => ['label' => 'Photo', 'icon' => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'],
                 'orang_tua' => ['label' => 'Orang Tua / Wali', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
                 'akademik' => ['label' => 'Prestasi Akademik', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
                 'riwayat' => ['label' => 'Riwayat Sekolah', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
@@ -154,6 +155,69 @@
                     <p class="text-sm text-slate-600 font-medium">{{ $bukuInduk->beasiswa ?? 'Tidak ada catatan beasiswa.' }}</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- TAB: PHOTO SISWA --}}
+    <div x-show="tab === 'photo'" x-transition x-data="{ 
+        preview1: '{{ $bukuInduk->foto_1 ? Storage::url($bukuInduk->foto_1) : '' }}',
+        preview2: '{{ $bukuInduk->foto_2 ? Storage::url($bukuInduk->foto_2) : '' }}'
+    }">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span>Unggah Pas Photo Murid
+            </h3>
+            
+            <form action="{{ route('buku-induk.update', $bukuInduk->nisn) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                @csrf
+                @method('PUT')
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {{-- Photo 1 --}}
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">Pas Photo 1 (Wajib Buku Induk)</label>
+                        <div class="relative group">
+                            <div class="w-48 h-64 mx-auto rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+                                <template x-if="preview1">
+                                    <img :src="preview1" class="w-full h-full object-cover">
+                                </template>
+                                <div x-show="!preview1" class="text-center p-4">
+                                    <svg class="w-10 h-10 text-slate-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Belum ada foto</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" name="foto_1" accept="image/*" 
+                               @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { preview1 = e.target.result; }; reader.readAsDataURL(file); }"
+                               class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all">
+                    </div>
+
+                    {{-- Photo 2 --}}
+                    <div class="space-y-4">
+                        <label class="block text-sm font-bold text-slate-700">Pas Photo 2 (Arsip Sekolah)</label>
+                        <div class="relative group">
+                            <div class="w-48 h-64 mx-auto rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+                                <template x-if="preview2">
+                                    <img :src="preview2" class="w-full h-full object-cover">
+                                </template>
+                                <div x-show="!preview2" class="text-center p-4">
+                                    <svg class="w-10 h-10 text-slate-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Belum ada foto</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="file" name="foto_2" accept="image/*" 
+                               @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { preview2 = e.target.result; }; reader.readAsDataURL(file); }"
+                               class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all">
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" class="bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-95">
+                        Simpan Perubahan Foto
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

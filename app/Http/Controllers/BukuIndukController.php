@@ -8,6 +8,7 @@ use App\Models\Siswa;
 use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BukuIndukController extends Controller
 {
@@ -183,7 +184,27 @@ class BukuIndukController extends Controller
             'pendidikan_wali_bi'      => 'nullable|string|max:100',
             'alamat_wali_bi'          => 'nullable|string',
             'telp_wali_bi'            => 'nullable|string|max:20',
+            'foto_1'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_2'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        if ($request->hasFile('foto_1')) {
+            if ($bukuInduk->foto_1) Storage::disk('public')->delete($bukuInduk->foto_1);
+            
+            $file = $request->file('foto_1');
+            $filename = time() . '_1_' . $file->getClientOriginalName();
+            $file->move(storage_path('app/public/siswa_photos'), $filename);
+            $validated['foto_1'] = 'siswa_photos/' . $filename;
+        }
+        
+        if ($request->hasFile('foto_2')) {
+            if ($bukuInduk->foto_2) Storage::disk('public')->delete($bukuInduk->foto_2);
+            
+            $file = $request->file('foto_2');
+            $filename = time() . '_2_' . $file->getClientOriginalName();
+            $file->move(storage_path('app/public/siswa_photos'), $filename);
+            $validated['foto_2'] = 'siswa_photos/' . $filename;
+        }
 
         $bukuInduk->update($validated);
 

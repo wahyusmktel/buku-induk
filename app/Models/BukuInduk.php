@@ -27,6 +27,7 @@ class BukuInduk extends Model
         'pekerjaan_ibu_bi', 'pendidikan_ibu_bi',
         // Data Wali
         'nama_wali_bi', 'hubungan_wali', 'pekerjaan_wali_bi', 'pendidikan_wali_bi', 'alamat_wali_bi', 'telp_wali_bi',
+        'foto_1', 'foto_2',
     ];
 
     protected $casts = [
