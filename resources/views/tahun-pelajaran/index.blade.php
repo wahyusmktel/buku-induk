@@ -155,8 +155,20 @@
                 <div class="space-y-5">
                     <div>
                         <label for="tahun" class="block text-sm font-bold text-slate-700 mb-2 ml-1">Tahun Pelajaran</label>
-                        <input type="text" name="tahun" id="tahun" required placeholder="Contoh: 2026/2027"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none font-medium">
+                        <select name="tahun" id="tahun" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all outline-none font-medium appearance-none bg-white">
+                            <option value="" disabled selected>Pilih Tahun Pelajaran</option>
+                            <option value="2020/2021">2020/2021</option>
+                            <option value="2021/2022">2021/2022</option>
+                            <option value="2022/2023">2022/2023</option>
+                            <option value="2023/2024">2023/2024</option>
+                            <option value="2024/2025">2024/2025</option>
+                            <option value="2025/2026">2025/2026</option>
+                            <option value="2026/2027">2026/2027</option>
+                            <option value="2027/2028">2027/2028</option>
+                            <option value="2028/2029">2028/2029</option>
+                            <option value="2029/2030">2029/2030</option>
+                            <option value="2030/2031">2030/2031</option>
+                        </select>
                     </div>
 
                     <div>

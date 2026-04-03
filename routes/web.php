@@ -31,9 +31,9 @@ use App\Http\Controllers\BukuIndukController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\MataPelajaranController;
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard')->middleware('auth');
+use App\Http\Controllers\DashboardController;
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     // Data Pokok Siswa

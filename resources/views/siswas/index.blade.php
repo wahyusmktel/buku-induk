@@ -5,7 +5,7 @@
 @section('breadcrumb', 'Data Pokok Siswa')
 
 @section('content')
-<div x-data="{ importModal: false, fileName: '', fileSelected: false, loading: false }">
+<div x-data="{ importModal: false, guideModal: false, fileName: '', fileSelected: false, loading: false }">
     @if(!$tahunAktif)
     <div class="mb-8 bg-rose-50 border-2 border-rose-200 border-dashed rounded-3xl p-8 text-center shadow-sm">
         <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -45,6 +45,12 @@
         
         @hasanyrole('Super Admin|Operator|Tata Usaha')
         <div class="flex gap-3">
+            <button 
+                @click="guideModal = true"
+                class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-sky-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-slate-100 cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Panduan
+            </button>
             <button 
                 @if($tahunAktif)
                     @click="importModal = true; fileName = ''; fileSelected = false" 
@@ -261,6 +267,73 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Guide Modal -->
+    <div x-show="guideModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div @click.away="guideModal = false" 
+             class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20">
+            
+            <div class="bg-gradient-to-r from-sky-600 to-blue-600 px-6 py-6 text-white relative">
+                <button @click="guideModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Panduan Penggunaan</h3>
+                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi & Cara Mengelola Data Pokok Siswa</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 max-h-[70vh] overflow-y-auto">
+                <div class="space-y-6 text-slate-600 text-sm leading-relaxed">
+                    
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
+                            Import Data Dapodik
+                        </h4>
+                        <p class="ml-8">Gunakan tombol <span class="font-bold text-emerald-600">Import Dapodik</span> untuk memasukkan banyak data siswa sekaligus menggunakan file Excel yang di-export langsung dari aplikasi Dapodik sekolah.</p>
+                        <p class="ml-8 mt-1 text-xs text-emerald-700 font-semibold bg-emerald-50 inline-block px-3 py-1.5 rounded-lg border border-emerald-100 mt-2">Penting: Di dalam file Excel, urutan data siswa harus dimulai pada baris ke-7 dan nama berada di kolom B.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">2</span>
+                            Syarat Tahun Pelajaran Aktif
+                        </h4>
+                        <p class="ml-8">Untuk menghindari kesalahan data, tombol Import hanya akan aktif jika terdapat <span class="font-bold text-sky-600">Tahun Pelajaran yang diset sebagai "Aktif"</span>. Pastikan Anda telah mengonfigurasinya terlebih dahulu.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
+                            Filter Data
+                        </h4>
+                        <p class="ml-8">Terdapat tombol filter pada bagian atas yang memungkinkan Anda hanya merender/menampilkan siswa yang berstatus <span class="font-bold text-slate-700">Aktif</span>, <span class="font-bold text-slate-700">Lulus</span>, <span class="font-bold text-slate-700">Keluar/Mutasi</span>, atau melihat kesemuanya.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button @click="guideModal = false" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+                    Mengerti
+                </button>
+            </div>
         </div>
     </div>
 </div>

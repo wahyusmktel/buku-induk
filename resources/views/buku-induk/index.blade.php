@@ -5,7 +5,7 @@
 @section('breadcrumb', 'Buku Induk')
 
 @section('content')
-<div class="space-y-5">
+<div class="space-y-5" x-data="{ guideModal: false }">
 
     {{-- ── Page Header ── --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -27,6 +27,9 @@
             <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-100 rounded-lg px-3 py-1.5 text-xs font-bold text-amber-600">
                 <span class="w-2 h-2 rounded-full bg-amber-400"></span> Rata-rata {{ $avgKelengkapan }}%
             </div>
+            <button @click="guideModal = true" class="flex items-center gap-1.5 bg-white border border-slate-200 hover:bg-slate-50 hover:text-sky-600 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-600 transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Panduan
+            </button>
         </div>
     </div>
 
@@ -348,6 +351,71 @@
 
     </div>{{-- .table card --}}
 
+    <!-- Guide Modal -->
+    <div x-show="guideModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div @click.away="guideModal = false" 
+             class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20">
+            
+            <div class="bg-gradient-to-r from-sky-600 to-blue-600 px-6 py-6 text-white relative">
+                <button @click="guideModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Panduan Buku Induk</h3>
+                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi & Penjelasan Halaman Buku Induk Siswa</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 max-h-[70vh] overflow-y-auto">
+                <div class="space-y-6 text-slate-600 text-sm leading-relaxed">
+                    
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
+                            Monitoring Kelengkapan Berkas
+                        </h4>
+                        <p class="ml-8">Di sini Anda bisa memantau tingkat kelengkapan administrasi siswa. Ada indikator presentase (progress bar) pada masing-masing baris. Bar hijau berarti sangat lengkap, oranye berarti cukup, dan merah berarti masih banyak berkas yang kurang.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">2</span>
+                            Mengisi Data Lebih Rinci
+                        </h4>
+                        <p class="ml-8">Klik tombol <span class="font-bold text-sky-600">Buka</span> (berwarna biru muda) untuk masuk ke halaman detail Buku Induk siswa secara individu. Anda dapat mengelola nilai, catatan pelanggaran, file scan dokumen, hingga data orang tua di sana.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
+                            Pencarian Pintar (Live Search)
+                        </h4>
+                        <p class="ml-8">Gunakan filter canggih di bagian atas untuk menyaring siswa berdasarkan status, angkatan, maupun fitur pencarian teks untuk menemukan data secara instan tanpa perlu memuat ulang halaman.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button @click="guideModal = false" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
