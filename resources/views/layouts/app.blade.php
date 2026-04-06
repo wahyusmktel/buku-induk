@@ -104,8 +104,12 @@
                     @endif
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
-                    <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <a href="{{ route('exports.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                          {{ request()->routeIs('exports.*') 
+                             ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                             : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('exports.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Eksport & Laporan
                 </a>
                 

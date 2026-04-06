@@ -31,6 +31,7 @@ use App\Http\Controllers\BukuIndukController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ExportController;
 
 use App\Http\Controllers\DashboardController;
 
@@ -62,6 +63,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/prestasi/template', [PrestasiController::class, 'downloadTemplate'])->name('prestasi.template');
         Route::post('/buku-induk/{nisn}/prestasi/import', [PrestasiController::class, 'import'])->name('prestasi.import');
 
+        // Export Massal ZIP
+        Route::get('/exports', [ExportController::class, 'index'])->name('exports.index');
+        Route::post('/exports', [ExportController::class, 'store'])->name('exports.store');
+        Route::get('/exports/progress/{id}', [ExportController::class, 'progress'])->name('exports.progress');
+        Route::get('/exports/{id}/download', [ExportController::class, 'download'])->name('exports.download');
+        Route::delete('/exports/{id}', [ExportController::class, 'destroy'])->name('exports.destroy');
+        
         // Rombel Management
         Route::get('/rombels', [RombelController::class, 'index'])->name('rombels.index');
         Route::get('/rombels/{id}', [RombelController::class, 'show'])->name('rombels.show');
