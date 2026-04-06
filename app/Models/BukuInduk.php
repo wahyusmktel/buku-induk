@@ -131,8 +131,8 @@ class BukuInduk extends Model
             ->filter(fn($f) => !empty($this->$f))
             ->count();
 
-        // Hitung dari Siswa (jika relasi sudah di-attach)
-        $siswa = $this->getRelation('siswaPokok');
+        // Hitung dari Siswa
+        $siswa = $this->siswaPokok;
         $filledSiswa = 0;
         if ($siswa) {
             $filledSiswa = collect($siswaFields)

@@ -30,6 +30,7 @@ use App\Http\Controllers\RombelController;
 use App\Http\Controllers\BukuIndukController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\MataPelajaranController;
+use App\Http\Controllers\SettingController;
 
 use App\Http\Controllers\DashboardController;
 
@@ -76,6 +77,10 @@ Route::middleware(['auth'])->group(function () {
         
         // Mata Pelajaran Management
         Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
+
+        // Settings (Konfigurasi Sistem)
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
     });
 
     // Super Admin Only

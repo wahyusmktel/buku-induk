@@ -50,16 +50,23 @@
 
             <!-- Sidebar Navigation Links -->
             <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-sky-800/80 text-white font-semibold transition-colors border border-sky-700/50 shadow-inner">
-                    <svg class="w-5 h-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <a href="{{ route('dashboard') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                          {{ request()->routeIs('dashboard') 
+                             ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                             : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('dashboard') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     Dashboard
                 </a>
 
                 <div x-data="{ open: {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'true' : 'false' }} }">
                     <button @click="open = !open" 
-                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sky-100 {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'bg-sky-800/80 text-white font-semibold' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors border border-transparent' }} group transition-all">
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
+                                   {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) 
+                                      ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                      : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 opacity-70 group-hover:text-yellow-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <svg class="w-5 h-5 transition-colors {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                             Data Pokok Siswa
                         </div>
                         <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -70,10 +77,10 @@
                          x-transition:enter-start="opacity-0 -translate-y-2" 
                          x-transition:enter-end="opacity-100 translate-y-0" 
                          class="mt-1 ml-4 pl-4 border-l border-sky-800/50 space-y-1" x-cloak>
-                        <a href="{{ route('siswas.index') }}" class="block px-3 py-2 text-sm rounded-lg {{ request()->routeIs('siswas.index') ? 'text-yellow-400 font-bold' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }} transition-colors">
+                        <a href="{{ route('siswas.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('siswas.*') ? 'text-yellow-400 font-bold bg-sky-800/40' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }}">
                             • Daftar Siswa
                         </a>
-                        <a href="{{ route('rombels.index') }}" class="block px-3 py-2 text-sm rounded-lg {{ request()->routeIs('rombels.*') ? 'text-yellow-400 font-bold' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }} transition-colors">
+                        <a href="{{ route('rombels.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('rombels.*') ? 'text-yellow-400 font-bold bg-sky-800/40' : 'text-sky-200 hover:text-white hover:bg-sky-800/30' }}">
                             • Rombongan Belajar
                         </a>
                     </div>
@@ -81,11 +88,12 @@
 
                 {{-- Buku Induk — menu mandiri di bawah Data Pokok Siswa --}}
                 <a href="{{ route('buku-induk.index') }}"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all
+                <a href="{{ route('buku-induk.index') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
                           {{ request()->routeIs('buku-induk.*')
-                             ? 'bg-sky-800/80 text-white font-semibold border border-sky-700/50 shadow-inner'
-                             : 'text-sky-100 hover:bg-sky-800/50 hover:text-white border border-transparent' }}">
-                    <svg class="w-5 h-5 {{ request()->routeIs('buku-induk.*') ? 'text-yellow-400' : 'opacity-70' }}"
+                             ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner'
+                             : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('buku-induk.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}"
                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -109,17 +117,29 @@
                 @hasrole('Super Admin')
                 <div class="pt-5 mt-5 border-t border-sky-800">
                     <p class="px-3 text-[0.7rem] font-bold text-sky-400 uppercase tracking-widest mb-2">Administrator</p>
-                    <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
-                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <a href="{{ route('users.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                              {{ request()->routeIs('users.*') 
+                                 ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                 : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('users.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         Manajemen User
                     </a>
-                    <a href="{{ route('roles.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
-                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    <a href="{{ route('roles.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                              {{ request()->routeIs('roles.*') 
+                                 ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                 : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('roles.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         Manajemen Role
                     </a>
                     @hasanyrole('Super Admin|Operator')
-                    <a href="{{ route('tahun-pelajaran.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 {{ request()->routeIs('tahun-pelajaran.*') ? 'bg-sky-800 text-white font-semibold' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors' }}">
-                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <a href="{{ route('tahun-pelajaran.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                              {{ request()->routeIs('tahun-pelajaran.*') 
+                                 ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                 : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('tahun-pelajaran.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Tahun Pelajaran
                     </a>
                     @endhasanyrole
@@ -128,12 +148,20 @@
 
                 <div class="pt-5 mt-5 border-t border-sky-800">
                     <p class="px-3 text-[0.7rem] font-bold text-sky-400 uppercase tracking-widest mb-2">Pengaturan</p>
-                    <a href="{{ route('mata-pelajaran.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 {{ request()->routeIs('mata-pelajaran.*') ? 'bg-sky-800 text-white font-semibold' : 'hover:bg-sky-800/50 hover:text-white font-medium transition-colors' }}">
-                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                    <a href="{{ route('mata-pelajaran.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                              {{ request()->routeIs('mata-pelajaran.*') 
+                                 ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                 : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('mata-pelajaran.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                         Konfigurasi Mapel
                     </a>
-                    <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium transition-colors">
-                        <svg class="w-5 h-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <a href="{{ route('settings.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                              {{ request()->routeIs('settings.*') 
+                                 ? 'bg-sky-800/80 text-white font-semibold border-sky-700/50 shadow-inner' 
+                                 : 'text-sky-100 hover:bg-sky-800/50 hover:text-white font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('settings.*') ? 'text-yellow-400' : 'opacity-70 group-hover:text-yellow-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         Konfigurasi Sistem
                     </a>
                 </div>
