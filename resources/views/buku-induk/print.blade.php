@@ -6,8 +6,13 @@
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; background: white; line-height: 1.4; padding: 0.5cm; }
-        @page { margin: 2.5cm; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; background: white; line-height: 1.4; padding: 0; }
+        @page { 
+            margin-top: {{ $settings['margin_top'] ?? '2.5' }}cm; 
+            margin-right: {{ $settings['margin_right'] ?? '2.5' }}cm; 
+            margin-bottom: {{ $settings['margin_bottom'] ?? '2.5' }}cm; 
+            margin-left: {{ $settings['margin_left'] ?? '2.5' }}cm; 
+        }
         @media print {
             .no-print { display: none !important; }
             .page-break { page-break-before: always; }

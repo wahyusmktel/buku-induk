@@ -91,7 +91,69 @@
             </div>
         </div>
 
-        {{-- 3. Aset Gambar (Kop, Logo, TTD, Stempel) --}}
+        {{-- 3. Pengaturan Ukuran & Margin Kertas --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" x-data="{ paperSize: '{{ old('paper_size', $settings['paper_size'] ?? 'a4') }}' }">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    <h3 class="font-bold text-slate-700">Pengaturan Kertas & Margin PDF</h3>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Pilihan Kertas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="paper_size" class="block text-sm font-semibold text-slate-700 mb-1.5">Ukuran Kertas</label>
+                        <select id="paper_size" name="paper_size" x-model="paperSize" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500/20 shadow-sm text-sm bg-white">
+                            <option value="a4">A4 (210 x 297 mm)</option>
+                            <option value="folio">F4 / Folio (215.9 x 330 mm)</option>
+                            <option value="legal">Legal (215.9 x 355.6 mm)</option>
+                            <option value="letter">Letter (215.9 x 279.4 mm)</option>
+                            <option value="custom">Kustom (Atur Manual)</option>
+                        </select>
+                        <p class="text-[0.65rem] text-slate-400 mt-1">Standar yang sering digunakan di Indonesia adalah A4 / F4(Folio).</p>
+                    </div>
+
+                    <!-- Kustom dimensi kertas -->
+                    <div x-show="paperSize === 'custom'" x-cloak class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Lebar <span class="text-xs font-normal text-slate-400">(mm)</span></label>
+                            <input type="number" step="0.1" name="paper_width" value="{{ old('paper_width', $settings['paper_width'] ?? '210') }}" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tinggi <span class="text-xs font-normal text-slate-400">(mm)</span></label>
+                            <input type="number" step="0.1" name="paper_height" value="{{ old('paper_height', $settings['paper_height'] ?? '297') }}" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pengaturan Margin -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 border-b border-slate-100 pb-2">Pengaturan Tepi (Margin) - dalam Centimeter (cm)</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Margin Atas (Top)</label>
+                            <input type="number" step="0.1" name="margin_top" value="{{ old('margin_top', $settings['margin_top'] ?? '2.5') }}" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Margin Kanan (Right)</label>
+                            <input type="number" step="0.1" name="margin_right" value="{{ old('margin_right', $settings['margin_right'] ?? '2.5') }}" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Margin Bawah (Bottom)</label>
+                            <input type="number" step="0.1" name="margin_bottom" value="{{ old('margin_bottom', $settings['margin_bottom'] ?? '2.5') }}" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm text-center font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Margin Kiri (Left)</label>
+                            <input type="number" step="0.1" name="margin_left" value="{{ old('margin_left', $settings['margin_left'] ?? '2.5') }}" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm text-center font-bold">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 4. Aset Gambar (Kop, Logo, TTD, Stempel) --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2">

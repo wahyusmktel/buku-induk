@@ -233,7 +233,9 @@ class BukuIndukController extends Controller
                 $akademikGrid[$kelas][$semester] = $record;
             }
         }
+        
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
 
-        return view('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans'));
+        return view('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings'));
     }
 }

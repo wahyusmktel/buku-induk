@@ -34,6 +34,15 @@ class SettingController extends Controller
             'sekolah_stempel' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'sekolah_kop' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'sekolah_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            
+            // Pengaturan Kertas
+            'paper_size' => 'nullable|string|in:a4,folio,legal,letter,custom',
+            'paper_width' => 'nullable|numeric|min:10',
+            'paper_height' => 'nullable|numeric|min:10',
+            'margin_top' => 'nullable|numeric|min:0',
+            'margin_right' => 'nullable|numeric|min:0',
+            'margin_bottom' => 'nullable|numeric|min:0',
+            'margin_left' => 'nullable|numeric|min:0',
         ]);
 
         // Simpan inputan string biasa
