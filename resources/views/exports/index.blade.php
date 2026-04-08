@@ -48,6 +48,17 @@
                         <p class="text-[0.65rem] text-slate-400 mt-1">Export seluruh siswa pada tahun ajaran ini ke PDF.</p>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Rombel / Kelas (Opsional)</label>
+                        <select x-model="form.rombel_id" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500/20 text-sm shadow-sm bg-white">
+                            <option value="">Semua Rombel</option>
+                            @foreach($rombels as $rombel)
+                                <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-[0.65rem] text-slate-400 mt-1">Export khusus untuk siswa pada rombongan belajar / kelas ini.</p>
+                    </div>
+
                     <button @click="startExport" :disabled="isProcessing" 
                             class="w-full mt-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                         <template x-if="!isProcessing">
@@ -87,7 +98,8 @@
                     Alpine.data('exportManager', () => ({
                         form: {
                             name: '',
-                            tahun_id: ''
+                            tahun_id: '',
+                            rombel_id: ''
                         },
                         isProcessing: false,
                         activeJobId: null,
@@ -110,7 +122,7 @@
                             this.downloadUrl = null;
                             this.statusText = 'Memasukkan ke dalam antrian Redis...';
 
-                            fetch('{{ route('settings.update') }}'.replace('settings', 'exports'), { // Trik mengambil prefix root sementara
+                            fetch('{{ route('exports.store') }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -126,12 +138,16 @@
                                       alert('Terjadi kesalahan pada server.');
                                       this.isProcessing = false;
                                   }
+                              }).catch(err => {
+                                  alert('Gagal menghubungi server.');
+                                  this.isProcessing = false;
                               });
                         },
 
                         startPolling() {
                             this.pollInterval = setInterval(() => {
-                                fetch(`/exports/progress/${this.activeJobId}`)
+                                let progressUrl = "{{ route('exports.progress', ':id') }}".replace(':id', this.activeJobId);
+                                fetch(progressUrl)
                                     .then(res => res.json())
                                     .then(data => {
                                         this.progress = data.percentage;
@@ -146,12 +162,14 @@
                                             this.isProcessing = false;
                                             this.statusText = 'Sukses dipacking ke ZIP!';
                                             this.progress = 100;
-                                            this.downloadUrl = `/exports/${this.activeJobId}/download`;
+                                            this.downloadUrl = "{{ route('exports.download', ':id') }}".replace(':id', this.activeJobId);
                                         } else if (this.status === 'failed') {
                                             clearInterval(this.pollInterval);
                                             this.isProcessing = false;
                                             this.statusText = 'Gagal: ' + data.error_message;
                                         }
+                                    }).catch(err => {
+                                        // Ignore fetch errors during polling temporarily
                                     });
                             }, 1500); // Polling per 1.5 detik
                         }

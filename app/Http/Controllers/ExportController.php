@@ -13,11 +13,12 @@ class ExportController extends Controller
     public function index()
     {
         $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
+        $rombels = \App\Models\Rombel::orderBy('nama', 'asc')->get();
         
         // Ambil 10 histori export terakhir
         $exportJobs = ExportJob::orderBy('created_at', 'desc')->take(10)->get();
 
-        return view('exports.index', compact('tahunPelajarans', 'exportJobs'));
+        return view('exports.index', compact('tahunPelajarans', 'rombels', 'exportJobs'));
     }
 
     public function store(Request $request)

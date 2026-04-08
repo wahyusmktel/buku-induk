@@ -101,7 +101,8 @@ class ProcessBukuIndukExport implements ShouldQueue
 
                 // Render PDF via View (View yang sama dengan mode cetak browser)
                 // catatan: karena background job, pastikan asset storage_path jika ada gambar lokal
-                $pdf = Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans'));
+                $is_pdf = true;
+                $pdf = Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'is_pdf'));
                 
                 // Naming convention file: "01. Ahmad.pdf"
                 $num = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);

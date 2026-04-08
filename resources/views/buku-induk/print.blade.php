@@ -6,26 +6,26 @@
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; background: white; }
-        @page { size: A4; margin: 1.5cm 1.5cm 1.5cm 2cm; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; background: white; line-height: 1.4; }
+        @page { size: A4 portrait; margin: 2.5cm; }
         @media print {
             .no-print { display: none !important; }
             .page-break { page-break-before: always; }
         }
         h1 { font-size: 16pt; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
         h2 { font-size: 13pt; font-weight: bold; text-align: center; text-transform: uppercase; }
-        .school-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 15px; }
-        .school-header p { font-size: 10pt; }
-        .section-title { font-weight: bold; font-size: 11pt; text-transform: uppercase; text-decoration: underline; margin: 15px 0 8px; }
-        table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        table.data-table td { padding: 3px 6px; vertical-align: top; }
-        table.data-table td:first-child { width: 38%; }
-        table.data-table td:nth-child(2) { width: 4%; text-align: center; }
-        table.data-table td:nth-child(3) { font-weight: bold; }
-        table.bordered { width: 100%; border-collapse: collapse; font-size: 9pt; }
-        table.bordered th, table.bordered td { border: 1px solid #000; padding: 3px 5px; text-align: center; }
-        table.bordered th { background-color: #e0e0e0; font-weight: bold; }
-        table.bordered td.left { text-align: left; }
+        .school-header { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 20px; }
+        .school-header p { font-size: 11pt; margin-top: 5px; }
+        .section-title { font-weight: bold; font-size: 11pt; text-transform: uppercase; text-decoration: underline; margin: 20px 0 10px; }
+        table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 10.5pt; }
+        table.data-table td { padding: 4px 6px; vertical-align: top; word-wrap: break-word; }
+        table.data-table td:first-child { width: 35%; }
+        table.data-table td:nth-child(2) { width: 3%; text-align: center; }
+        table.data-table td:nth-child(3) { font-weight: bold; width: 62%; }
+        table.bordered { width: 100%; border-collapse: collapse; font-size: 8.5pt; table-layout: fixed; margin-bottom: 15px; }
+        table.bordered th, table.bordered td { border: 1px solid #000; padding: 4px 3px; text-align: center; word-wrap: break-word; }
+        table.bordered th { background-color: #e0e0e0; font-weight: bold; font-size: 7.5pt; }
+        table.bordered td.left { text-align: left; padding-left: 5px; }
         .signature-area { display: flex; justify-content: flex-end; margin-top: 30px; }
         .signature-box { text-align: center; min-width: 200px; }
         .signature-line { border-bottom: 1px solid #000; margin: 50px auto 5px; width: 180px; }
@@ -40,7 +40,9 @@
 </head>
 <body>
 
+    @if(!isset($is_pdf) || !$is_pdf)
     <button class="print-btn no-print" onclick="window.print()">🖨️ Cetak Buku Induk</button>
+    @endif
 
     {{-- PAGE 1: Identity --}}
     <div class="school-header">
@@ -142,11 +144,11 @@
                 </tr>
                 <tr>
                     @foreach($mataPelajarans as $mapel)
-                    <th style="font-size: 6.5pt; max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $mapel->nama }}">
+                    <th style="font-size: 6.5pt; overflow: hidden; text-overflow: ellipsis; word-wrap: break-word;" title="{{ $mapel->nama }}">
                         {{ $mapel->nama }}
                     </th>
                     @endforeach
-                    <th>S</th><th>I</th><th>A</th>
+                    <th style="width: 15px;">S</th><th style="width: 15px;">I</th><th style="width: 15px;">A</th>
                 </tr>
             </thead>
             <tbody>
