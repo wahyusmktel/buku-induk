@@ -23,6 +23,7 @@ Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TahunPelajaranController;
@@ -42,6 +43,13 @@ Route::middleware(['auth'])->group(function () {
     // Audit Log / Riwayat Aktivitas
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
+
+    // Profile & Settings
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/captcha', [ProfileController::class, 'captchaImage'])->name('captcha');
 
     // Data Pokok Siswa
     Route::get('/siswas', [SiswaController::class, 'index'])->name('siswas.index');
