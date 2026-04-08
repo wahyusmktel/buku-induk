@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use App\Services\ActivityLogService;
 
@@ -24,11 +25,83 @@ class ProfileController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:1024',
         ]);
 
-        $user->update($request->only('name', 'email'));
+        $data = $request->only('name', 'email');
 
-        ActivityLogService::log('profile_update', "Memperbarui profil: {$user->name}");
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $file = $request->file('avatar');
+            
+            if (!$file->isValid()) {
+                throw ValidationException::withMessages([
+                    'avatar' => "Gagal mengunggah file: " . $file->getErrorMessage(),
+                ]);
+            }
+
+            $imagePath = $file->getPathname();
+            if (empty($imagePath) || !file_exists($imagePath)) {
+                throw ValidationException::withMessages([
+                    'avatar' => "File tidak ditemukan di direktori sementara.",
+                ]);
+            }
+
+            $extension = strtolower($file->getClientOriginalExtension());
+            $imageData = file_get_contents($imagePath);
+            $sourceImage = @imagecreatefromstring($imageData);
+
+            if ($sourceImage) {
+                $width = imagesx($sourceImage);
+                $height = imagesy($sourceImage);
+                $maxDimension = 400; 
+                
+                $cropSize = min($width, $height);
+                $targetImage = imagecreatetruecolor($maxDimension, $maxDimension);
+                
+                $white = imagecolorallocate($targetImage, 255, 255, 255);
+                imagefill($targetImage, 0, 0, $white);
+                
+                imagecopyresampled(
+                    $targetImage, $sourceImage,
+                    0, 0,
+                    ($width - $cropSize) / 2, ($height - $cropSize) / 2,
+                    $maxDimension, $maxDimension,
+                    $cropSize, $cropSize
+                );
+
+                ob_start();
+                imagejpeg($targetImage, null, 75); 
+                $processedImageData = ob_get_clean();
+                
+                imagedestroy($sourceImage);
+                imagedestroy($targetImage);
+
+                $fileName = 'avatars/' . uniqid() . '.jpg';
+                Storage::disk('public')->put($fileName, $processedImageData);
+                $data['avatar'] = $fileName;
+            } else {
+                // Fallback to standard store if image creation fails
+                $path = $file->store('avatars', 'public');
+                $data['avatar'] = $path;
+            }
+        }
+
+        $user->update($data);
+
+        ActivityLogService::log('profile_update', "Memperbarui profil: {$user->name}" . ($request->hasFile('avatar') ? " (Termasuk foto profil)" : ""));
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto profil berhasil diperbarui.',
+                'avatar_url' => $user->avatar_url
+            ]);
+        }
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }

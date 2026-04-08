@@ -232,8 +232,8 @@
                     <div x-data="{ dropdownOpen: false }" class="relative">
                         <!-- Profile Trigger Button -->
                         <button @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false" class="cursor-pointer flex items-center gap-2.5 rounded-full p-1 pl-1.5 border hover:bg-slate-50 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 bg-white shadow-sm">
-                            <img class="w-8 h-8 rounded-full object-cover ring-2 ring-white" src="https://ui-avatars.com/api/?name=Admin+Sistem&background=0284c7&color=fff&bold=true" alt="UserAvatar">
-                            <span class="hidden sm:block text-sm font-semibold text-slate-700 pr-1">Admin TU</span>
+                            <img id="header-user-avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-white" src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}">
+                            <span class="hidden sm:block text-sm font-semibold text-slate-700 pr-1">{{ auth()->user()->name }}</span>
                             <svg class="hidden sm:block w-4 h-4 text-slate-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
 
@@ -248,8 +248,8 @@
                              class="absolute right-0 mt-3 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 py-2 z-50 text-sm" x-cloak>
                             
                             <div class="px-4 py-3 border-b border-slate-100 mb-1">
-                                <p class="font-bold text-slate-800 text-base">Kepala Tata Usaha</p>
-                                <p class="text-slate-500 text-xs mt-0.5 truncate font-medium">admin@sdmuhgisting.sch.id</p>
+                                <p class="font-bold text-slate-800 text-base truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-slate-500 text-xs mt-0.5 truncate font-medium">{{ auth()->user()->email }}</p>
                             </div>
                             <a href="{{ route('profile.index') }}" class="flex items-center gap-2 px-4 py-2.5 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 font-medium transition-colors">
                                 <svg class="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Profil Pengguna
