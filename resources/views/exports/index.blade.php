@@ -11,6 +11,12 @@
 @endsection
 
 @section('content')
+<style>
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+</style>
 <div class="max-w-6xl mx-auto space-y-6">
 
     @if (session('success'))
@@ -31,63 +37,106 @@
                     <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     <h3 class="font-bold text-slate-700">Filter Export & Zip</h3>
                 </div>
-                <div class="p-5 space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama File Export (Saran)</label>
-                        <input type="text" x-model="form.name" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500/20 text-sm shadow-sm" placeholder="Contoh: Export Kelas VI Lulusan 2024">
+                <div class="p-6 space-y-5">
+                    {{-- Nama File Export --}}
+                    <div class="group">
+                        <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 transition-colors group-focus-within:text-indigo-600">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Nama File Export (Saran)
+                        </label>
+                        <div class="relative">
+                            <input type="text" x-model="form.name" 
+                                class="w-full pl-4 pr-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all placeholder:text-slate-400 font-medium" 
+                                placeholder="Contoh: Export Kelas VI Lulusan 2024">
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Angkatan (Tahun Pelajaran)</label>
-                        <select x-model="form.tahun_id" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500/20 text-sm shadow-sm bg-white">
-                            <option value="">Semua Tahun (Bahaya / Berat)</option>
-                            @foreach($tahunPelajarans as $tp)
-                                <option value="{{ $tp->id }}">{{ $tp->tahun }} - Semester {{ $tp->semester }} {{ $tp->is_aktif ? '(Sesi Aktif)' : '' }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-[0.65rem] text-slate-400 mt-1">Export seluruh siswa pada tahun ajaran ini ke PDF.</p>
+                    {{-- Pilih Angkatan --}}
+                    <div class="group">
+                        <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 transition-colors group-focus-within:text-indigo-600">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Pilih Angkatan (Tahun Pelajaran)
+                        </label>
+                        <div class="relative">
+                            <select x-model="form.tahun_id" 
+                                class="w-full pl-4 pr-10 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all font-medium appearance-none">
+                                <option value="">Semua Tahun (Bahaya / Berat)</option>
+                                @foreach($tahunPelajarans as $tp)
+                                    <option value="{{ $tp->id }}">{{ $tp->tahun }} - Semester {{ $tp->semester }} {{ $tp->is_aktif ? '(Aktif)' : '' }}</option>
+                                @endforeach
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Export seluruh siswa pada tahun ajaran ini ke PDF.
+                        </p>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Rombel / Kelas (Opsional)</label>
-                        <select x-model="form.rombel_id" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500/20 text-sm shadow-sm bg-white">
-                            <option value="">Semua Rombel</option>
-                            @foreach($rombels as $rombel)
-                                <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
-                            @endforeach
-                        </select>
-                        <p class="text-[0.65rem] text-slate-400 mt-1">Export khusus untuk siswa pada rombongan belajar / kelas ini.</p>
+                    {{-- Pilih Rombel --}}
+                    <div class="group">
+                        <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 transition-colors group-focus-within:text-indigo-600">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            Pilih Rombel / Kelas (Opsional)
+                        </label>
+                        <div class="relative">
+                            <select x-model="form.rombel_id" 
+                                class="w-full pl-4 pr-10 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all font-medium appearance-none">
+                                <option value="">Semua Rombel</option>
+                                @foreach($rombels as $rombel)
+                                    <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
+                                @endforeach
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Export khusus untuk siswa pada rombongan belajar / kelas ini.
+                        </p>
                     </div>
 
                     <button @click="startExport" :disabled="isProcessing" 
-                            class="w-full mt-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                            class="w-full mt-2 px-4 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group">
                         <template x-if="!isProcessing">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <svg class="w-5 h-5 transition-transform group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                         </template>
                         <template x-if="isProcessing">
-                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         </template>
-                        <span x-text="isProcessing ? 'Proses Dimulai...' : 'Generate Format ZIP'"></span>
+                        <span x-text="isProcessing ? 'Sedang Memproses...' : 'Generate Format ZIP'"></span>
                     </button>
                 </div>
 
                 {{-- Progress Bar Interaktif --}}
-                <div x-show="isProcessing || activeJobId" x-transition class="p-5 border-t border-slate-100 bg-indigo-50/50" x-cloak>
-                    <div class="flex justify-between items-end mb-1.5">
-                        <span class="text-xs font-bold text-indigo-900">Progres Pembuatan PDF</span>
-                        <span class="text-xs font-bold text-indigo-700" x-text="progress + '%'"></span>
+                <div x-show="isProcessing || activeJobId" x-transition class="p-6 border-t border-indigo-100 bg-indigo-50/30" x-cloak>
+                    <div class="flex justify-between items-end mb-2">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase font-black text-indigo-400 tracking-widest">System Engine</span>
+                            <span class="text-xs font-bold text-indigo-900" x-text="statusText"></span>
+                        </div>
+                        <span class="text-lg font-black text-indigo-600" x-text="progress + '%'"></span>
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden shadow-inner">
-                        <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-out" :style="'width: ' + progress + '%'"></div>
+                    <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner flex p-0.5 mt-1">
+                        <div class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-500 ease-out relative" :style="'width: ' + progress + '%'">
+                            <div class="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                        </div>
                     </div>
-                    <div class="flex justify-between mt-2">
-                        <span class="text-[0.65rem] font-medium text-slate-500" x-text="statusText"></span>
-                        <span class="text-[0.65rem] font-medium text-slate-500" x-text="processed + ' / ' + total + ' File'"></span>
+                    <div class="flex justify-between mt-3 px-1">
+                        <span class="text-[0.7rem] font-bold text-slate-400" x-text="processed + ' / ' + total + ' Dokumen'"></span>
+                        <div class="flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                            <span class="text-[0.7rem] font-medium text-slate-500 uppercase tracking-tighter">Live Monitor</span>
+                        </div>
                     </div>
 
-                    <div x-show="downloadUrl" class="mt-4" x-cloak>
-                        <a :href="downloadUrl" class="block w-full text-center px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer">
-                            ⬇️ Unduh File ZIP Sekarang
+                    <div x-show="downloadUrl" class="mt-5" x-cloak>
+                        <a :href="downloadUrl" class="flex items-center justify-center gap-2 w-full text-center px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-100 transition-all hover:scale-[1.02] cursor-pointer">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Unduh Arsip ZIP
                         </a>
                     </div>
                 </div>
