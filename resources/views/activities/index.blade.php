@@ -4,47 +4,82 @@
 
 @section('content')
 <div class="px-4 py-6 sm:px-0">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    {{-- Breadcrumb --}}
+    <nav class="flex mb-6 text-sm font-medium text-slate-500" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{{ route('dashboard') }}" class="inline-flex items-center hover:text-indigo-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span class="ml-1 md:ml-2 text-slate-400">Riwayat Aktivitas</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    {{-- Header Section --}}
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Riwayat Aktivitas</h1>
-            <p class="text-slate-500 text-sm mt-1">Audit log seluruh perubahan data dan aktivitas sistem secara spesifik.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Riwayat Aktivitas</h1>
+            <p class="text-slate-500 text-base mt-2 max-w-2xl">Audit log komprehensif untuk memantau setiap perubahan data, alur ekspor, dan aktivitas keamanan sistem.</p>
         </div>
         
-        {{-- Filter Actions --}}
-        <form action="{{ route('activities.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
-            <div class="relative">
-                <input type="text" name="search" value="{{ request('search') }}" 
-                    class="pl-9 pr-4 py-2 text-sm rounded-xl border-slate-200 bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all w-full sm:w-64 shadow-sm" 
-                    placeholder="Cari user atau aktivitas...">
-                <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
-            
-            <select name="type" class="pl-4 pr-10 py-2 text-sm rounded-xl border-slate-200 bg-white focus:border-indigo-500 transition-all shadow-sm">
-                <option value="">Semua Tipe</option>
-                @foreach($types as $type)
-                    <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
-                        {{ ucwords(str_replace('_', ' ', $type)) }}
-                    </option>
-                @endforeach
-            </select>
-
-            <input type="date" name="date" value="{{ request('date') }}" 
-                class="px-4 py-2 text-sm rounded-xl border-slate-200 bg-white focus:border-indigo-500 transition-all shadow-sm text-slate-600">
-            
-            <button type="submit" class="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all shadow-md shadow-indigo-200 flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </button>
-
-            @if(request()->anyFilled(['search', 'type', 'date']))
-                <a href="{{ route('activities.index') }}" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all shadow-sm flex items-center justify-center" title="Reset Filter">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </a>
-            @endif
-
-            <a href="{{ route('activities.export', request()->all()) }}" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-emerald-200">
+        <div class="flex items-center gap-3 self-end lg:self-auto">
+            <a href="{{ route('activities.export', request()->all()) }}" class="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-emerald-200/50 hover:-translate-y-0.5 active:translate-y-0">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Export Excel
             </a>
+        </div>
+    </div>
+
+    {{-- Filters Card --}}
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
+        <form action="{{ route('activities.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Cari Aktivitas</label>
+                <div class="relative">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                        class="pl-10 pr-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all w-full shadow-inner" 
+                        placeholder="Nama user, deskripsi...">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Kategori</label>
+                <select name="type" class="w-full pl-4 pr-10 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 transition-all shadow-inner">
+                    <option value="">Semua Kategori</option>
+                    @foreach($types as $type)
+                        <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
+                            {{ ucwords(str_replace('_', ' ', $type)) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal</label>
+                <input type="date" name="date" value="{{ request('date') }}" 
+                    class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 transition-all shadow-inner text-slate-600">
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all shadow-md shadow-indigo-200 font-bold flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Terapkan Filter
+                </button>
+
+                @if(request()->anyFilled(['search', 'type', 'date']))
+                    <a href="{{ route('activities.index') }}" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all shadow-sm flex items-center justify-center" title="Reset Filter">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </a>
+                @endif
+            </div>
         </form>
     </div>
 
@@ -54,6 +89,7 @@
             <table class="w-full text-left text-sm text-slate-600 border-collapse">
                 <thead class="bg-slate-50 border-b border-slate-100 text-xs uppercase font-bold text-slate-500 tracking-wider">
                     <tr>
+                        <th class="px-6 py-4 w-12 text-center">No</th>
                         <th class="px-6 py-4">Waktu</th>
                         <th class="px-6 py-4">Pengguna</th>
                         <th class="px-6 py-4">Aktivitas</th>
@@ -64,6 +100,9 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse($activities as $activity)
                     <tr class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-6 py-4 text-center font-bold text-slate-400">
+                            {{ $activities->firstItem() + $loop->index }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-slate-800 font-medium">{{ $activity->created_at->translatedFormat('d M Y') }}</div>
                             <div class="text-slate-400 text-xs mt-0.5">{{ $activity->created_at->format('H:i:s') }} ({{ $activity->created_at->diffForHumans() }})</div>

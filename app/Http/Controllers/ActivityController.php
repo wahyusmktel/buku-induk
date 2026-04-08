@@ -35,7 +35,7 @@ class ActivityController extends Controller
             $query->whereDate('created_at', $request->date);
         }
 
-        $activities = $query->paginate(20)->withQueryString();
+        $activities = $query->paginate(10)->withQueryString();
         
         // Get unique types for filter dropdown
         $types = Activity::select('type')->distinct()->pluck('type');
