@@ -31,7 +31,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Form Trigger Export --}}
-        <div class="lg:col-span-1" x-data="exportManager()">
+        <div class="lg:col-span-1" x-data="exportManager(@js($rombels))">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
@@ -85,9 +85,9 @@
                             <select x-model="form.rombel_id" 
                                 class="w-full pl-4 pr-10 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all font-medium appearance-none">
                                 <option value="">Semua Rombel</option>
-                                @foreach($rombels as $rombel)
-                                    <option value="{{ $rombel->id }}">{{ $rombel->nama }}</option>
-                                @endforeach
+                                <template x-for="rombel in filteredRombels" :key="rombel.id">
+                                    <option :value="rombel.id" x-text="rombel.nama"></option>
+                                </template>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -144,12 +144,25 @@
             
             <script>
                 document.addEventListener('alpine:init', () => {
-                    Alpine.data('exportManager', () => ({
+                    Alpine.data('exportManager', (initialRombels) => ({
                         form: {
                             name: '',
                             tahun_id: '',
                             rombel_id: ''
                         },
+                        allRombels: initialRombels,
+
+                        get filteredRombels() {
+                            if (!this.form.tahun_id) return [];
+                            return this.allRombels.filter(r => r.tahun_pelajaran_id === this.form.tahun_id);
+                        },
+
+                        init() {
+                            this.$watch('form.tahun_id', (value) => {
+                                this.form.rombel_id = '';
+                            });
+                        },
+
                         isProcessing: false,
                         activeJobId: null,
                         progress: 0,
