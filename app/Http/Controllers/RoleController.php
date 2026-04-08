@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
+use App\Services\ActivityLogService;
 
 class RoleController extends Controller
 {
@@ -28,6 +29,10 @@ class RoleController extends Controller
 
         Role::create(['name' => $validated['name']]);
 
+        ActivityLogService::log('role_add', "Menambahkan role baru: {$validated['name']}", [
+            'name' => $validated['name']
+        ]);
+
         return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
     }
 
@@ -44,6 +49,11 @@ class RoleController extends Controller
 
         $role->update(['name' => $validated['name']]);
 
+        ActivityLogService::log('role_update', "Memperbarui data role: {$role->name}", [
+            'role_id' => $role->id,
+            'name' => $role->name
+        ]);
+
         return redirect()->route('roles.index')->with('success', 'Data role berhasil diperbarui.');
     }
 
@@ -53,7 +63,12 @@ class RoleController extends Controller
             return redirect()->route('roles.index')->with('error', 'Role Super Admin tidak dapat dihapus.');
         }
 
+        $roleName = $role->name;
         $role->delete();
+
+        ActivityLogService::log('role_delete', "Menghapus role: {$roleName}", [
+            'name' => $roleName
+        ]);
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil dihapus.');
     }

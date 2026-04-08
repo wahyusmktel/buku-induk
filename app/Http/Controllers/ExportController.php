@@ -7,6 +7,7 @@ use App\Models\ExportJob;
 use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLogService;
 
 class ExportController extends Controller
 {
@@ -49,6 +50,12 @@ class ExportController extends Controller
 
         // Dispatch job ke Redis queue
         ProcessBukuIndukExport::dispatch($job, $request->tahun_id, $request->rombel_id);
+
+        ActivityLogService::log('mass_export_start', "Memulai Export Massal: {$request->name}", [
+            'name' => $request->name,
+            'tahun_id' => $request->tahun_id,
+            'rombel_id' => $request->rombel_id
+        ]);
 
         return response()->json([
             'success' => true,

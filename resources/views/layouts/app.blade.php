@@ -112,9 +112,13 @@
                     Eksport & Laporan
                 </a>
                 
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium transition-colors group border border-transparent">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Riwayat Status
+                <a href="{{ route('activities.index') }}" 
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
+                          {{ request()->routeIs('activities.*') 
+                             ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                             : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                    <svg class="w-5 h-5 transition-colors {{ request()->routeIs('activities.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Riwayat Aktivitas
                 </a>
 
                 @hasrole('Super Admin')

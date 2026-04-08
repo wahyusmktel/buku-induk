@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ActivityLogService;
 
 class TahunPelajaranController extends Controller
 {
@@ -25,6 +26,11 @@ class TahunPelajaranController extends Controller
             'tahun' => $request->tahun,
             'semester' => $request->semester,
             'is_aktif' => false,
+        ]);
+
+        ActivityLogService::log('tahun_pelajaran_add', "Menambahkan Tahun Pelajaran baru: {$request->tahun} - {$request->semester}", [
+            'tahun' => $request->tahun,
+            'semester' => $request->semester
         ]);
 
         return redirect()->back()->with('success', 'Tahun Pelajaran berhasil ditambahkan.');
@@ -74,17 +80,23 @@ class TahunPelajaranController extends Controller
             }
         });
 
+        ActivityLogService::log('tahun_pelajaran_copy', "Menyalin data dari sesi {$sourceYear->tahun} - {$sourceYear->semester} ke {$targetYear->tahun} - {$targetYear->semester}", [
+            'source_id' => $sourceYear->id,
+            'target_id' => $targetYear->id
+        ]);
+
         return redirect()->back()->with('success', "Berhasil menyalin data dari sesi {$sourceYear->tahun} - {$sourceYear->semester}.");
     }
 
     public function activate($id)
     {
-        DB::transaction(function () use ($id) {
+        $tp = TahunPelajaran::findOrFail($id);
+
+        DB::transaction(function () use ($tp) {
             // Deactivate all
             TahunPelajaran::query()->update(['is_aktif' => false]);
             
             // Activate selected
-            $tp = TahunPelajaran::findOrFail($id);
             $tp->update(['is_aktif' => true]);
 
             // Backfill existing students with null academic year to this active year
@@ -92,6 +104,12 @@ class TahunPelajaranController extends Controller
                 ->whereNull('tahun_pelajaran_id')
                 ->update(['tahun_pelajaran_id' => $tp->id]);
         });
+
+        ActivityLogService::log('tahun_pelajaran_activate', "Mengaktifkan Tahun Pelajaran: {$tp->tahun} - {$tp->semester}", [
+            'tahun_id' => $tp->id,
+            'tahun' => $tp->tahun,
+            'semester' => $tp->semester
+        ]);
 
         return redirect()->back()->with('success', 'Tahun Pelajaran berhasil diaktifkan dan data siswa tanpa tahun telah dikaitkan.');
     }
@@ -104,7 +122,13 @@ class TahunPelajaranController extends Controller
             return redirect()->back()->with('error', 'Tidak bisa menghapus tahun pelajaran yang sudah memiliki data siswa.');
         }
 
+        $info = "{$tp->tahun} - {$tp->semester}";
         $tp->delete();
+
+        ActivityLogService::log('tahun_pelajaran_delete', "Menghapus Tahun Pelajaran: {$info}", [
+            'info' => $info
+        ]);
+
         return redirect()->back()->with('success', 'Tahun Pelajaran berhasil dihapus.');
     }
 }

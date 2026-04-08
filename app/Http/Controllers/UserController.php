@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Services\ActivityLogService;
 
 class UserController extends Controller
 {
@@ -40,6 +41,13 @@ class UserController extends Controller
 
         $user->assignRole($validated['roles']);
 
+        ActivityLogService::log('user_add', "Menambahkan pengguna baru: {$user->name}", [
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $validated['roles']
+        ]);
+
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
@@ -70,6 +78,12 @@ class UserController extends Controller
         $user->save();
         $user->syncRoles($validated['roles']);
 
+        ActivityLogService::log('user_update', "Memperbarui data pengguna: {$user->name}", [
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'roles' => $validated['roles']
+        ]);
+
         return redirect()->route('users.index')->with('success', 'Data pengguna berhasil diperbarui.');
     }
 
@@ -79,7 +93,13 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('error', 'Tidak dapat menghapus Super Admin terakhir.');
         }
 
+        $userName = $user->name;
         $user->delete();
+
+        ActivityLogService::log('user_delete', "Menghapus pengguna: {$userName}", [
+            'name' => $userName
+        ]);
+
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

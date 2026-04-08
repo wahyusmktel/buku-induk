@@ -9,6 +9,7 @@ use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLogService;
 
 class BukuIndukController extends Controller
 {
@@ -207,6 +208,19 @@ class BukuIndukController extends Controller
         }
 
         $bukuInduk->update($validated);
+
+        // Fetch name for logging (from latest Siswa record)
+        $siswa = Siswa::withoutGlobalScope('tahun_aktif')
+            ->where('nisn', $nisn)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        $namaSiswa = $siswa ? $siswa->nama : "NISN: {$nisn}";
+
+        ActivityLogService::log('buku_induk_update', "Melengkapi data Buku Induk: {$namaSiswa}", [
+            'nisn' => $nisn,
+            'nama' => $namaSiswa
+        ]);
 
         return redirect()->route('buku-induk.show', $nisn)->with('success', 'Buku Induk berhasil diperbarui.');
     }

@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLogService;
 
 
 class SiswaController extends Controller
@@ -173,6 +174,13 @@ class SiswaController extends Controller
                 $message .= " Arsip Sesi Ini: {$graduatedCurrCount} Lulus, {$departedCurrCount} Keluar.";
             }
             
+            ActivityLogService::log('dapodik_import', "Import data Dapodik berhasil: {$import->createdCount} baru, {$import->updatedCount} diperbarui.", [
+                'created' => $import->createdCount,
+                'updated' => $import->updatedCount,
+                'graduated' => $graduatedPrevCount + $graduatedCurrCount,
+                'departed' => $departedPrevCount + $departedCurrCount
+            ]);
+
             return redirect()->route('siswas.index')->with('success', $message);
         } catch (\Exception $e) {
             // Clean up if something went wrong but we have a path
@@ -285,6 +293,11 @@ class SiswaController extends Controller
 
         $siswa->update($validated);
 
+        ActivityLogService::log('siswa_update', "Memperbarui profil siswa: {$siswa->nama}", [
+            'siswa_id' => $siswa->id,
+            'nama' => $siswa->nama
+        ]);
+
         return redirect()->route('siswas.show', $siswa)->with('success', 'Data siswa berhasil diperbarui.');
     }
 
@@ -294,7 +307,13 @@ class SiswaController extends Controller
             abort(403);
         }
 
+        $namaSiswa = $siswa->nama;
         $siswa->delete();
+
+        ActivityLogService::log('siswa_delete', "Menghapus data siswa: {$namaSiswa}", [
+            'nama' => $namaSiswa
+        ]);
+
         return redirect()->route('siswas.index')->with('success', 'Data siswa berhasil dihapus.');
     }
     /**

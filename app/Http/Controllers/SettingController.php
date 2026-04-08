@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLogService;
 
 class SettingController extends Controller
 {
@@ -74,6 +75,10 @@ class SettingController extends Controller
                 Setting::updateOrCreate(['key' => $fileKey], ['value' => $path]);
             }
         }
+
+        ActivityLogService::log('system_settings_update', "Memperbarui Konfigurasi Sistem", [
+            'updated_at' => now()
+        ]);
 
         return redirect()->route('settings.index')->with('success', 'Konfigurasi Sistem Berhasil Diperbarui!');
     }

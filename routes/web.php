@@ -34,10 +34,15 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ExportController;
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ActivityController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
+    // Audit Log / Riwayat Aktivitas
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
+
     // Data Pokok Siswa
     Route::get('/siswas', [SiswaController::class, 'index'])->name('siswas.index');
     Route::get('/siswas/{siswa}', [SiswaController::class, 'show'])->name('siswas.show');

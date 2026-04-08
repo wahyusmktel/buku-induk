@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
+use App\Services\ActivityLogService;
 
 class AuthController extends Controller
 {
@@ -28,6 +29,10 @@ class AuthController extends Controller
             
             // Clear rate limiting log on successful login
             RateLimiter::clear($this->throttleKey($request));
+
+            ActivityLogService::log('login', "User berhasil login: " . Auth::user()->name, [
+                'email' => Auth::user()->email
+            ]);
 
             return redirect()->intended('/dashboard');
         }
@@ -74,6 +79,8 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        ActivityLogService::log('logout', "User telah logout: " . Auth::user()->name);
+
         Auth::logout();
 
         $request->session()->invalidate();

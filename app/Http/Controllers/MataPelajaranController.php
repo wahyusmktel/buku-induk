@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
+use App\Services\ActivityLogService;
 
 class MataPelajaranController extends Controller
 {
@@ -26,6 +27,10 @@ class MataPelajaranController extends Controller
 
         MataPelajaran::create($validated);
 
+        ActivityLogService::log('mapel_add', "Menambahkan Mata Pelajaran baru: {$validated['nama']}", [
+            'nama' => $validated['nama']
+        ]);
+
         return redirect()->route('mata-pelajaran.index')->with('success', 'Mata Pelajaran berhasil ditambahkan.');
     }
 
@@ -42,12 +47,23 @@ class MataPelajaranController extends Controller
 
         $mataPelajaran->update($validated);
 
+        ActivityLogService::log('mapel_update', "Memperbarui Mata Pelajaran: {$mataPelajaran->nama}", [
+            'mapel_id' => $mataPelajaran->id,
+            'nama' => $mataPelajaran->nama
+        ]);
+
         return redirect()->route('mata-pelajaran.index')->with('success', 'Mata Pelajaran berhasil diperbarui.');
     }
 
     public function destroy(MataPelajaran $mataPelajaran)
     {
+        $namaMapel = $mataPelajaran->nama;
         $mataPelajaran->delete();
+
+        ActivityLogService::log('mapel_delete', "Menghapus Mata Pelajaran: {$namaMapel}", [
+            'nama' => $namaMapel
+        ]);
+
         return redirect()->route('mata-pelajaran.index')->with('success', 'Mata Pelajaran berhasil dihapus.');
     }
 }
