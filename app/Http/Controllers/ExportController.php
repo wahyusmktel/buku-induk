@@ -13,7 +13,7 @@ class ExportController extends Controller
     public function index(Request $request)
     {
         $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
-        $rombels = \App\Models\Rombel::orderBy('nama', 'asc')->get();
+        $rombels = \App\Models\Rombel::withCount('siswas')->orderBy('nama', 'asc')->get();
         
         // Build Export Jobs Query
         $query = ExportJob::orderBy('created_at', 'desc');

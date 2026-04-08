@@ -86,7 +86,7 @@
                                 class="w-full pl-4 pr-10 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all font-medium appearance-none">
                                 <option value="">Semua Rombel</option>
                                 <template x-for="rombel in filteredRombels" :key="rombel.id">
-                                    <option :value="rombel.id" x-text="rombel.nama"></option>
+                                    <option :value="rombel.id" x-text="`${rombel.nama} (${rombel.siswas_count} Siswa)`"></option>
                                 </template>
                             </select>
                             <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
