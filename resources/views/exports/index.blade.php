@@ -288,6 +288,7 @@
                                 <td class="px-5 py-3 text-center font-bold text-slate-400 text-xs">
                                     {{ $exportJobs->firstItem() + $loop->index }}
                                 </td>
+                                <td class="px-5 py-3 font-medium text-slate-800">{{ $job->name }}</td>
                                 <td class="px-5 py-3 text-center">
                                     @if($job->status === 'completed')
                                         <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[0.65rem] font-bold uppercase tracking-wide">Selesai</span>
