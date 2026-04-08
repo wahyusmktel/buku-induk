@@ -103,6 +103,8 @@ class ProcessBukuIndukExport implements ShouldQueue
                 // catatan: karena background job, pastikan asset storage_path jika ada gambar lokal
                 $is_pdf = true;
                 $pdf = Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'is_pdf'));
+                $pdf->setPaper('a4', 'portrait');
+                $pdf->setOption('isHtml5ParserEnabled', true);
                 
                 // Naming convention file: "01. Ahmad.pdf"
                 $num = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
