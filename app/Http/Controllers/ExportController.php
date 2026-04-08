@@ -10,13 +10,26 @@ use Illuminate\Support\Facades\Storage;
 
 class ExportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
         $rombels = \App\Models\Rombel::orderBy('nama', 'asc')->get();
         
-        // Ambil 10 histori export terakhir
-        $exportJobs = ExportJob::orderBy('created_at', 'desc')->take(10)->get();
+        // Build Export Jobs Query
+        $query = ExportJob::orderBy('created_at', 'desc');
+
+        // Filter Nama
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter Tanggal
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        // Paginate 10 data
+        $exportJobs = $query->paginate(10)->withQueryString();
 
         return view('exports.index', compact('tahunPelajarans', 'rombels', 'exportJobs'));
     }

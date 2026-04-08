@@ -242,16 +242,39 @@
 
         {{-- History Table --}}
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-full">
-                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <h3 class="font-bold text-slate-700">Riwayat Proses Sistem (10 Terakhir)</h3>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
+                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <h3 class="font-bold text-slate-700">Riwayat Proses Sistem</h3>
+                    </div>
+                    
+                    {{-- Form Pencarian & Filter --}}
+                    <form action="{{ route('exports.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
+                        <div class="relative">
+                            <input type="text" name="search" value="{{ request('search') }}" 
+                                class="pl-8 pr-3 py-1.5 text-xs rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all w-40 sm:w-48" 
+                                placeholder="Cari nama export...">
+                            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input type="date" name="date" value="{{ request('date') }}" 
+                            class="px-2 py-1.5 text-xs rounded-lg border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-600">
+                        <button type="submit" class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </button>
+                        @if(request()->anyFilled(['search', 'date']))
+                            <a href="{{ route('exports.index') }}" class="p-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-lg transition-colors cursor-pointer" title="Reset Filter">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </a>
+                        @endif
+                    </form>
                 </div>
                 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto flex-1">
                     <table class="w-full text-left text-sm text-slate-600">
                         <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase font-bold text-slate-500">
                             <tr>
+                                <th class="px-5 py-3 w-10 text-center">No</th>
                                 <th class="px-5 py-3">Nama Export</th>
                                 <th class="px-5 py-3 text-center">Status</th>
                                 <th class="px-5 py-3 text-center">Data</th>
@@ -262,7 +285,9 @@
                         <tbody class="divide-y divide-slate-100">
                             @forelse($exportJobs as $job)
                             <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-5 py-3 font-medium text-slate-800">{{ $job->name }}</td>
+                                <td class="px-5 py-3 text-center font-bold text-slate-400 text-xs">
+                                    {{ $exportJobs->firstItem() + $loop->index }}
+                                </td>
                                 <td class="px-5 py-3 text-center">
                                     @if($job->status === 'completed')
                                         <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[0.65rem] font-bold uppercase tracking-wide">Selesai</span>
@@ -305,6 +330,11 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+                    {{ $exportJobs->links() }}
                 </div>
             </div>
         </div>
