@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Siswa;
 use App\Imports\SiswaImport;
+use App\Imports\MasterBukuIndukImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Gate;
@@ -17,6 +18,7 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'Aktif');
+        $tingkat = $request->get('tingkat');
         $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
         
         $query = Siswa::query();
@@ -24,9 +26,13 @@ class SiswaController extends Controller
             $query->where('status', $status);
         }
 
+        if ($tingkat) {
+            $query->where('tingkat_kelas', $tingkat);
+        }
+
         $siswas = $query->latest()->paginate(15)->withQueryString();
         
-        return view('siswas.index', compact('siswas', 'tahunAktif', 'status'));
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat'));
     }
 
     public function import(Request $request)
@@ -222,6 +228,8 @@ class SiswaController extends Controller
             'nama_panggilan'          => 'nullable|string|max:100',
             'nipd'                    => 'nullable|string|max:50',
             'jk'                      => 'required|in:L,P',
+            'tingkat_kelas'           => 'nullable|integer|min:1|max:13',
+            'tahun_masuk'             => 'nullable|integer',
             'nisn'                    => 'nullable|string|max:10',
             'nik'                     => 'nullable|string|max:16',
             'tempat_lahir'            => 'nullable|string|max:100',
@@ -356,5 +364,49 @@ class SiswaController extends Controller
         }
 
         return false;
+    }
+
+    public function masterImport(Request $request)
+    {
+        if (!auth()->user()->hasAnyRole(['Super Admin', 'Operator', 'Tata Usaha'])) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+
+        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+        $file = $request->file('file');
+
+        try {
+            $filename = 'master_' . time() . '_' . $file->getClientOriginalName();
+            $tempDir = storage_path('app/private/temp');
+            
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $file->move($tempDir, $filename);
+            $path = 'temp/' . $filename;
+
+            $import = new MasterBukuIndukImport();
+            Excel::import($import, $path);
+
+            // Clean up
+            if (Storage::disk('local')->exists($path)) {
+                Storage::disk('local')->delete($path);
+            }
+
+            ActivityLogService::log('master_import', "Master Import Buku Induk berhasil: {$import->createdCount} baru, {$import->updatedCount} diperbarui.", [
+                'created' => $import->createdCount,
+                'updated' => $import->updatedCount
+            ]);
+
+            return redirect()->route('siswas.index')->with('success', "Master Import berhasil: {$import->createdCount} data baru ditambahkan, {$import->updatedCount} data diperbarui.");
+        } catch (\Exception $e) {
+            // Clean up on failure
+            if (isset($path) && Storage::disk('local')->exists($path)) {
+                Storage::disk('local')->delete($path);
+            }
+            Log::error('Master Import Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memproses file Master Import: ' . $e->getMessage());
+        }
     }
 }

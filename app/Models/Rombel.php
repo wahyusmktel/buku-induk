@@ -12,6 +12,7 @@ class Rombel extends Model
 
     protected $fillable = [
         'nama',
+        'tingkat',
         'tahun_pelajaran_id',
     ];
 

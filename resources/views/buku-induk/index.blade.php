@@ -59,7 +59,30 @@
         {{-- Status dibawa sebagai hidden (agar form search tidak reset status) --}}
         <input type="hidden" name="status" value="{{ $statusFilter }}">
 
-        {{-- ① Tahun Pelajaran — ada di DALAM form dengan name="tahun_id" --}}
+        {{-- ① Angkatan (Tahun Masuk) --}}
+        <div class="relative shrink-0">
+            <select name="angkatan"
+                    onchange="this.form.submit()"
+                    class="appearance-none pl-3 pr-8 py-2 text-xs font-bold border-2 rounded-xl cursor-pointer transition-all
+                           bg-white text-slate-600 border-slate-200
+                           hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                    style="{{ $angkatan ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
+                <option value="">Semua Angkatan</option>
+                @foreach($angkatans as $year)
+                    <option value="{{ $year }}" {{ $angkatan == $year ? 'selected' : '' }}>
+                        Angkatan {{ $year }}
+                    </option>
+                @endforeach
+            </select>
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </div>
+
+        <div class="w-px h-7 bg-slate-200 shrink-0 hidden sm:block"></div>
+
+        {{-- ② Sesi Akademik (Tahun Pelajaran) --}}
         <div class="relative shrink-0">
             <select name="tahun_id"
                     onchange="this.form.submit()"
@@ -67,10 +90,10 @@
                            bg-white text-slate-600 border-slate-200
                            hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
                     style="{{ $tahunId ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
-                <option value="">Semua Angkatan</option>
+                <option value="">Semua Sesi</option>
                 @foreach($tahunPelajarans as $tp)
                     <option value="{{ $tp->id }}" {{ $tahunId == $tp->id ? 'selected' : '' }}>
-                        {{ $tp->tahun }} — Sem. {{ $tp->semester }}
+                        Sesi {{ $tp->tahun }} ({{ $tp->semester }})
                     </option>
                 @endforeach
             </select>
@@ -130,7 +153,7 @@
         </div>
 
         {{-- ⑤ Reset --}}
-        @if($search || $tahunId || $statusFilter !== 'Aktif' || $perPage != 20)
+        @if($search || $tahunId || $angkatan || $statusFilter !== 'Aktif' || $perPage != 20)
         <a href="{{ route('buku-induk.index') }}"
            class="px-3 py-2 text-xs font-bold text-slate-400 border-2 border-slate-200 rounded-xl
                   hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all whitespace-nowrap shrink-0">
@@ -150,21 +173,25 @@
     @endif
 
     {{-- ── Active Filter Badge ── --}}
-    @if($tahunId)
-    @php $selectedTp = $tahunPelajarans->firstWhere('id', $tahunId); @endphp
-    @if($selectedTp)
+    @if($tahunId || $angkatan)
     <div class="flex items-center gap-2 flex-wrap">
         <span class="text-xs text-slate-500 font-medium">Filter aktif:</span>
+        @if($angkatan)
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+              style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;">
+            Angkatan {{ $angkatan }}
+        </span>
+        @endif
+        @if($tahunId)
+        @php $selectedTp = $tahunPelajarans->firstWhere('id', $tahunId); @endphp
+        @if($selectedTp)
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
               style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;">
-            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            Angkatan {{ $selectedTp->tahun }} — Sem. {{ $selectedTp->semester }}
+            Sesi {{ $selectedTp->tahun }}
         </span>
+        @endif
+        @endif
     </div>
-    @endif
     @endif
 
     {{-- ── Data Table ── --}}

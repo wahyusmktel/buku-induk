@@ -21,6 +21,7 @@ class BukuIndukController extends Controller
         $search       = $request->get('q', '');
         $statusFilter = $request->get('status', 'Aktif');
         $tahunId      = $request->get('tahun_id', '');
+        $angkatan     = $request->get('angkatan', '');
         $perPage      = (int) $request->get('per_page', 20);
 
         // Clamp per_page to allowed values
@@ -31,6 +32,12 @@ class BukuIndukController extends Controller
 
         // All tahun pelajaran for the filter dropdown
         $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
+        // Unique angkatan for filter
+        $angkatans = Siswa::withoutGlobalScope('tahun_aktif')
+            ->whereNotNull('tahun_masuk')
+            ->distinct()
+            ->orderByDesc('tahun_masuk')
+            ->pluck('tahun_masuk');
 
         // ── Build query: satu baris per NISN (terbaru by created_at) ─────
         // UUID primary key tidak bisa di-MAX(), jadi kita pakai MAX(created_at).
@@ -62,6 +69,10 @@ class BukuIndukController extends Controller
             $query->where('siswas.status', $statusFilter);
         }
 
+        if ($angkatan) {
+            $query->where('siswas.tahun_masuk', $angkatan);
+        }
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('siswas.nama', 'like', "%{$search}%")
@@ -69,7 +80,10 @@ class BukuIndukController extends Controller
             });
         }
 
-        $siswas = $query->orderBy('siswas.nama')->paginate($perPage)->withQueryString();
+        $siswas = $query->orderBy('siswas.tahun_masuk', 'asc')
+            ->orderBy('siswas.nama', 'asc')
+            ->paginate($perPage)
+            ->withQueryString();
 
         // Map nisn => BukuInduk record (with kelengkapan accessor)
         $nisnList     = $siswas->pluck('nisn')->filter()->toArray();
@@ -84,7 +98,7 @@ class BukuIndukController extends Controller
 
         return view('buku-induk.index', compact(
             'siswas', 'bukuIndukMap', 'search', 'statusFilter',
-            'tahunPelajarans', 'tahunId', 'perPage'
+            'tahunPelajarans', 'tahunId', 'perPage', 'angkatans', 'angkatan'
         ));
     }
 
@@ -104,9 +118,15 @@ class BukuIndukController extends Controller
         $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
-        // Build academic grid: kelas 1-6, semester 1-2
+        // Build academic grid: dynamic grades based on recorded data
+        $availableGrades = $prestasis->pluck('kelas')->unique()->sort()->values()->toArray();
+        // If no data, default to at least grade 1 if it's a new student, or use provided grade info
+        if (empty($availableGrades)) {
+            $availableGrades = [1]; 
+        }
+
         $akademikGrid = [];
-        foreach (range(1, 6) as $kelas) {
+        foreach ($availableGrades as $kelas) {
             foreach ([1, 2] as $semester) {
                 $record = $prestasis->where('kelas', $kelas)->where('semester', $semester)->first();
                 $akademikGrid[$kelas][$semester] = $record;
@@ -240,8 +260,13 @@ class BukuIndukController extends Controller
         $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
+        $availableGrades = $prestasis->pluck('kelas')->unique()->sort()->values()->toArray();
+        if (empty($availableGrades)) {
+            $availableGrades = [1];
+        }
+
         $akademikGrid = [];
-        foreach (range(1, 6) as $kelas) {
+        foreach ($availableGrades as $kelas) {
             foreach ([1, 2] as $semester) {
                 $record = $prestasis->where('kelas', $kelas)->where('semester', $semester)->first();
                 $akademikGrid[$kelas][$semester] = $record;

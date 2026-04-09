@@ -41,6 +41,11 @@
                         NIPD: {{ $siswa->nipd }}
                     </span>
                     @endif
+                    @if($siswa->tingkat_kelas)
+                    <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-100 uppercase tracking-wider">
+                        Tingkat: {{ $siswa->tingkat_kelas }}
+                    </span>
+                    @endif
                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider">
                         Rombel: {{ $siswa->rombel_saat_ini ?? '-' }}
                     </span>

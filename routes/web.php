@@ -36,6 +36,7 @@ use App\Http\Controllers\ExportController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\SiswaPromotionController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
@@ -43,6 +44,14 @@ Route::middleware(['auth'])->group(function () {
     // Audit Log / Riwayat Aktivitas
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
+
+    // Promosi / Naik Kelas
+    Route::get('/siswas/promote', [SiswaPromotionController::class, 'index'])->name('siswas.promote.index');
+    Route::post('/siswas/promote', [SiswaPromotionController::class, 'store'])->name('siswas.promote.store');
+    Route::get('/api/rombels/{tahunId}', [SiswaPromotionController::class, 'getRombelsByYear']);
+
+    // Master Import
+    Route::post('/siswas/master-import', [SiswaController::class, 'masterImport'])->name('siswas.master-import');
 
     // Profile & Settings
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

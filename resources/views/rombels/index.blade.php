@@ -50,7 +50,12 @@
                     </div>
                 </div>
                 
-                <h3 class="text-xl font-black text-slate-800 group-hover:text-sky-700 transition-colors">{{ $rombel->nama }}</h3>
+                <div class="flex items-center justify-between mt-2">
+                    <h3 class="text-xl font-black text-slate-800 group-hover:text-sky-700 transition-colors">{{ $rombel->nama }}</h3>
+                    @if($rombel->tingkat)
+                        <span class="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-lg uppercase tracking-wider shadow-sm border border-amber-200/50">Tingkat {{ $rombel->tingkat }}</span>
+                    @endif
+                </div>
                 <div class="mt-2 flex items-center gap-2">
                     <span class="text-2xl font-bold text-slate-700">{{ $rombel->siswas_count }}</span>
                     <span class="text-sm font-medium text-slate-400">Siswa Terdaftar</span>

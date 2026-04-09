@@ -70,6 +70,15 @@
                         </select>
                     </div>
                     <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tingkat Kelas</label>
+                        <select name="tingkat_kelas" class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all font-bold text-slate-700 appearance-none bg-white">
+                            <option value="">-- Pilih Tingkat --</option>
+                            @foreach([1, 2, 3, 4, 5, 6] as $t)
+                                <option value="{{ $t }}" {{ old('tingkat_kelas', $siswa->tingkat_kelas) == $t ? 'selected' : '' }}>Tingkat {{ $t }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Agama</label>
                         <input type="text" name="agama" value="{{ old('agama', $siswa->agama) }}" class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 transition-all font-bold text-slate-700">
                     </div>

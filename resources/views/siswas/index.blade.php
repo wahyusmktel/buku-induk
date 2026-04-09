@@ -5,7 +5,7 @@
 @section('breadcrumb', 'Data Pokok Siswa')
 
 @section('content')
-<div x-data="{ importModal: false, guideModal: false, fileName: '', fileSelected: false, loading: false }">
+<div x-data="{ importModal: false, masterImportModal: false, guideModal: false, fileName: '', fileSelected: false, loading: false }">
     @if(!$tahunAktif)
     <div class="mb-8 bg-rose-50 border-2 border-rose-200 border-dashed rounded-3xl p-8 text-center shadow-sm">
         <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -24,11 +24,24 @@
 
     <div class="mb-4 flex flex-wrap gap-2 px-2">
         @foreach(['Aktif', 'Lulus', 'Keluar/Mutasi', 'Semua'] as $st)
-            <a href="{{ route('siswas.index', ['status' => $st]) }}" 
+            <a href="{{ route('siswas.index', ['status' => $st, 'tingkat' => $tingkat]) }}" 
                class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $status == $st ? 'bg-[#0ea5e9] text-white border-[#0ea5e9] shadow-md shadow-sky-200' : 'bg-white text-slate-500 border-slate-200 hover:border-sky-300 hover:text-sky-600' }}">
                 {{ $st }}
             </a>
         @endforeach
+        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+        @foreach([1, 2, 3, 4, 5, 6] as $t)
+            <a href="{{ route('siswas.index', ['status' => $status, 'tingkat' => $t]) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $tingkat == $t ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600' }}">
+                Tingkat {{ $t }}
+            </a>
+        @endforeach
+        @if($tingkat)
+            <a href="{{ route('siswas.index', ['status' => $status]) }}" 
+               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100">
+                Reset Filter
+            </a>
+        @endif
     </div>
 
     <div class="mb-6 flex justify-between items-center px-2">
@@ -45,22 +58,44 @@
         
         @hasanyrole('Super Admin|Operator|Tata Usaha')
         <div class="flex gap-3">
+            <a href="{{ route('siswas.promote.index') }}" 
+               class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all shadow-indigo-600/20 hover:shadow-md cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                Naik Kelas
+            </a>
+            <div class="h-10 w-px bg-slate-200 mx-1"></div>
             <button 
                 @click="guideModal = true"
                 class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-sky-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-slate-100 cursor-pointer">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Panduan
             </button>
-            <button 
-                @if($tahunAktif)
-                    @click="importModal = true; fileName = ''; fileSelected = false" 
-                @else
-                    @click="alert('Silakan aktifkan Tahun Pelajaran terlebih dahulu!')"
-                @endif
-                class="inline-flex items-center gap-2 {{ $tahunAktif ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-300 cursor-not-allowed opacity-70' }} text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all shadow-emerald-600/20 hover:shadow-md cursor-pointer">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Import Dapodik
-            </button>
+            <div class="relative group" x-data="{ open: false }">
+                <button 
+                    @click="open = !open"
+                    class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all shadow-emerald-600/20 hover:shadow-md cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Import Data
+                    <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="open" @click.away="open = false" x-cloak
+                    class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden">
+                    <button @click="open = false; masterImportModal = true; fileName = ''; fileSelected = false" 
+                            class="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-3 transition-colors">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        Master Buku Induk
+                    </button>
+                    <button @click="open = false; importModal = true; fileName = ''; fileSelected = false" 
+                            class="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-3 transition-colors">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                        </div>
+                        Format Dapodik
+                    </button>
+                </div>
+            </div>
         </div>
         @endhasanyrole
     </div>
@@ -99,10 +134,8 @@
                 <thead class="bg-slate-50/80 text-slate-500 uppercase text-xs font-extrabold tracking-wider border-b border-slate-100">
                     <tr>
                         <th class="py-4 px-6">Nama Lengkap / NISN</th>
-                        <th class="py-4 px-6">Jenis Kelamin</th>
-                        <th class="py-4 px-6">Rombel</th>
+                        <th class="py-4 px-6">Jenjang / Rombel</th>
                         <th class="py-4 px-6">Status</th>
-                        <th class="py-4 px-6">Tempat, Tgl Lahir</th>
                         <th class="py-4 px-6 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -120,13 +153,15 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="py-4 px-6 font-medium">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold {{ $siswa->jk == 'L' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700' }}">
-                                {{ $siswa->jk == 'L' ? 'Laki-laki' : 'Perempuan' }}
-                            </span>
-                        </td>
-                        <td class="py-4 px-6 font-bold text-slate-700">
-                            {{ $siswa->rombel_saat_ini ?? '-' }}
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-slate-700 italic">
+                                    {{ $siswa->tingkat_kelas ? 'Tingkat ' . $siswa->tingkat_kelas : '-' }}
+                                </span>
+                                <span class="text-xs text-slate-400 font-medium tracking-tight">
+                                    {{ $siswa->rombel_saat_ini ?? 'Tanpa Rombel' }}
+                                </span>
+                            </div>
                         </td>
                         <td class="py-4 px-6">
                             @php
@@ -181,7 +216,91 @@
         @endif
     </div>
 
-    <!-- Import Modal -->
+    <!-- Master Import Modal -->
+    <div x-show="masterImportModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-indigo-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div @click.away="masterImportModal = false" 
+             class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all border border-white/20">
+            
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-700 px-6 py-8 text-white relative">
+                <button @click="masterImportModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <h3 class="text-2xl font-extrabold tracking-tight">Master Import Buku Induk</h3>
+                <p class="text-indigo-100 text-sm mt-1 font-medium italic opacity-90">Sangat disarankan untuk input data manual secara massal.</p>
+            </div>
+
+            <form action="{{ route('siswas.master-import') }}" method="POST" enctype="multipart/form-data" class="p-8" @submit="loading = true">
+                @csrf
+                <div class="space-y-6">
+                    <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
+                        <div class="flex gap-4 items-start mb-3">
+                            <svg class="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <div class="text-sm text-indigo-800 font-medium italic leading-relaxed">
+                                Gunakan fitur ini untuk melakukan pemutakhiran data secara menyeluruh (Buku Induk + Data Siswa). 
+                            </div>
+                        </div>
+                        <a href="{{ asset('templates/master_buku_induk_template.xlsx') }}" class="inline-flex items-center gap-2 text-xs font-black text-indigo-700 hover:text-indigo-900 bg-white px-4 py-2 rounded-xl shadow-sm border border-indigo-100 transition-all hover:translate-x-1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Download Template Excel
+                        </a>
+                    </div>
+
+                    <div class="relative group" x-data="{ localFileName: '', localFileSelected: false }">
+                        <label for="master_excel_file" class="block text-sm font-bold text-slate-700 mb-3 ml-1 uppercase tracking-wide">Select Template File</label>
+                        
+                        <div class="border-2 border-dashed border-slate-200 group-hover:border-indigo-500 rounded-2xl p-8 transition-all bg-slate-50/50 group-hover:bg-white flex flex-col items-center justify-center gap-3 relative overflow-hidden" 
+                             :class="{ 'border-indigo-500 bg-indigo-50/20': localFileSelected }">
+                            
+                            <input type="file" name="file" id="master_excel_file" required x-ref="masterRef"
+                                   class="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                   @change="if($event.target.files[0]) { localFileName = $event.target.files[0].name; localFileSelected = true }">
+                            
+                            <div x-show="!localFileSelected" class="flex flex-col items-center pointer-events-none">
+                                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-1">
+                                    <svg class="w-8 h-8 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <span class="text-sm font-bold text-slate-500 group-hover:text-indigo-700 text-center">Drag filled template here</span>
+                            </div>
+                            
+                            <div x-show="localFileSelected" class="flex flex-col items-center text-center">
+                                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center shadow-sm mb-1 animate-pulse">
+                                    <svg class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <span class="text-sm font-bold text-slate-800 px-4 break-all" x-text="localFileName"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                    <button type="button" @click="masterImportModal = false" :disabled="loading" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all">
+                        Batal
+                    </button>
+                    <button type="submit" :disabled="loading" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <template x-if="!loading">
+                            <span>Proses Import Master</span>
+                        </template>
+                        <template x-if="loading">
+                            <span>Memproses...</span>
+                        </template>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dapodik Import Modal -->
     <div x-show="importModal" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -189,7 +308,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-emerald-900/60 backdrop-blur-sm" x-cloak>
         
         <div @click.away="importModal = false" 
              class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all border border-white/20">
@@ -218,40 +337,32 @@
                     <div class="relative group">
                         <label for="excel_file" class="block text-sm font-bold text-slate-700 mb-3 ml-1 uppercase tracking-wide">Pilih File Excel (.xlsx / .xls)</label>
                         
-                        <!-- File Upload Area -->
                         <div class="border-2 border-dashed border-slate-200 group-hover:border-emerald-500 rounded-2xl p-8 transition-all bg-slate-50/50 group-hover:bg-white flex flex-col items-center justify-center gap-3 relative overflow-hidden" 
                              :class="{ 'border-emerald-500 bg-emerald-50/20': fileSelected }">
                             
-                            <!-- True Input (Invisible but always present) -->
                             <input type="file" name="file" id="excel_file" required x-ref="fileInput"
                                    class="absolute inset-0 opacity-0 cursor-pointer z-10"
                                    @change="if($event.target.files[0]) { fileName = $event.target.files[0].name; fileSelected = true }">
                             
-                            <!-- Empty State -->
                             <div x-show="!fileSelected" class="flex flex-col items-center pointer-events-none">
                                 <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-1">
                                     <svg class="w-8 h-8 text-slate-400 group-hover:text-emerald-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                 </div>
                                 <span class="text-sm font-bold text-slate-500 group-hover:text-emerald-700">Klik atau seret file ke sini</span>
-                                <span class="text-xs text-slate-400">File harus maksimal 5MB</span>
                             </div>
                             
-                            <!-- Selected State -->
                             <div x-show="fileSelected" class="flex flex-col items-center text-center">
                                 <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center shadow-sm mb-1 animate-pulse">
                                     <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 </div>
-                                <span class="text-[0.65rem] uppercase font-black text-emerald-500 tracking-widest">File Terpilih</span>
                                 <span class="text-sm font-bold text-slate-800 px-4 break-all" x-text="fileName"></span>
-                                <p class="text-xs text-emerald-600 font-medium mt-1">Siap untuk diungguh</p>
-                                <button type="button" @click.prevent="fileName = ''; fileSelected = false; $refs.fileInput.value = ''" class="mt-2 text-[0.65rem] font-bold text-slate-400 hover:text-rose-500 uppercase underline tracking-tighter cursor-pointer relative z-20">Ganti File</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 flex gap-3">
-                    <button type="button" @click="importModal = false" :disabled="loading" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-2xl transition-all disabled:opacity-50">
+                    <button type="button" @click="importModal = false" :disabled="loading" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all">
                         Batal
                     </button>
                     <button type="submit" :disabled="loading" class="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-200 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer disabled:bg-slate-400 disabled:shadow-none flex items-center justify-center gap-2">
@@ -259,10 +370,7 @@
                             <span>Mulai Import Data</span>
                         </template>
                         <template x-if="loading">
-                            <div class="flex items-center gap-3">
-                                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <span>Memproses...</span>
-                            </div>
+                            <span>Memproses...</span>
                         </template>
                     </button>
                 </div>

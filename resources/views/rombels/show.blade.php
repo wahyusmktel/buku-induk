@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Anggota Rombel ' . $rombel->nama)
-@section('header_title', $rombel->nama)
+@section('header_title')
+    {{ $rombel->nama }}
+    @if($rombel->tingkat)
+        <span class="ml-2 px-3 py-1 bg-amber-500/20 text-amber-200 text-xs font-black rounded-lg uppercase tracking-wider border border-amber-500/30 shadow-inner">Tingkat {{ $rombel->tingkat }}</span>
+    @endif
+@endsection
 @section('breadcrumb')
     <a href="{{ route('rombels.index') }}" class="hover:text-sky-600">Daftar Rombel</a>
     <span class="text-slate-300 mx-1">/</span>

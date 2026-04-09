@@ -13,6 +13,8 @@ class Siswa extends Model
     protected $fillable = [
         'tahun_pelajaran_id',
         'rombel_id',
+        'tingkat_kelas',
+        'tahun_masuk',
         'nama', 'nama_panggilan', 'nipd', 'jk', 'nisn', 'tempat_lahir', 'tanggal_lahir', 'nik', 'agama',
         'kewarganegaraan', 'bahasa_sehari_hari', 'golongan_darah', 'riwayat_penyakit',
         'alamat', 'rt', 'rw', 'dusun', 'kelurahan', 'kecamatan', 'kode_pos',
