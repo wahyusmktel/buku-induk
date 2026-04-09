@@ -23,6 +23,7 @@
         </div>
     </div>
     <!-- Decorative Elements -->
+    <img src="{{ asset('images/batik-kawung-motif.png') }}" class="absolute -right-4 -bottom-4 w-72 opacity-20 pointer-events-none" style="mask-image: linear-gradient(to bottom right, black, transparent); -webkit-mask-image: linear-gradient(to bottom right, black, transparent);">
     <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
     <div class="absolute right-10 top-10 w-20 h-20 bg-indigo-400/20 rounded-full blur-2xl animate-pulse"></div>
 </div>
