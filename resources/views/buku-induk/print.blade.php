@@ -38,9 +38,9 @@
         
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 10pt; }
         table.data-table td { padding: 4px 6px; vertical-align: top; word-wrap: break-word; color: #374151; }
-        table.data-table tr td:first-child { width: 35%; color: #4b5563; }
-        table.data-table tr td:nth-child(2) { width: 2%; text-align: center; color: #6b7280; }
-        table.data-table tr td:nth-child(3) { font-weight: bold; width: 63%; color: #111827; }
+        table.data-table tr td:first-child { width: 5.8cm; color: #4b5563; }
+        table.data-table tr td:nth-child(2) { width: 15px; text-align: center; color: #6b7280; }
+        table.data-table tr td:nth-child(3) { font-weight: bold; color: #111827; }
         
         .sub-header td { padding-top: 12px !important; font-weight: bold; color: #111827 !important; }
         
@@ -75,45 +75,48 @@
         <p>Tahun Pelajaran {{ $siswa->rombel_saat_ini ?? '' }}</p>
     </div>
 
-    <div style="position: relative;">
-        {{-- Photo side area --}}
-        <div class="photo-container">
-            <div class="photo-box">
-                @if($bukuInduk->foto_1)
-                    <img src="{{ public_path('storage/' . $bukuInduk->foto_1) }}">
-                @else
-                    <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
-                @endif
-            </div>
-            <p class="photo-label">Foto 1</p>
+    <table style="width: 100%; border: none; margin-bottom: 10px;">
+        <tr>
+            <td style="vertical-align: top; padding-right: 20px;">
+                <p class="section-title" style="margin-top: 0;">I. Identitas Murid</p>
+                <table class="data-table" style="margin-bottom: 0;">
+                    <tr><td>1. Nomor Induk Sekolah (NIS)</td><td>:</td><td>{{ $siswa->nipd ?? '—' }}</td></tr>
+                    <tr><td>2. NISN</td><td>:</td><td>{{ $siswa->nisn ?? '—' }}</td></tr>
+                    <tr><td>3. NIK</td><td>:</td><td>{{ $siswa->nik ?? '—' }}</td></tr>
+                    <tr><td>4. Nama Lengkap</td><td>:</td><td style="text-transform: uppercase;">{{ $siswa->nama }}</td></tr>
+                    <tr><td>5. Nama Panggilan</td><td>:</td><td>{{ $siswa->nama_panggilan ?? '—' }}</td></tr>
+                    <tr><td>6. Jenis Kelamin</td><td>:</td><td>{{ $siswa->jk == 'L' ? 'Laki-laki' : ($siswa->jk == 'P' ? 'Perempuan' : '—') }}</td></tr>
+                    <tr><td>7. Tempat, Tanggal Lahir</td><td>:</td><td>{{ $siswa->tempat_lahir ?? '—' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '—' }}</td></tr>
+                    <tr><td>8. Agama</td><td>:</td><td>{{ $siswa->agama ?? '—' }}</td></tr>
+                    <tr><td>9. Kewarganegaraan</td><td>:</td><td>{{ $siswa->kewarganegaraan ?? 'WNI' }}</td></tr>
+                    <tr><td>10. Nomor Telepon / HP</td><td>:</td><td>{{ $siswa->hp ?? $siswa->telepon ?? '—' }}</td></tr>
+                </table>
+            </td>
+            <td style="width: 3.2cm; vertical-align: top; padding-top: 10px;">
+                <div class="photo-box" style="margin-bottom: 5px;">
+                    @if($bukuInduk->foto_1)
+                        <img src="{{ public_path('storage/' . $bukuInduk->foto_1) }}">
+                    @else
+                        <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
+                    @endif
+                </div>
+                <p class="photo-label" style="margin-bottom: 15px;">FOTO 1</p>
 
-            <div class="photo-box">
-                @if($bukuInduk->foto_2)
-                    <img src="{{ public_path('storage/' . $bukuInduk->foto_2) }}">
-                @else
-                    <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
-                @endif
-            </div>
-            <p class="photo-label">Foto 2</p>
-        </div>
+                <div class="photo-box" style="margin-bottom: 5px;">
+                    @if($bukuInduk->foto_2)
+                        <img src="{{ public_path('storage/' . $bukuInduk->foto_2) }}">
+                    @else
+                        <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
+                    @endif
+                </div>
+                <p class="photo-label">FOTO 2</p>
+            </td>
+        </tr>
+    </table>
 
-        <p class="section-title">I. Identitas Murid</p>
-        <table class="data-table">
-            <tr><td>1. Nomor Induk Sekolah (NIS)</td><td>:</td><td>{{ $siswa->nipd ?? '—' }}</td></tr>
-            <tr><td>2. NISN</td><td>:</td><td>{{ $siswa->nisn ?? '—' }}</td></tr>
-            <tr><td>3. NIK</td><td>:</td><td>{{ $siswa->nik ?? '—' }}</td></tr>
-            <tr><td>4. Nama Lengkap</td><td>:</td><td style="text-transform: uppercase;">{{ $siswa->nama }}</td></tr>
-            <tr><td>5. Nama Panggilan</td><td>:</td><td>{{ $siswa->nama_panggilan ?? '—' }}</td></tr>
-            <tr><td>6. Jenis Kelamin</td><td>:</td><td>{{ $siswa->jk == 'L' ? 'Laki-laki' : ($siswa->jk == 'P' ? 'Perempuan' : '—') }}</td></tr>
-            <tr><td>7. Tempat, Tanggal Lahir</td><td>:</td><td>{{ $siswa->tempat_lahir ?? '—' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '—' }}</td></tr>
-            <tr><td>8. Agama</td><td>:</td><td>{{ $siswa->agama ?? '—' }}</td></tr>
-            <tr><td>9. Kewarganegaraan</td><td>:</td><td>{{ $siswa->kewarganegaraan ?? 'WNI' }}</td></tr>
-            <tr><td>10. Nomor Telepon / HP</td><td>:</td><td>{{ $siswa->hp ?? $siswa->telepon ?? '—' }}</td></tr>
-        </table>
-        
-        <p class="section-title">II. Data Periodik</p>
-        <table class="data-table">
-            @php $periodik = $siswa->dataPeriodik; @endphp
+    <p class="section-title">II. Data Periodik</p>
+    <table class="data-table">
+        @php $periodik = $siswa->dataPeriodik; @endphp
             <tr><td>1. Jumlah Saudara Kandung</td><td>:</td><td>{{ $periodik?->jml_saudara_kandung ?? '0' }}</td></tr>
             <tr><td>2. Jumlah Saudara Tiri</td><td>:</td><td>{{ $periodik?->jml_saudara_tiri ?? '0' }}</td></tr>
             <tr><td>3. Jumlah Saudara Angkat</td><td>:</td><td>{{ $periodik?->jml_saudara_angkat ?? '0' }}</td></tr>
