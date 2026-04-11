@@ -23,6 +23,11 @@ class PrestasiImport implements ToModel, WithHeadingRow
         $this->mapels = MataPelajaran::all();
     }
 
+    public function headingRow(): int
+    {
+        return 2;
+    }
+
     public function model(array $row)
     {
         // Simple validation to ensure we have required fields
@@ -44,11 +49,10 @@ class PrestasiImport implements ToModel, WithHeadingRow
             'hadir_sakit' => $row['sakit_hari'] ?? 0,
             'hadir_izin' => $row['izin_hari'] ?? 0,
             'hadir_alpha' => $row['alpha_hari'] ?? 0,
-            'sikap' => $row['sikap_baikcukupkurang'] ?? $row['sikap'] ?? null,
-            'kerajinan' => $row['kerajinan_baikcukupkurang'] ?? $row['kerajinan'] ?? null,
-            'kebersihan_kerapian' => $row['kebersihan_baikcukupkurang'] ?? $row['kebersihan'] ?? null,
+            'sikap' => $row['sikap_abcd'] ?? $row['sikap_baikcukupkurang'] ?? $row['sikap'] ?? null,
+            'kerajinan' => $row['kerajinan_abcd'] ?? $row['kerajinan_baikcukupkurang'] ?? $row['kerajinan'] ?? null,
+            'kebersihan_kerapian' => $row['kebersihan_abcd'] ?? $row['kebersihan_baikcukupkurang'] ?? $row['kebersihan'] ?? null,
             'keterangan_kenaikan' => $row['kenaikan_naiktidak_naik'] ?? $row['keterangan_kenaikan'] ?? null,
-            'tgl_keputusan_kenaikan' => $this->transformDate($row['tgl_keputusan_yyyymmdd'] ?? $row['tgl_keputusan'] ?? null),
         ];
 
         $prestasi = PrestasiBelajar::updateOrCreate(
@@ -83,20 +87,4 @@ class PrestasiImport implements ToModel, WithHeadingRow
         return null; // Return null because we handled update manually
     }
 
-    private function transformDate($value)
-    {
-        if (empty($value)) return null;
-
-        if (is_numeric($value)) {
-            try {
-                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
-            } catch (\Throwable $t) {}
-        }
-
-        try {
-            return Carbon::parse($value);
-        } catch (\Throwable $e) {
-            return null;
-        }
-    }
 }

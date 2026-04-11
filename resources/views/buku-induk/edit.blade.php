@@ -831,7 +831,7 @@
                     <div class="space-y-1">
                         <p class="text-sm font-bold text-emerald-900">Gunakan Template Resmi</p>
                         <p class="text-xs text-emerald-700 leading-relaxed font-medium">Pastikan format kolom sesuai dengan template agar data berhasil diimpor.</p>
-                        <a href="{{ route('prestasi.template') }}" class="inline-flex items-center gap-1.5 text-emerald-600 text-xs font-black hover:text-emerald-800 transition-colors mt-2">
+                        <a href="{{ route('prestasi.template', $siswa->nisn) }}" class="inline-flex items-center gap-1.5 text-emerald-600 text-xs font-black hover:text-emerald-800 transition-colors mt-2">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             Unduh Template Format Excel
                         </a>

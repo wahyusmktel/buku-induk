@@ -113,9 +113,10 @@ class PrestasiController extends Controller
     /**
      * Download Template Excel for Prestasi
      */
-    public function downloadTemplate()
+    public function downloadTemplate(string $nisn)
     {
-        return Excel::download(new PrestasiTemplateExport, 'template-nilai-akademik.xlsx');
+        $bukuInduk = BukuInduk::where('nisn', $nisn)->firstOrFail();
+        return Excel::download(new PrestasiTemplateExport($bukuInduk), 'template-nilai-semester-' . $nisn . '.xlsx');
     }
 
     /**
