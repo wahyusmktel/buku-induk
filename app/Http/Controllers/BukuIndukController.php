@@ -396,7 +396,8 @@ class BukuIndukController extends Controller
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
         $is_pdf = true;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf'))
+            ->setOption('isPhpEnabled', true);
         
         $paperSize = $settings['paper_size'] ?? 'a4';
         

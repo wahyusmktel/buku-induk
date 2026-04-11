@@ -53,7 +53,15 @@
                 </div>
             </div>
             
-            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="sekolah_nama" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Sekolah</label>
+                    <input type="text" id="sekolah_nama" name="sekolah_nama" 
+                           value="{{ old('sekolah_nama', $settings['sekolah_nama'] ?? '') }}"
+                           class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner"
+                           placeholder="Contoh: SD Muhammadiyah Gisting">
+                    @error('sekolah_nama') <p class="mt-1 text-xs text-red-500 font-medium">{{ $message }}</p> @enderror
+                </div>
                 <div>
                     <label for="jenjang_pendidikan" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jenjang Pendidikan</label>
                     <select id="jenjang_pendidikan" name="jenjang_pendidikan" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner">

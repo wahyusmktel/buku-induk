@@ -268,6 +268,30 @@
             </div>
         </div>
     </div>
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->get_font("Helvetica", "italic");
+            $size = 7.5;
+            $color = [0.4, 0.4, 0.4]; // grayish
+            
+            $w = $pdf->get_width();
+            $h = $pdf->get_height();
+            $y = $h - 40; // 40px from bottom edge
 
+            // Teks Halaman - Kanan
+            $text_right = "Halaman {PAGE_NUM} dari {PAGE_COUNT}";
+            // Approximate width to align right (dompdf handles text alignment loosely, so we offset)
+            $width_right = $fontMetrics->get_text_width("Halaman 10 dari 10", $font, $size); 
+            $pdf->page_text($w - $width_right - 45, $y, $text_right, $font, $size, $color);
+
+            // Teks Info Cetak - Kiri
+            $sekolah = {!! json_encode($settings['sekolah_nama'] ?? '') !!};
+            $text_left = "Dicetak melalui Aplikasi Buku Induk" . ($sekolah ? " " . $sekolah : "");
+            $pdf->page_text(45, $y, $text_left, $font, $size, $color);
+            
+            // Garis tipis pembatas footer
+            $pdf->line(45, $y - 10, $w - 45, $y - 10, [0.8, 0.8, 0.8], 0.5);
+        }
+    </script>
 </body>
 </html>
