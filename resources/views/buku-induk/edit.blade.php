@@ -53,7 +53,9 @@
                 'periodik' => 'Data Periodik',
                 'jasmani' => 'Keadaan Jasmani',
                 'beasiswa' => 'Beasiswa',
-                'registrasi' => 'Meninggalkan Sekolah'
+                'registrasi' => 'Meninggalkan Sekolah',
+                'photo' => 'Foto Siswa',
+                'akademik' => 'Prestasi Akademik'
             ] as $key => $label)
             <button type="button" @click="section = '{{ $key }}'"
                     :class="section === '{{ $key }}' ? 'border-b-2 border-indigo-600 text-indigo-700 font-black' : 'text-slate-500 hover:text-slate-700'"
@@ -82,7 +84,7 @@
             @endforeach
         </datalist>
 
-        <form action="{{ route('buku-induk.update', $siswa->nisn) }}" method="POST" class="p-8" @submit="validateWali($event)">
+        <form action="{{ route('buku-induk.update', $siswa->nisn) }}" method="POST" enctype="multipart/form-data" class="p-8" @submit="validateWali($event)">
             @csrf
             @method('PUT')
 
@@ -318,6 +320,75 @@
                     <button type="button" @click="items.push({})" class="w-full py-3 border-2 border-dashed border-rose-200 text-rose-600 font-bold rounded-2xl hover:bg-rose-50 transition-colors flex items-center justify-center gap-2">+ Tambah Catatan Keluar / Registrasi</button>
                 </div>
             </div>
+            {{-- SECTION: FOTO SISWA --}}
+            <div x-show="section === 'photo'" x-transition x-data="{ 
+                preview1: '{{ $bukuInduk->foto_1 ? Storage::url($bukuInduk->foto_1) : '' }}',
+                preview2: '{{ $bukuInduk->foto_2 ? Storage::url($bukuInduk->foto_2) : '' }}'
+            }">
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 mb-6 relative bg-slate-50/50">
+                    <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Pas Photo Siswa</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{-- Photo 1 --}}
+                        <div class="space-y-4">
+                            <label class="block text-sm font-bold text-slate-700">Pas Photo 1 (Wajib Buku Induk)</label>
+                            <div class="relative group">
+                                <div class="w-48 h-64 mx-auto rounded-2xl border-2 border-dashed border-slate-200 bg-white flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+                                    <template x-if="preview1">
+                                        <img :src="preview1" class="w-full h-full object-cover">
+                                    </template>
+                                    <div x-show="!preview1" class="text-center p-4">
+                                        <svg class="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Belum ada foto</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="file" name="foto_1" accept="image/*" 
+                                   @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { preview1 = e.target.result; }; reader.readAsDataURL(file); }"
+                                   class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all">
+                        </div>
+                        {{-- Photo 2 --}}
+                        <div class="space-y-4">
+                            <label class="block text-sm font-bold text-slate-700">Pas Photo 2 (Arsip Sekolah)</label>
+                            <div class="relative group">
+                                <div class="w-48 h-64 mx-auto rounded-2xl border-2 border-dashed border-slate-200 bg-white flex items-center justify-center overflow-hidden transition-all group-hover:border-indigo-300">
+                                    <template x-if="preview2">
+                                        <img :src="preview2" class="w-full h-full object-cover">
+                                    </template>
+                                    <div x-show="!preview2" class="text-center p-4">
+                                        <svg class="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Belum ada foto</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="file" name="foto_2" accept="image/*" 
+                                   @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { preview2 = e.target.result; }; reader.readAsDataURL(file); }"
+                                   class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SECTION: PRESTASI AKADEMIK --}}
+            <div x-show="section === 'akademik'" x-transition>
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 mb-6 relative bg-slate-50/50">
+                    <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Prestasi Belajar</p>
+                    <p class="text-sm text-slate-500 mb-6">Gunakan tombol di bawah untuk menambah atau memperbarui data nilai semester siswa.</p>
+                    @hasanyrole('Super Admin|Operator|Tata Usaha')
+                    <div class="flex flex-wrap gap-3">
+                        <button type="button" x-on:click="$dispatch('open-prestasi-modal')"
+                                class="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-200 transition-all cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Tambah / Update Nilai Semester
+                        </button>
+                        <button type="button" x-on:click="$dispatch('open-import-prestasi-modal')"
+                                class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-bold rounded-2xl shadow-sm transition-all cursor-pointer">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Import dari Excel
+                        </button>
+                    </div>
+                    @endhasanyrole
+                </div>
+            </div>
             
             {{-- Submit --}}
             <div class="mt-10 pt-6 border-t border-slate-100 flex gap-3">
@@ -328,5 +399,124 @@
             </div>
         </form>
     </div>
+
+    {{-- MODAL: Input Prestasi (di luar form utama) --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    <div x-data="{ open: false }" @open-prestasi-modal.window="open = true"
+         x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white rounded-t-3xl flex items-center justify-between">
+                <h3 class="text-xl font-extrabold tracking-tight">Input / Update Nilai Semester</h3>
+                <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <form action="{{ route('prestasi.store', $siswa->nisn) }}" method="POST" class="p-8 space-y-6">
+                @csrf
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Kelas</label>
+                        <select name="kelas" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
+                            @foreach(range(1,6) as $k)<option value="{{ $k }}">Kelas {{ $k }}</option>@endforeach
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Semester</label>
+                        <select name="semester" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
+                            <option value="1">Ganjil (1)</option><option value="2">Genap (2)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Tahun Pelajaran</label>
+                        <input type="text" name="tahun_pelajaran" placeholder="2024/2025" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
+                    </div>
+                </div>
+                <div>
+                    <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Nilai Mata Pelajaran</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                        @foreach($mataPelajarans as $mapel)
+                        <div class="space-y-1">
+                            <label class="text-[0.65rem] font-bold text-slate-400">{{ $mapel->nama }}</label>
+                            <input type="number" name="nilai[{{ $mapel->id }}]" min="0" max="100" step="0.5" placeholder="—"
+                                   class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm">
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Peringkat</label><input type="number" name="peringkat" min="1" placeholder="—" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Sakit (hari)</label><input type="number" name="hadir_sakit" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Izin (hari)</label><input type="number" name="hadir_izin" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Alpha (hari)</label><input type="number" name="hadir_alpha" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Sikap</label>
+                        <select name="sikap" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kerajinan</label>
+                        <select name="kerajinan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kebersihan</label>
+                        <select name="kebersihan_kerapian" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kenaikan Kelas</label>
+                        <select name="keterangan_kenaikan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Naik</option><option>Tidak Naik</option></select></div>
+                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Tgl Keputusan</label>
+                        <input type="date" name="tgl_keputusan_kenaikan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" @click="open = false" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">Batal</button>
+                    <button type="submit" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer">Simpan Nilai</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endhasanyrole
+
+    {{-- MODAL: Import Prestasi --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    <div x-data="{ open: false }" @open-import-prestasi-modal.window="open = true"
+         x-show="open" x-transition class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden">
+            <div class="bg-emerald-600 px-8 py-6 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/10 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Import Nilai Excel</h3>
+                        <p class="text-xs text-white/70 font-bold uppercase tracking-widest">Update massal nilai semester</p>
+                    </div>
+                </div>
+                <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="p-8 space-y-6">
+                <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
+                    <div class="p-2 bg-emerald-100 rounded-lg text-emerald-600">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-emerald-900">Gunakan Template Resmi</p>
+                        <p class="text-xs text-emerald-700 leading-relaxed font-medium">Pastikan format kolom sesuai dengan template agar data berhasil diimpor.</p>
+                        <a href="{{ route('prestasi.template') }}" class="inline-flex items-center gap-1.5 text-emerald-600 text-xs font-black hover:text-emerald-800 transition-colors mt-2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Unduh Template Format Excel
+                        </a>
+                    </div>
+                </div>
+                <form action="{{ route('prestasi.import', $siswa->nisn) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest px-1">Pilih File Excel</label>
+                        <input type="file" name="file" required accept=".xlsx,.xls,.csv"
+                               class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 font-bold text-sm cursor-pointer">
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" @click="open = false" class="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">Batal</button>
+                        <button type="submit" class="flex-[2] py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-200 transition-all cursor-pointer">Unggah & Proses Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endhasanyrole
+
 </div>
 @endsection

@@ -148,7 +148,9 @@ class BukuIndukController extends Controller
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
 
-        return view('buku-induk.edit', compact('bukuInduk', 'siswa'));
+        $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
+
+        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans'));
     }
 
     /**
