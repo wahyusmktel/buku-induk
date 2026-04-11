@@ -101,18 +101,21 @@ class BukuIndukController extends Controller
     {
         $bukuInduk = BukuInduk::where('nisn', $nisn)->firstOrFail();
 
-        // Fetch the canonical siswa record (latest)
+        // Fetch the canonical siswa record (latest) with relations for kelengkapan
         $siswa = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $nisn)
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua'])
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
+
+        $bukuInduk->setRelation('siswaPokok', $siswa);
+        $kelengkapan = $bukuInduk->kelengkapan;
 
         $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
         // Build academic grid: dynamic grades based on recorded data
         $availableGrades = $prestasis->pluck('kelas')->unique()->sort()->values()->toArray();
-        // If no data, default to at least grade 1 if it's a new student, or use provided grade info
         if (empty($availableGrades)) {
             $availableGrades = [1]; 
         }
@@ -125,7 +128,7 @@ class BukuIndukController extends Controller
             }
         }
 
-        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans'));
+        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'kelengkapan'));
     }
 
     /**
@@ -137,13 +140,17 @@ class BukuIndukController extends Controller
 
         $siswa = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $nisn)
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua'])
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
+
+        $bukuInduk->setRelation('siswaPokok', $siswa);
+        $kelengkapan = $bukuInduk->kelengkapan;
 
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
         $jenjang = \App\Models\Setting::where('key', 'jenjang_pendidikan')->first()?->value ?? 'SD';
 
-        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang'));
+        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang', 'kelengkapan'));
     }
 
     /**

@@ -43,6 +43,29 @@
         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-8 text-white">
             <h2 class="text-2xl font-extrabold tracking-tight">Lengkapi Buku Induk</h2>
             <p class="text-indigo-200 text-sm mt-1 font-medium">{{ $siswa->nama }} — NISN {{ $siswa->nisn }}</p>
+            
+            {{-- Progress Bar --}}
+            @php
+                $progressBg = $kelengkapan >= 80 ? 'from-emerald-400 to-teal-300' : ($kelengkapan >= 40 ? 'from-amber-400 to-yellow-300' : 'from-rose-400 to-pink-300');
+                $emoji = $kelengkapan >= 100 ? '🏆' : ($kelengkapan >= 80 ? '🎉' : ($kelengkapan >= 40 ? '💪' : '🚀'));
+                $motivasi = $kelengkapan >= 100 ? 'Sempurna! Semua data sudah terlengkapi. Anda luar biasa!'
+                    : ($kelengkapan >= 80 ? 'Hampir sampai! Sedikit lagi menuju data yang sempurna.'
+                    : ($kelengkapan >= 40 ? 'Progres bagus! Terus lengkapi, setiap field yang terisi memperkuat arsip digital sekolah.'
+                    : 'Mari mulai! Setiap data yang dilengkapi adalah langkah kecil menuju administrasi sekolah yang profesional.'));
+            @endphp
+            <div class="mt-5">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-white/60 uppercase tracking-widest">Kelengkapan Data</span>
+                    <span class="text-sm font-black text-white">{{ $kelengkapan }}%</span>
+                </div>
+                <div class="w-full h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                    <div class="h-full rounded-full bg-gradient-to-r {{ $progressBg }} transition-all duration-700" style="width: {{ $kelengkapan }}%"></div>
+                </div>
+                <div class="mt-3 flex items-start gap-3 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20">
+                    <span class="text-xl flex-shrink-0">{{ $emoji }}</span>
+                    <p class="text-sm font-semibold text-white/90">{{ $motivasi }}</p>
+                </div>
+            </div>
         </div>
 
         {{-- Section Nav --}}
