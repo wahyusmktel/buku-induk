@@ -49,9 +49,10 @@
         table.bordered th { background-color: #f3f4f6; font-weight: bold; text-transform: uppercase; font-size: 7.5pt; color: #374151; }
         table.bordered td.left { text-align: left; padding-left: 6px; }
         
-        .signature-area { display: flex; justify-content: flex-end; margin-top: 40px; float: right; width: 250px; text-align: center; }
-        .signature-box { text-align: center; }
-        .signature-line { border-bottom: 1px solid #111827; margin: 60px auto 5px; width: 200px; }
+        .signature-area { display: flex; justify-content: flex-end; margin-top: 40px; float: right; width: 250px; text-align: left; }
+        .signature-box { text-align: left; width: 100%; }
+        .signature-box p { margin: 0; padding: 0; line-height: 1.3; }
+        .signature-line { border-bottom: 0px solid #111827; margin: 80px 0 5px; width: 200px; }
         
         .print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-family: 'Helvetica', sans-serif; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
 
@@ -71,7 +72,7 @@
     {{-- PAGE 1: Identity --}}
     <div class="school-header">
         <h1>Buku Induk Siswa</h1>
-        <h2>Sekolah Dasar / Menengah</h2>
+        <h2>{{ $settings['sekolah_nama'] ?? 'Sekolah Dasar / Menengah' }}</h2>
         <p>Tahun Pelajaran {{ $siswa->rombel_saat_ini ?? '' }}</p>
     </div>
 
@@ -261,10 +262,12 @@
 
         <div class="signature-area">
             <div class="signature-box">
+                <p>{{ $settings['buku_induk_kota'] ?? '..........' }}, {{ !empty($settings['buku_induk_tanggal']) ? $settings['buku_induk_tanggal'] : \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p>Mengetahui,</p>
-                <p>Kepala Sekolah</p>
+                <p>Kepala {{ $settings['sekolah_nama'] ?? 'Sekolah' }}</p>
                 <div class="signature-line"></div>
-                <p>NIP. _________________________</p>
+                <p><strong><u>{{ $settings['kepsek_nama'] ?? '__________________________' }}</u></strong></p>
+                <p>NIP. {{ $settings['kepsek_nip'] ?? '__________________________' }}</p>
             </div>
         </div>
     </div>

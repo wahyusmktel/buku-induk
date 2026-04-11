@@ -62,19 +62,36 @@ class SettingController extends Controller
             'kepsek_ttd', 'sekolah_stempel', 'sekolah_kop', 'sekolah_logo'
         ];
 
+        // Pastikan folder settings ada
+        if (!Storage::disk('public')->exists('settings')) {
+            Storage::disk('public')->makeDirectory('settings');
+        }
+
         foreach ($files as $fileKey) {
             if ($request->hasFile($fileKey)) {
-                // Ambil file setting lama untuk bisa dihapus agar storage tidak penuh
-                $oldSetting = Setting::where('key', $fileKey)->first();
+                $file = $request->file($fileKey);
+                
+                if ($file && $file->isValid()) {
+                    // Ambil file setting lama untuk bisa dihapus agar storage tidak penuh
+                    $oldSetting = Setting::where('key', $fileKey)->first();
 
-                if ($oldSetting && $oldSetting->value) {
-                    if (Storage::disk('public')->exists($oldSetting->value)) {
-                        Storage::disk('public')->delete($oldSetting->value);
+                    if ($oldSetting && !empty($oldSetting->value)) {
+                        try {
+                            if (Storage::disk('public')->exists($oldSetting->value)) {
+                                Storage::disk('public')->delete($oldSetting->value);
+                            }
+                        } catch (\Exception $e) {
+                            // Abaikan error jika file lama tidak ditemukan atau path bermasalah
+                        }
                     }
-                }
 
-                $path = $request->file($fileKey)->store('settings', 'public');
-                Setting::updateOrCreate(['key' => $fileKey], ['value' => $path]);
+                    // Simpan file baru
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $file->move(storage_path('app/public/settings'), $filename);
+                    $path = 'settings/' . $filename;
+
+                    Setting::updateOrCreate(['key' => $fileKey], ['value' => $path]);
+                }
             }
         }
 
