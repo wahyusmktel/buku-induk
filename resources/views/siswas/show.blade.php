@@ -47,7 +47,7 @@
                     </span>
                     @endif
                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider">
-                        Rombel: {{ $siswa->rombel_saat_ini ?? '-' }}
+                        Rombel: {{ $siswa->rombel ? $siswa->rombel->nama : ($siswa->rombel_saat_ini ?? '-') }}
                     </span>
                     @php
                         $statusBadge = match($siswa->status) {
@@ -65,10 +65,17 @@
 
             @hasanyrole('Super Admin|Operator|Tata Usaha')
             <div class="flex gap-4">
-                <a href="{{ route('siswas.edit', $siswa) }}" class="px-6 py-3 bg-indigo-600 text-white text-sm font-black rounded-2xl hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-indigo-100 flex items-center gap-2">
-                    <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Ubah Profil
+                @if($siswa->nisn)
+                <a href="{{ route('buku-induk.show', $siswa->nisn) }}" class="px-6 py-3 bg-indigo-600 text-white text-sm font-black rounded-2xl hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-indigo-100 flex items-center gap-2">
+                    <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Buku Induk
                 </a>
+                @else
+                <button disabled title="Siswa tidak memiliki NISN" class="px-6 py-3 bg-slate-200 text-slate-500 text-sm font-black rounded-2xl shadow border border-slate-300 flex items-center gap-2 cursor-not-allowed">
+                    <svg class="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Buku Induk
+                </button>
+                @endif
             </div>
             @endhasanyrole
         </div>
@@ -89,11 +96,11 @@
                 <div class="grid grid-cols-2 gap-y-10 gap-x-6">
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Berat Badan</p>
-                        <p class="text-3xl font-black">{{ $siswa->berat_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">kg</span></p>
+                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->berat_badan ?? $siswa->berat_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">kg</span></p>
                     </div>
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Tinggi Badan</p>
-                        <p class="text-3xl font-black">{{ $siswa->tinggi_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">cm</span></p>
+                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->tinggi_badan ?? $siswa->tinggi_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">cm</span></p>
                     </div>
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Lingkar Kepala</p>
@@ -101,17 +108,17 @@
                     </div>
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Jarak Sekolah</p>
-                        <p class="text-xl font-black">{{ $siswa->jarak_rumah_ke_sekolah_km ?? '-' }}<span class="text-xs font-medium opacity-50 ml-1">KM</span></p>
+                        <p class="text-xl font-black">{{ $siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? $siswa->jarak_rumah_ke_sekolah_km ?? '-' }}</p>
                     </div>
                 </div>
                 <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Golongan Darah</p>
-                        <p class="text-indigo-100 font-black">{{ $siswa->golongan_darah ?? '-' }}</p>
+                        <p class="text-indigo-100 font-black">{{ $siswa->keadaanJasmani->golongan_darah ?? '-' }}</p>
                     </div>
                     <div>
-                        <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Anak Ke-</p>
-                        <p class="text-indigo-100 font-black">{{ $siswa->anak_ke_berapa ?? '-' }} <span class="text-[10px] font-medium opacity-60">dari {{ $siswa->jml_saudara_kandung + 1 }} bersaudara</span></p>
+                        <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Jumlah Saudara</p>
+                        <p class="text-indigo-100 font-black">{{ $siswa->dataPeriodik->jml_saudara_kandung ?? $siswa->jml_saudara_kandung ?? '0' }} <span class="text-[10px] font-medium opacity-60">Kandung</span> &bull; {{ $siswa->dataPeriodik->jml_saudara_tiri ?? '0' }} <span class="text-[10px] font-medium opacity-60">Tiri</span></p>
                     </div>
                 </div>
             </div>
@@ -124,11 +131,11 @@
                 <div class="space-y-4">
                     <div class="p-4 bg-rose-50/50 rounded-2xl border border-rose-100/50">
                         <p class="text-[10px] font-bold text-rose-400 uppercase mb-1">Riwayat Penyakit</p>
-                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->riwayat_penyakit ?? 'Tidak ada riwayat penyakit signifikan' }}</p>
+                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->nama_riwayat_penyakit ?? $siswa->riwayat_penyakit ?? 'Tidak ada riwayat penyakit signifikan' }}</p>
                     </div>
                     <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/50">
-                        <p class="text-[10px] font-bold text-amber-500 uppercase mb-1">Kebutuhan Khusus</p>
-                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->kebutuhan_khusus ?? 'Tidak ada' }}</p>
+                        <p class="text-[10px] font-bold text-amber-500 uppercase mb-1">Kelainan Jasmani / Kebutuhan Khusus</p>
+                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->kelainan_jasmani ?? $siswa->kebutuhan_khusus ?? 'Tidak ada' }}</p>
                     </div>
                 </div>
             </div>
@@ -220,7 +227,7 @@
                         </div>
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Bahasa Sehari-hari</p>
-                            <p class="text-base font-bold text-slate-700">{{ $siswa->bahasa_sehari_hari ?? '-' }}</p>
+                            <p class="text-base font-bold text-slate-700">{{ $siswa->dataPeriodik->bahasa_sehari_hari ?? '-' }}</p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. Reg. Akta Lahir</p>
@@ -240,12 +247,12 @@
                     <div class="space-y-6">
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap</p>
-                            <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->alamat ?? '-' }} (RT {{ $siswa->rt }}/RW {{ $siswa->rw }}), Dusun {{ $siswa->dusun }}, Kelurahan {{ $siswa->kelurahan }}, Kecamatan {{ $siswa->kecamatan }}, {{ $siswa->kode_pos }}</p>
+                            <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->dataPeriodik->alamat_tinggal ?? $siswa->alamat ?? '-' }}</p>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="p-3 bg-slate-50 rounded-2xl">
-                                <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Jenis Tinggal</p>
-                                <p class="text-xs font-bold text-slate-600">{{ $siswa->jenis_tinggal ?? '-' }}</p>
+                                <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Bertempat Tinggal Pada</p>
+                                <p class="text-xs font-bold text-slate-600">{{ $siswa->dataPeriodik->bertempat_tinggal_pada ?? $siswa->jenis_tinggal ?? '-' }}</p>
                             </div>
                             <div class="p-3 bg-slate-50 rounded-2xl">
                                 <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Transportasi</p>
@@ -289,6 +296,13 @@
                 <div class="bg-slate-50/50 px-10 py-5 border-b border-slate-100">
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-[0.15em]">Data Orang Tua Kandung</h3>
                 </div>
+                
+                @php
+                    $ayah = $siswa->dataOrangTua->where('jenis', 'Ayah')->first();
+                    $ibu = $siswa->dataOrangTua->where('jenis', 'Ibu')->first();
+                    $wali = $siswa->dataOrangTua->where('jenis', 'Wali')->first();
+                @endphp
+
                 <div class="p-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                         <!-- Ayah -->
@@ -298,13 +312,13 @@
                                 <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">Ayah Kandung</h4>
                             </div>
                             <div class="space-y-4">
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ayah</p><p class="text-sm font-bold text-slate-800">{{ $siswa->nama_ayah ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ayah</p><p class="text-sm font-bold text-slate-800">{{ $ayah->nama ?? $siswa->nama_ayah ?? '-' }}</p></div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Thn Lahir</p><p class="text-xs font-bold text-slate-700">{{ $siswa->tahun_lahir_ayah ?? '-' }}</p></div>
                                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Ayah</p><p class="text-xs font-bold text-slate-700 font-mono tracking-tighter">{{ $siswa->nik_ayah ?? '-' }}</p></div>
                                 </div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->jenjang_pendidikan_ayah ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->pekerjaan_ayah ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_ayah ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</p></div>
                                 <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-indigo-600">{{ $siswa->penghasilan_ayah ?? '-' }}</p></div>
                             </div>
                         </div>
@@ -316,13 +330,13 @@
                                 <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">Ibu Kandung</h4>
                             </div>
                             <div class="space-y-4">
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ibu</p><p class="text-sm font-bold text-slate-800">{{ $siswa->nama_ibu ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ibu</p><p class="text-sm font-bold text-slate-800">{{ $ibu->nama ?? $siswa->nama_ibu ?? '-' }}</p></div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Thn Lahir</p><p class="text-xs font-bold text-slate-700">{{ $siswa->tahun_lahir_ibu ?? '-' }}</p></div>
                                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Ibu</p><p class="text-xs font-bold text-slate-700 font-mono tracking-tighter">{{ $siswa->nik_ibu ?? '-' }}</p></div>
                                 </div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->jenjang_pendidikan_ibu ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->pekerjaan_ibu ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_ibu ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pekerjaan ?? $siswa->pekerjaan_ibu ?? '-' }}</p></div>
                                 <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-rose-600">{{ $siswa->penghasilan_ibu ?? '-' }}</p></div>
                             </div>
                         </div>
@@ -336,13 +350,13 @@
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Data Wali Murid</h3>
                     <div class="px-3 py-1 bg-slate-50 text-[10px] font-bold text-slate-400 rounded-full border border-slate-100 uppercase tracking-tighter">Optional</div>
                  </div>
-                 @if($siswa->nama_wali)
+                 @if($wali || $siswa->nama_wali)
                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Wali</p><p class="text-sm font-bold text-slate-800">{{ $siswa->nama_wali }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Thn Lahir</p><p class="text-xs font-bold text-slate-700">{{ $siswa->tahun_lahir_wali ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Wali</p><p class="text-sm font-bold text-slate-800">{{ $wali->nama ?? $siswa->nama_wali ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Status Hubungan</p><p class="text-xs font-bold text-slate-700">{{ $wali->status_hubungan_wali ?? '-' }}</p></div>
                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Wali</p><p class="text-xs font-bold text-slate-700 font-mono">{{ $siswa->nik_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->jenjang_pendidikan_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $siswa->pekerjaan_wali ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_wali ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</p></div>
                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-emerald-600">{{ $siswa->penghasilan_wali ?? '-' }}</p></div>
                  </div>
                  @else

@@ -27,6 +27,7 @@ class SettingController extends Controller
     {
         // Validasi input
         $validatedData = $request->validate([
+            'jenjang_pendidikan' => 'nullable|string|in:SD,SMP,SMA/SMK',
             'kepsek_nama' => 'nullable|string|max:255',
             'kepsek_nip' => 'nullable|string|max:255',
             'buku_induk_kota' => 'nullable|string|max:255',

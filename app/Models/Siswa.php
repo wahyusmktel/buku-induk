@@ -60,6 +60,31 @@ class Siswa extends Model
 
     public function rombel()
     {
-        return $this->belongsTo(Rombel::class);
+        return $this->belongsTo(Rombel::class, 'rombel_id');
+    }
+
+    public function dataPeriodik()
+    {
+        return $this->hasOne(DataPeriodikSiswa::class);
+    }
+
+    public function keadaanJasmani()
+    {
+        return $this->hasOne(KeadaanJasmaniSiswa::class);
+    }
+
+    public function dataOrangTua()
+    {
+        return $this->hasMany(DataOrangTuaSiswa::class);
+    }
+
+    public function beasiswa()
+    {
+        return $this->hasMany(BeasiswaSiswa::class);
+    }
+
+    public function registrasi()
+    {
+        return $this->hasMany(RegistrasiSiswa::class);
     }
 }

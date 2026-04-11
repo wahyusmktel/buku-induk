@@ -94,7 +94,10 @@ Route::middleware(['auth'])->group(function () {
         
         // Rombel Management
         Route::get('/rombels', [RombelController::class, 'index'])->name('rombels.index');
+        Route::post('/rombels', [RombelController::class, 'store'])->name('rombels.store');
         Route::get('/rombels/{id}', [RombelController::class, 'show'])->name('rombels.show');
+        Route::get('/api/rombels/{id}/unassigned-siswas', [RombelController::class, 'getUnassignedSiswas']);
+        Route::post('/rombels/{id}/assign-siswas', [RombelController::class, 'assignSiswas'])->name('rombels.assign');
     });
 
     // Tahun Pelajaran Management

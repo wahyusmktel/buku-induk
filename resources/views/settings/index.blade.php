@@ -44,16 +44,26 @@
     <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        {{-- 1. Kartu Informasi Kepala Sekolah --}}
+        {{-- 1. Kartu Informasi Kepala Sekolah & Institusi --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <h3 class="font-bold text-slate-700">Informasi Kepala Sekolah</h3>
+                    <h3 class="font-bold text-slate-700">Identitas Institusi & Kepala Sekolah</h3>
                 </div>
             </div>
             
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label for="jenjang_pendidikan" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jenjang Pendidikan</label>
+                    <select id="jenjang_pendidikan" name="jenjang_pendidikan" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner">
+                        <option value="" disabled {{ empty($settings['jenjang_pendidikan']) ? 'selected' : '' }}>Pilih Jenjang</option>
+                        <option value="SD" {{ (old('jenjang_pendidikan', $settings['jenjang_pendidikan'] ?? '')) == 'SD' ? 'selected' : '' }}>SD</option>
+                        <option value="SMP" {{ (old('jenjang_pendidikan', $settings['jenjang_pendidikan'] ?? '')) == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMA/SMK" {{ (old('jenjang_pendidikan', $settings['jenjang_pendidikan'] ?? '')) == 'SMA/SMK' ? 'selected' : '' }}>SMA/SMK</option>
+                    </select>
+                    @error('jenjang_pendidikan') <p class="mt-1 text-xs text-red-500 font-medium">{{ $message }}</p> @enderror
+                </div>
                 <div>
                     <label for="kepsek_nama" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Terang Kepala Sekolah</label>
                     <input type="text" id="kepsek_nama" name="kepsek_nama" 

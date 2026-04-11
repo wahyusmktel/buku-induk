@@ -14,6 +14,10 @@ class Rombel extends Model
         'nama',
         'tingkat',
         'tahun_pelajaran_id',
+        'jenis_rombel',
+        'kompetensi_keahlian',
+        'kurikulum',
+        'guru_id',
     ];
 
     public function siswas()
