@@ -6,7 +6,10 @@
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
         @page { 
-            margin: 0; 
+            margin: 0;
+        }
+        @page :first {
+            margin-top: 0;
         }
         body { 
             font-family: 'Helvetica', 'Arial', sans-serif; 
@@ -56,6 +59,7 @@
         .page-break-before {
             page-break-before: always;
             break-before: page;
+            padding-top: 1.5cm;
         }
         
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 9.5pt; }
