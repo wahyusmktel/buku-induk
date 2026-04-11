@@ -85,63 +85,71 @@ class BukuInduk extends Model
      */
     public function getKelengkapanAttribute(): int
     {
-        // ── Group A: Field eksklusif di tabel buku_induks (diisi manual) ──
-        $bukuIndukFields = [
-            'no_induk',                 // Nomor Induk Sekolah
-            'nama_panggilan',           // Nama Panggilan
-            'tgl_masuk_sekolah',        // Tanggal Masuk Sekolah
-            'asal_masuk_sekolah',       // Asal / SD sebelumnya
-            'bertempat_tinggal_dengan', // Tinggal bersama
-            // Data Ayah (buku induk)
-            'nama_ayah',
-            'tempat_lahir_ayah',
-            'tanggal_lahir_ayah',
-            'agama_ayah',
-            'pekerjaan_ayah_bi',
-            'pendidikan_ayah_bi',
-            // Data Ibu (buku induk)
-            'nama_ibu',
-            'tempat_lahir_ibu',
-            'tanggal_lahir_ibu',
-            'agama_ibu',
-            'pekerjaan_ibu_bi',
-            'pendidikan_ibu_bi',
-        ];
-
-        // ── Group B: Field yang bersumber dari Dapodik / Siswa ──
-        $siswaFields = [
-            'nik',              // NIK siswa
-            'tempat_lahir',     // Tempat lahir
-            'tanggal_lahir',    // Tanggal lahir
-            'agama',            // Agama
-            'kewarganegaraan',  // Kewarganegaraan
-            'bahasa_sehari_hari', // Bahasa sehari-hari
-            'golongan_darah',   // Golongan darah
-            'alamat',           // Alamat lengkap
-            'telepon',          // No. HP / Telepon
-            'sekolah_asal',     // Sekolah asal (TK)
-            'no_kk',            // Nomor KK
-            'jml_saudara_kandung', // Jumlah saudara kandung
-            'nik_ayah',
-            'nik_ibu',
-        ];
-
-        // Hitung dari BukuInduk
-        $filledBi = collect($bukuIndukFields)
-            ->filter(fn($f) => !empty($this->$f))
-            ->count();
-
-        // Hitung dari Siswa
         $siswa = $this->siswaPokok;
-        $filledSiswa = 0;
-        if ($siswa) {
-            $filledSiswa = collect($siswaFields)
-                ->filter(fn($f) => !empty($siswa->$f))
-                ->count();
+        if (!$siswa) return 0;
+
+        $filled = 0;
+        $total  = 0;
+
+        // ── 1. Identitas Murid (dari tabel siswas) — 10 field ──
+        $identitasFields = [
+            'nipd', 'nisn', 'nik', 'nama', 'nama_panggilan',
+            'jk', 'tempat_lahir', 'tanggal_lahir', 'agama', 'kewarganegaraan',
+        ];
+        $total += count($identitasFields);
+        $filled += collect($identitasFields)->filter(fn($f) => !empty($siswa->$f))->count();
+
+        // ── 2. Data Periodik (dari tabel data_periodik_siswas) — 7 field ──
+        $periodikFields = [
+            'jml_saudara_kandung', 'jml_saudara_tiri', 'jml_saudara_angkat',
+            'bahasa_sehari_hari', 'alamat_tinggal', 'bertempat_tinggal_pada',
+            'jarak_tempat_tinggal_ke_sekolah',
+        ];
+        $total += count($periodikFields);
+        $periodik = $siswa->dataPeriodik;
+        if ($periodik) {
+            $filled += collect($periodikFields)->filter(fn($f) => !empty($periodik->$f))->count();
         }
 
-        $total  = count($bukuIndukFields) + count($siswaFields);
-        $filled = $filledBi + $filledSiswa;
+        // ── 3. Keadaan Jasmani (dari tabel keadaan_jasmani_siswas) — 5 field ──
+        $jasmaniFields = [
+            'berat_badan', 'tinggi_badan', 'golongan_darah',
+            'nama_riwayat_penyakit', 'kelainan_jasmani',
+        ];
+        $total += count($jasmaniFields);
+        $jasmani = $siswa->keadaanJasmani;
+        if ($jasmani) {
+            $filled += collect($jasmaniFields)->filter(fn($f) => !empty($jasmani->$f))->count();
+        }
+
+        // ── 4. Data Orang Tua — Ayah (3 field) + Ibu (3 field) = 6 field ──
+        $orangTuaFields = ['nama', 'pendidikan_terakhir', 'pekerjaan'];
+        $total += count($orangTuaFields) * 2; // ayah + ibu
+
+        $orangTua = $siswa->dataOrangTua;
+        if ($orangTua) {
+            $ayah = $orangTua->where('jenis', 'Ayah')->first();
+            $ibu  = $orangTua->where('jenis', 'Ibu')->first();
+            if ($ayah) {
+                $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ayah->$f))->count();
+            }
+            if ($ibu) {
+                $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ibu->$f))->count();
+            }
+        }
+
+        // ── 5. Pendidikan Sebelumnya (dari tabel buku_induks) — 3 field ──
+        $pendidikanFields = [
+            'asal_masuk_sekolah', 'nama_tk_asal', 'tgl_masuk_sekolah',
+        ];
+        $total += count($pendidikanFields);
+        $filled += collect($pendidikanFields)->filter(fn($f) => !empty($this->$f))->count();
+
+        // ── 6. Foto (dari tabel buku_induks) — 1 field ──
+        $total += 1;
+        if (!empty($this->foto_1)) $filled += 1;
+
+        if ($total === 0) return 0;
 
         return (int) round(($filled / $total) * 100);
     }

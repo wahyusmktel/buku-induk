@@ -77,10 +77,15 @@ class BukuIndukController extends Controller
         $nisnList     = $siswas->pluck('nisn')->filter()->toArray();
         $bukuIndukMap = BukuInduk::whereIn('nisn', $nisnList)->get()->keyBy('nisn');
 
-        // Attach the matched Siswa row onto each BukuInduk so the accessor can use it
-        $siswaByNisn  = $siswas->keyBy('nisn');
+        // Eager-load related data for kelengkapan calculation
+        $siswaWithRelations = Siswa::whereIn('nisn', $nisnList)
+            ->where('tahun_pelajaran_id', $tahunAktif?->id)
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua'])
+            ->get()
+            ->keyBy('nisn');
+
         foreach ($bukuIndukMap as $nisn => $bi) {
-            $bi->setRelation('siswaPokok', $siswaByNisn[$nisn] ?? null);
+            $bi->setRelation('siswaPokok', $siswaWithRelations[$nisn] ?? null);
         }
 
         return view('buku-induk.index', compact(
