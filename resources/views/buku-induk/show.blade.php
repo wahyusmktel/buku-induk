@@ -64,7 +64,7 @@
             </div>
             {{-- Actions --}}
             <div class="flex gap-3 flex-shrink-0">
-                <a href="{{ route('buku-induk.print', $siswa->nisn) }}" target="_blank"
+                <a href="javascript:void(0)" onclick="confirmPrint()"
                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     Cetak
@@ -557,4 +557,30 @@
     </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmPrint() {
+    let kelengkapan = {{ $kelengkapan }};
+    let printUrl = "{{ route('buku-induk.print', $siswa->nisn) }}";
+    
+    if (kelengkapan < 100) {
+        Swal.fire({
+            title: 'Data Belum Lengkap (100%)',
+            text: 'Kelengkapan data buku induk saat ini baru ' + kelengkapan + '%. Dokumen PDF mungkin memiliki bagian yang kosong. Apakah Anda tetap ingin mencetak?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Ya, Cetak PDF',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(printUrl, "_blank");
+            }
+        });
+    } else {
+        window.open(printUrl, "_blank");
+    }
+}
+</script>
 @endsection

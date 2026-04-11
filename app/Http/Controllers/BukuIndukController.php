@@ -374,6 +374,7 @@ class BukuIndukController extends Controller
 
         $siswa = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $nisn)
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua', 'beasiswa', 'registrasi'])
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
 
@@ -392,9 +393,12 @@ class BukuIndukController extends Controller
                 $akademikGrid[$kelas][$semester] = $record;
             }
         }
-        
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        $is_pdf = true;
 
-        return view('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->stream("Buku_Induk_{$nisn}_{$siswa->nama}.pdf");
     }
 }
