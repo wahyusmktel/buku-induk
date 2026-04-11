@@ -6,7 +6,7 @@
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
         @page { 
-            margin: {{ $settings['margin_top'] ?? '2.5' }}cm {{ $settings['margin_right'] ?? '2.5' }}cm {{ $settings['margin_bottom'] ?? '2.5' }}cm {{ $settings['margin_left'] ?? '2.5' }}cm; 
+            margin: 0; 
         }
         body { 
             font-family: 'Helvetica', 'Arial', sans-serif; 
@@ -17,14 +17,24 @@
             margin: 0;
             padding: 0;
         }
+        .content-wrapper {
+            margin: 5px {{ $settings['margin_right'] ?? '2.5' }}cm {{ $settings['margin_bottom'] ?? '2.5' }}cm {{ $settings['margin_left'] ?? '2.5' }}cm;
+            position: relative;
+        }
+        .kop-surat-full {
+            width: 100%;
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
         @media print {
             .no-print { display: none !important; }
             .page-break { page-break-before: always; }
         }
-        h1 { font-size: 14pt; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 2px; color: #111827; }
-        h2 { font-size: 12pt; font-weight: normal; text-align: center; text-transform: uppercase; color: #4b5563; margin-top: 4px; }
-        .school-header { text-align: center; border-bottom: 2px solid #111827; padding-bottom: 12px; margin-bottom: 24px; }
-        .school-header p { font-size: 10pt; margin-top: 6px; font-weight: bold; color: #374151; }
+        h1 { font-size: 14pt; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 2px; color: #111827; margin: 0; }
+        h2 { font-size: 12pt; font-weight: normal; text-align: center; text-transform: uppercase; color: #4b5563; margin: 2px 0; }
+        .school-header { text-align: center; border-bottom: 2px solid #111827; padding-bottom: 8px; margin-bottom: 24px; }
+        .school-header p { font-size: 10pt; margin: 2px 0 0; font-weight: bold; color: #374151; }
         
         .section-title { 
             font-weight: bold; 
@@ -49,9 +59,12 @@
         table.bordered th { background-color: #f3f4f6; font-weight: bold; text-transform: uppercase; font-size: 7.5pt; color: #374151; }
         table.bordered td.left { text-align: left; padding-left: 6px; }
         
-        .signature-area { display: flex; justify-content: flex-end; margin-top: 40px; float: right; width: 250px; text-align: left; }
-        .signature-box { text-align: left; width: 100%; }
+        .signature-wrapper { margin-top: 40px; text-align: right; width: 100%; clear: both; }
+        .signature-box { display: inline-block; width: 300px; text-align: left; position: relative; }
         .signature-box p { margin: 0; padding: 0; line-height: 1.3; }
+        .signature-space { position: relative; height: 100px; width: 100%; }
+        .stempel-img { height: 100px; width: auto; position: absolute; left: 10px; top: 0; z-index: 1; }
+        .ttd-img { height: 80px; width: auto; position: absolute; left: 50px; top: 10px; z-index: 2; }
         .signature-line { border-bottom: 0px solid #111827; margin: 80px 0 5px; width: 200px; }
         
         .print-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-family: 'Helvetica', sans-serif; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
@@ -69,12 +82,19 @@
     <button class="print-btn no-print" onclick="window.print()">🖨️ Cetak Buku Induk</button>
     @endif
 
-    {{-- PAGE 1: Identity --}}
-    <div class="school-header">
-        <h1>Buku Induk Siswa</h1>
-        <h2>{{ $settings['sekolah_nama'] ?? 'Sekolah Dasar / Menengah' }}</h2>
-        <p>Tahun Pelajaran {{ $siswa->rombel_saat_ini ?? '' }}</p>
-    </div>
+    @if(!empty($settings['sekolah_kop_pdf']))
+        <img src="{{ $settings['sekolah_kop_pdf'] }}" class="kop-surat-full">
+    @elseif(!empty($settings['sekolah_kop']))
+        <img src="{{ storage_path('app/public/' . $settings['sekolah_kop']) }}" class="kop-surat-full">
+    @endif
+
+    <div class="content-wrapper">
+        {{-- PAGE 1: Identity --}}
+        <div class="school-header">
+            <h1>Buku Induk Siswa</h1>
+            <h2>{{ $settings['sekolah_nama'] ?? 'Sekolah Dasar / Menengah' }}</h2>
+            <p>Tahun Pelajaran {{ $siswa->tahunPelajaran ? $siswa->tahunPelajaran->tahun . ' / Semester ' . $siswa->tahunPelajaran->semester : ($siswa->rombel_saat_ini ?? '—') }}</p>
+        </div>
 
     <table style="width: 100%; border: none; margin-bottom: 10px;">
         <tr>
@@ -96,7 +116,7 @@
             <td style="width: 3.2cm; vertical-align: top; padding-top: 10px;">
                 <div class="photo-box" style="margin-bottom: 5px;">
                     @if($bukuInduk->foto_1)
-                        <img src="{{ public_path('storage/' . $bukuInduk->foto_1) }}">
+                        <img src="{{ storage_path('app/public/' . $bukuInduk->foto_1) }}">
                     @else
                         <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
                     @endif
@@ -105,7 +125,7 @@
 
                 <div class="photo-box" style="margin-bottom: 5px;">
                     @if($bukuInduk->foto_2)
-                        <img src="{{ public_path('storage/' . $bukuInduk->foto_2) }}">
+                        <img src="{{ storage_path('app/public/' . $bukuInduk->foto_2) }}">
                     @else
                         <div style="text-align:center; color:#9ca3af; font-size:8pt; width: 100%; margin-top: 1.5cm;">Pas Foto<br/>3 x 4</div>
                     @endif
@@ -136,9 +156,8 @@
             <tr><td>4. Riwayat Penyakit</td><td>:</td><td>{{ $jasmani?->nama_riwayat_penyakit ?? 'Tidak ada' }}</td></tr>
             <tr><td>5. Kelainan Jasmani</td><td>:</td><td>{{ $jasmani?->kelainan_jasmani ?? 'Tidak ada' }}</td></tr>
         </table>
-    </div>
-
-    <div class="page-break">
+        
+        <div class="page-break">
         <p class="section-title">IV. Pendidikan Sebelumnya</p>
         <table class="data-table">
             <tr class="sub-header"><td colspan="3">A. Masuk Menjadi Siswa Baru</td></tr>
@@ -182,8 +201,7 @@
             <tr><td>Pendidikan Terakhir</td><td>:</td><td>{{ $wali?->pendidikan_terakhir ?? '—' }}</td></tr>
             <tr><td>Pekerjaan</td><td>:</td><td>{{ $wali?->pekerjaan ?? '—' }}</td></tr>
         </table>
-    </div>
-
+    
     {{-- PAGE 3: Academic Records & Beasiswa --}}
     <div class="page-break">
         <p class="section-title">VI. Prestasi Belajar</p>
@@ -260,12 +278,25 @@
             <tr><td>2. Alasan Keluar</td><td>:</td><td>{{ $reg_keluar?->alasan_keluar ?? '—' }}</td></tr>
         </table>
 
-        <div class="signature-area">
+        <div class="signature-wrapper">
             <div class="signature-box">
                 <p>{{ $settings['buku_induk_kota'] ?? '..........' }}, {{ !empty($settings['buku_induk_tanggal']) ? $settings['buku_induk_tanggal'] : \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p>Mengetahui,</p>
                 <p>Kepala {{ $settings['sekolah_nama'] ?? 'Sekolah' }}</p>
-                <div class="signature-line"></div>
+                
+                <div class="signature-space">
+                    @if(!empty($settings['kepsek_ttd_pdf']))
+                        <img src="{{ $settings['kepsek_ttd_pdf'] }}" class="ttd-img">
+                    @elseif(!empty($settings['kepsek_ttd']))
+                        <img src="{{ storage_path('app/public/' . $settings['kepsek_ttd']) }}" class="ttd-img">
+                    @endif
+                    @if(!empty($settings['sekolah_stempel_pdf']))
+                        <img src="{{ $settings['sekolah_stempel_pdf'] }}" class="stempel-img">
+                    @elseif(!empty($settings['sekolah_stempel']))
+                        <img src="{{ storage_path('app/public/' . $settings['sekolah_stempel']) }}" class="stempel-img">
+                    @endif
+                </div>
+
                 <p><strong><u>{{ $settings['kepsek_nama'] ?? '__________________________' }}</u></strong></p>
                 <p>NIP. {{ $settings['kepsek_nip'] ?? '__________________________' }}</p>
             </div>
