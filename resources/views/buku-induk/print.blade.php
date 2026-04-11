@@ -6,7 +6,10 @@
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
         @page { 
-            margin: 0;
+            margin-top: {{ $settings['margin_top'] ?? '2.5' }}cm;
+            margin-bottom: {{ $settings['margin_bottom'] ?? '2.5' }}cm;
+            margin-left: 0;
+            margin-right: 0;
         }
         @page :first {
             margin-top: 0;
@@ -21,7 +24,10 @@
             padding: 0;
         }
         .content-wrapper {
-            margin: 5px {{ $settings['margin_right'] ?? '2' }}cm {{ $settings['margin_bottom'] ?? '2' }}cm {{ $settings['margin_left'] ?? '2' }}cm;
+            margin-top: 5px;
+            margin-right: {{ $settings['margin_right'] ?? '2.5' }}cm;
+            margin-bottom: 0px; /* @page margin-bottom has handled the bottom spacing */
+            margin-left: {{ $settings['margin_left'] ?? '2.5' }}cm;
             position: relative;
         }
         .kop-surat-full {
@@ -59,7 +65,6 @@
         .page-break-before {
             page-break-before: always;
             break-before: page;
-            padding-top: 1.5cm;
         }
         
         table.data-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 9.5pt; }
