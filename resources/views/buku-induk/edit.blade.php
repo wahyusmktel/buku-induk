@@ -51,6 +51,7 @@
                 'identitas' => 'Identitas Murid', 
                 'orang_tua' => 'Data Orang Tua', 
                 'periodik' => 'Data Periodik',
+                'pendidikan' => 'Pendidikan Sebelumnya',
                 'jasmani' => 'Keadaan Jasmani',
                 'beasiswa' => 'Beasiswa',
                 'registrasi' => 'Meninggalkan Sekolah',
@@ -254,6 +255,87 @@
                             </select>
                         </div>
                         <div class="space-y-1.5"><label class="text-xs font-black text-slate-500 uppercase">7. Jarak Tempat Tinggal ke Sekolah (km)</label><input type="number" step="0.1" name="periodik[jarak]" value="{{ old('periodik.jarak', $siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? '') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="Misal: 2.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SECTION: PENDIDIKAN SEBELUMNYA --}}
+            <div x-show="section === 'pendidikan'" x-transition>
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 mb-6 relative bg-slate-50/50">
+                    <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Data Pendidikan Sebelumnya</p>
+
+                    {{-- A. Masuk Sebagai Siswa Baru --}}
+                    <div class="mb-8">
+                        <h4 class="font-black text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2 mb-4"><span class="w-1 h-5 bg-emerald-500 rounded-full"></span>A. Masuk Menjadi Siswa Baru Kelas</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase">1. Asal Siswa</label>
+                                <select name="pendidikan_sebelumnya[asal_siswa]" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach(['Siswa Baru', 'Pindahan'] as $opt)
+                                    <option value="{{ $opt }}" {{ old('pendidikan_sebelumnya.asal_siswa', $bukuInduk->asal_masuk_sekolah) == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase">
+                                    2. {{ $jenjang === 'SD' ? 'Nama Taman Kanak-Kanak' : 'Nama Sekolah Jenjang Sebelumnya' }}
+                                </label>
+                                <input type="text" name="pendidikan_sebelumnya[nama_sekolah_asal]" value="{{ old('pendidikan_sebelumnya.nama_sekolah_asal', $bukuInduk->nama_tk_asal ?? $siswa->sekolah_asal) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="{{ $jenjang === 'SD' ? 'Nama TK / PAUD...' : 'Nama sekolah sebelumnya...' }}">
+                            </div>
+                            <div class="space-y-1.5 lg:col-span-1">
+                                <label class="text-xs font-black text-slate-500 uppercase">3. Alamat Sekolah Asal</label>
+                                <input type="text" name="pendidikan_sebelumnya[alamat_sekolah_asal]" value="{{ old('pendidikan_sebelumnya.alamat_sekolah_asal', '') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="Alamat sekolah...">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase">4. Tanggal Masuk Sekolah Ini</label>
+                                <input type="date" name="pendidikan_sebelumnya[tgl_masuk]" value="{{ old('pendidikan_sebelumnya.tgl_masuk', $bukuInduk->tgl_masuk_sekolah ? $bukuInduk->tgl_masuk_sekolah->format('Y-m-d') : '') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                            </div>
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label class="text-xs font-black text-slate-500 uppercase">5. Keterangan</label>
+                                <input type="text" name="pendidikan_sebelumnya[keterangan_masuk]" value="{{ old('pendidikan_sebelumnya.keterangan_masuk', '') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="Keterangan tambahan...">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- B. Pindahan Dari Sekolah Lain --}}
+                    <div class="border-t border-dashed border-slate-200 pt-8">
+                        <h4 class="font-black text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2 mb-4"><span class="w-1 h-5 bg-amber-500 rounded-full"></span>B. Pindahan Dari Sekolah Lain</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label class="text-xs font-black text-slate-500 uppercase">1. Nama Sekolah Asal</label>
+                                <input type="text" name="pendidikan_sebelumnya[pindah_nama_sekolah]" value="{{ old('pendidikan_sebelumnya.pindah_nama_sekolah', $bukuInduk->pindah_dari) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="Nama SD / SMP / SMA asal...">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase">2. Dari Kelas</label>
+                                <select name="pendidikan_sebelumnya[pindah_dari_kelas]" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                                    <option value="">-- Pilih --</option>
+                                    @php
+                                        $kelasRange = match($jenjang) {
+                                            'SMP' => range(7, 9),
+                                            'SMA/SMK' => range(10, 12),
+                                            default => range(1, 6),
+                                        };
+                                    @endphp
+                                    @foreach($kelasRange as $k)
+                                    <option value="{{ $k }}" {{ old('pendidikan_sebelumnya.pindah_dari_kelas') == $k ? 'selected' : '' }}>Kelas {{ $k }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase">3. Diterima pada Tanggal</label>
+                                <input type="date" name="pendidikan_sebelumnya[pindah_tgl_diterima]" value="{{ old('pendidikan_sebelumnya.pindah_tgl_diterima', $bukuInduk->tgl_pindah_masuk ? $bukuInduk->tgl_pindah_masuk->format('Y-m-d') : '') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                            </div>
+                            <div class="space-y-1.5 md:col-span-2">
+                                <label class="text-xs font-black text-slate-500 uppercase">4. Diterima di Kelas</label>
+                                <select name="pendidikan_sebelumnya[pindah_di_kelas]" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach($kelasRange as $k)
+                                    <option value="{{ $k }}" {{ old('pendidikan_sebelumnya.pindah_di_kelas', $bukuInduk->kelas_pindah_masuk) == $k ? 'selected' : '' }}>Kelas {{ $k }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

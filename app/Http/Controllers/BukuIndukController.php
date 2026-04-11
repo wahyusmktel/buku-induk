@@ -18,11 +18,10 @@ class BukuIndukController extends Controller
      */
     public function index(Request $request)
     {
-        $search       = $request->get('q', '');
-        $statusFilter = $request->get('status', 'Aktif');
-        $tahunId      = $request->get('tahun_id', '');
-        $angkatan     = $request->get('angkatan', '');
-        $perPage      = (int) $request->get('per_page', 20);
+        $search   = $request->get('q', '');
+        $tingkat  = $request->get('tingkat', '');
+        $rombelId = $request->get('rombel_id', '');
+        $perPage  = (int) $request->get('per_page', 20);
 
         // Clamp per_page to allowed values
         $allowedPerPage = [10, 20, 30, 40, 50, 100];
@@ -30,58 +29,47 @@ class BukuIndukController extends Controller
             $perPage = 20;
         }
 
-        // All tahun pelajaran for the filter dropdown
-        $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
-        // Unique angkatan for filter
-        $angkatans = Siswa::withoutGlobalScope('tahun_aktif')
-            ->whereNotNull('tahun_masuk')
-            ->distinct()
-            ->orderByDesc('tahun_masuk')
-            ->pluck('tahun_masuk');
+        // Get active tahun pelajaran
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
 
-        // ── Build query: satu baris per NISN (terbaru by created_at) ─────
-        // UUID primary key tidak bisa di-MAX(), jadi kita pakai MAX(created_at).
-        // Subquery menghasilkan: nisn → max created_at dalam scope tahun (jika dipilih).
+        // Get available tingkat & rombel for filters (from siswa in active tahun)
+        $tingkatList = collect();
+        $rombelList  = collect();
+        if ($tahunAktif) {
+            $tingkatList = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)
+                ->whereNotNull('tingkat_kelas')
+                ->distinct()
+                ->orderBy('tingkat_kelas')
+                ->pluck('tingkat_kelas');
 
-        $latestSub = Siswa::withoutGlobalScope('tahun_aktif')
-            ->selectRaw('nisn AS s_nisn, MAX(created_at) AS max_ca')
-            ->whereNotNull('nisn');
-
-        if ($tahunId) {
-            $latestSub->where('tahun_pelajaran_id', $tahunId);
+            $rombelQuery = \App\Models\Rombel::orderBy('nama');
+            $rombelList  = $rombelQuery->get();
         }
 
-        $latestSub->groupBy('nisn');
+        // Build query: siswa in active tahun pelajaran
+        $query = Siswa::query()->whereNotNull('nisn');
 
-        $query = Siswa::withoutGlobalScope('tahun_aktif')
-            ->joinSub($latestSub, 'ls', function ($join) {
-                $join->on('siswas.nisn', '=', 'ls.s_nisn')
-                     ->on('siswas.created_at', '=', 'ls.max_ca');
-            })
-            ->select(
-                'siswas.nisn', 'siswas.nama', 'siswas.rombel_saat_ini',
-                'siswas.status', 'siswas.tanggal_lahir', 'siswas.jk',
-                'siswas.tahun_pelajaran_id'
-            )
-            ->whereNotNull('siswas.nisn');
-
-        if ($statusFilter !== 'Semua') {
-            $query->where('siswas.status', $statusFilter);
+        if ($tahunAktif) {
+            $query->where('tahun_pelajaran_id', $tahunAktif->id);
         }
 
-        if ($angkatan) {
-            $query->where('siswas.tahun_masuk', $angkatan);
+        if ($tingkat) {
+            $query->where('tingkat_kelas', $tingkat);
+        }
+
+        if ($rombelId) {
+            $query->where('rombel_id', $rombelId);
         }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('siswas.nama', 'like', "%{$search}%")
-                  ->orWhere('siswas.nisn', 'like', "%{$search}%");
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
             });
         }
 
-        $siswas = $query->orderBy('siswas.tahun_masuk', 'asc')
-            ->orderBy('siswas.nama', 'asc')
+        $siswas = $query->orderBy('tingkat_kelas', 'asc')
+            ->orderBy('nama', 'asc')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -89,7 +77,6 @@ class BukuIndukController extends Controller
         $nisnList     = $siswas->pluck('nisn')->filter()->toArray();
         $bukuIndukMap = BukuInduk::whereIn('nisn', $nisnList)->get()->keyBy('nisn');
 
-        // Build kelengkapan that merges Siswa data into the calculation
         // Attach the matched Siswa row onto each BukuInduk so the accessor can use it
         $siswaByNisn  = $siswas->keyBy('nisn');
         foreach ($bukuIndukMap as $nisn => $bi) {
@@ -97,8 +84,8 @@ class BukuIndukController extends Controller
         }
 
         return view('buku-induk.index', compact(
-            'siswas', 'bukuIndukMap', 'search', 'statusFilter',
-            'tahunPelajarans', 'tahunId', 'perPage', 'angkatans', 'angkatan'
+            'siswas', 'bukuIndukMap', 'search', 'perPage',
+            'tahunAktif', 'tingkatList', 'rombelList', 'tingkat', 'rombelId'
         ));
     }
 
@@ -149,8 +136,9 @@ class BukuIndukController extends Controller
             ->firstOrFail();
 
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
+        $jenjang = \App\Models\Setting::where('key', 'jenjang_pendidikan')->first()?->value ?? 'SD';
 
-        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans'));
+        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang'));
     }
 
     /**
@@ -186,6 +174,7 @@ class BukuIndukController extends Controller
             'jasmani' => 'nullable|array',
             'beasiswa' => 'nullable|array',
             'registrasi' => 'nullable|array',
+            'pendidikan_sebelumnya' => 'nullable|array',
 
             'foto_1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'foto_2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -321,6 +310,20 @@ class BukuIndukController extends Controller
             }
 
             // 7. Proses Foto
+            // 7. Update Pendidikan Sebelumnya (ke tabel buku_induks)
+            if (isset($validated['pendidikan_sebelumnya'])) {
+                $ps = $validated['pendidikan_sebelumnya'];
+                $bukuInduk->fill([
+                    'asal_masuk_sekolah' => $ps['asal_siswa'] ?? null,
+                    'nama_tk_asal' => $ps['nama_sekolah_asal'] ?? null,
+                    'tgl_masuk_sekolah' => $ps['tgl_masuk'] ?? null,
+                    'pindah_dari' => $ps['pindah_nama_sekolah'] ?? null,
+                    'kelas_pindah_masuk' => $ps['pindah_di_kelas'] ?? null,
+                    'tgl_pindah_masuk' => $ps['pindah_tgl_diterima'] ?? null,
+                ]);
+            }
+
+            // 8. Proses Foto
             if ($request->hasFile('foto_1')) {
                 if ($bukuInduk->foto_1) Storage::disk('public')->delete($bukuInduk->foto_1);
                 $file = $request->file('foto_1');

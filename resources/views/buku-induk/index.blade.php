@@ -11,7 +11,10 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
             <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Buku Induk Siswa</h2>
-            <p class="text-xs text-slate-400 mt-0.5">Arsip digital permanen — tersedia untuk seluruh siswa aktif maupun alumni.</p>
+            <p class="text-xs text-slate-400 mt-0.5">
+                Tahun Pelajaran Aktif: 
+                <strong class="text-indigo-600">{{ $tahunAktif ? $tahunAktif->tahun . ' (' . $tahunAktif->semester . ')' : 'Belum diatur' }}</strong>
+            </p>
         </div>
         @php
             $totalBerkas    = collect($bukuIndukMap)->count();
@@ -34,43 +37,42 @@
     </div>
 
     {{-- ══ FILTER AREA ══ --}}
-    {{-- Baris 1: Status pills sebagai <a> link (tidak konflik dengan form) --}}
-    <div class="flex flex-wrap gap-2 items-center">
-        @foreach(['Aktif', 'Lulus', 'Semua'] as $st)
-            <a href="{{ route('buku-induk.index', array_filter([
-                    'status'   => $st,
-                    'q'        => $search,
-                    'tahun_id' => $tahunId,
-                    'per_page' => ($perPage != 20) ? $perPage : null,
-                ], fn($v) => $v !== null && $v !== '')) }}"
-               class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all
-                      {{ $statusFilter == $st
-                         ? 'bg-sky-700 text-white border-sky-700 shadow-md shadow-sky-200'
-                         : 'bg-white text-slate-500 border-slate-200 hover:border-sky-400 hover:text-sky-700 hover:bg-sky-50' }}">
-                {{ $st }}
-            </a>
-        @endforeach
-    </div>
-
-    {{-- Baris 2: Satu form tunggal — Tahun | Search | Cari | Per-page | Reset --}}
     <form method="GET" action="{{ route('buku-induk.index') }}" id="filter-form"
           class="flex flex-wrap gap-2 items-center">
 
-        {{-- Status dibawa sebagai hidden (agar form search tidak reset status) --}}
-        <input type="hidden" name="status" value="{{ $statusFilter }}">
-
-        {{-- ① Angkatan (Tahun Masuk) --}}
+        {{-- ① Filter Tingkat --}}
         <div class="relative shrink-0">
-            <select name="angkatan"
+            <select name="tingkat"
                     onchange="this.form.submit()"
                     class="appearance-none pl-3 pr-8 py-2 text-xs font-bold border-2 rounded-xl cursor-pointer transition-all
                            bg-white text-slate-600 border-slate-200
                            hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
-                    style="{{ $angkatan ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
-                <option value="">Semua Angkatan</option>
-                @foreach($angkatans as $year)
-                    <option value="{{ $year }}" {{ $angkatan == $year ? 'selected' : '' }}>
-                        Angkatan {{ $year }}
+                    style="{{ $tingkat ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
+                <option value="">Semua Tingkat</option>
+                @foreach($tingkatList as $tk)
+                    <option value="{{ $tk }}" {{ $tingkat == $tk ? 'selected' : '' }}>
+                        Tingkat {{ $tk }}
+                    </option>
+                @endforeach
+            </select>
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </div>
+
+        {{-- ② Filter Kelas / Rombel --}}
+        <div class="relative shrink-0">
+            <select name="rombel_id"
+                    onchange="this.form.submit()"
+                    class="appearance-none pl-3 pr-8 py-2 text-xs font-bold border-2 rounded-xl cursor-pointer transition-all
+                           bg-white text-slate-600 border-slate-200
+                           hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
+                    style="{{ $rombelId ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
+                <option value="">Semua Rombel</option>
+                @foreach($rombelList as $rmb)
+                    <option value="{{ $rmb->id }}" {{ $rombelId == $rmb->id ? 'selected' : '' }}>
+                        {{ $rmb->nama }}
                     </option>
                 @endforeach
             </select>
@@ -82,30 +84,7 @@
 
         <div class="w-px h-7 bg-slate-200 shrink-0 hidden sm:block"></div>
 
-        {{-- ② Sesi Akademik (Tahun Pelajaran) --}}
-        <div class="relative shrink-0">
-            <select name="tahun_id"
-                    onchange="this.form.submit()"
-                    class="appearance-none pl-3 pr-8 py-2 text-xs font-bold border-2 rounded-xl cursor-pointer transition-all
-                           bg-white text-slate-600 border-slate-200
-                           hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10"
-                    style="{{ $tahunId ? 'border-color:#0369a1;color:#0369a1;background:#e0f2fe;' : '' }}">
-                <option value="">Semua Sesi</option>
-                @foreach($tahunPelajarans as $tp)
-                    <option value="{{ $tp->id }}" {{ $tahunId == $tp->id ? 'selected' : '' }}>
-                        Sesi {{ $tp->tahun }} ({{ $tp->semester }})
-                    </option>
-                @endforeach
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-            </svg>
-        </div>
-
-        <div class="w-px h-7 bg-slate-200 shrink-0 hidden sm:block"></div>
-
-        {{-- ② Search input --}}
+        {{-- ③ Search input --}}
         <div class="relative flex-1" style="min-width:180px;">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,7 +99,7 @@
                           text-slate-700 font-medium bg-white transition-all">
         </div>
 
-        {{-- ③ Tombol Cari --}}
+        {{-- ④ Tombol Cari --}}
         <button type="submit"
                 class="px-4 py-2 text-white text-xs font-bold rounded-xl transition-all
                        whitespace-nowrap cursor-pointer hover:-translate-y-0.5 shrink-0"
@@ -132,7 +111,7 @@
 
         <div class="w-px h-7 bg-slate-200 shrink-0 hidden sm:block"></div>
 
-        {{-- ④ Per-page dropdown --}}
+        {{-- ⑤ Per-page dropdown --}}
         <div class="flex items-center gap-1.5 shrink-0">
             <span class="text-xs text-slate-500 font-semibold whitespace-nowrap hidden sm:inline">Tampilkan</span>
             <div class="relative">
@@ -152,8 +131,8 @@
             <span class="text-xs text-slate-500 font-semibold whitespace-nowrap hidden sm:inline">/ hal.</span>
         </div>
 
-        {{-- ⑤ Reset --}}
-        @if($search || $tahunId || $angkatan || $statusFilter !== 'Aktif' || $perPage != 20)
+        {{-- ⑥ Reset --}}
+        @if($search || $tingkat || $rombelId || $perPage != 20)
         <a href="{{ route('buku-induk.index') }}"
            class="px-3 py-2 text-xs font-bold text-slate-400 border-2 border-slate-200 rounded-xl
                   hover:border-rose-300 hover:text-rose-500 hover:bg-rose-50 transition-all whitespace-nowrap shrink-0">
@@ -164,30 +143,31 @@
 
     {{-- ── Flash Message ── --}}
     @if(session('success'))
-    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center gap-3">
-        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        <p class="text-xs font-semibold">{{ session('success') }}</p>
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-5" x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-5"
+         class="fixed z-50 bottom-8 right-8 bg-slate-800 text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-semibold text-sm">
+        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1.5"><svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+        <p>{{ session('success') }}</p>
     </div>
     @endif
 
     {{-- ── Active Filter Badge ── --}}
-    @if($tahunId || $angkatan)
+    @if($tingkat || $rombelId)
     <div class="flex items-center gap-2 flex-wrap">
         <span class="text-xs text-slate-500 font-medium">Filter aktif:</span>
-        @if($angkatan)
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
-              style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;">
-            Angkatan {{ $angkatan }}
-        </span>
-        @endif
-        @if($tahunId)
-        @php $selectedTp = $tahunPelajarans->firstWhere('id', $tahunId); @endphp
-        @if($selectedTp)
+        @if($tingkat)
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
               style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;">
-            Sesi {{ $selectedTp->tahun }}
+            Tingkat {{ $tingkat }}
+        </span>
+        @endif
+        @if($rombelId)
+        @php $selectedRombel = $rombelList->firstWhere('id', $rombelId); @endphp
+        @if($selectedRombel)
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+              style="background:#f0fdf4;color:#166534;border:1.5px solid #bbf7d0;">
+            Rombel {{ $selectedRombel->nama }}
         </span>
         @endif
         @endif
@@ -228,29 +208,23 @@
                         </th>
                         <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
                                    cursor-pointer select-none"
-                            style="white-space:nowrap" onclick="biSort(1)"
-                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
-                            onmouseout="this.style.background=''">
+                            style="white-space:nowrap" onclick="biSort(1)">
                             <span class="flex items-center gap-1">NISN
                                 <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/></svg>
                             </span>
                         </th>
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100"
+                            style="white-space:nowrap">Tingkat</th>
                         <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
                                    cursor-pointer select-none"
-                            style="white-space:nowrap" onclick="biSort(2)"
-                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
-                            onmouseout="this.style.background=''">
-                            <span class="flex items-center gap-1">Kelas / Rombel Terakhir
+                            style="white-space:nowrap" onclick="biSort(3)">
+                            <span class="flex items-center gap-1">Kelas / Rombel
                                 <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/></svg>
                             </span>
                         </th>
-                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100"
-                            style="white-space:nowrap">Status</th>
                         <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-sky-100
                                    cursor-pointer select-none"
-                            style="white-space:nowrap" onclick="biSort(4)"
-                            onmouseover="this.style.background='rgba(255,255,255,.08)'"
-                            onmouseout="this.style.background=''">
+                            style="white-space:nowrap" onclick="biSort(4)">
                             <span class="flex items-center gap-1">Kelengkapan Data
                                 <svg class="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 8V4m0 12l-4-4m4 4l4-4"/></svg>
                             </span>
@@ -270,12 +244,7 @@
                                                   : 'background:linear-gradient(90deg,#f43f5e,#fb7185)');
                         $pctColor    = $kelengkapan >= 80 ? 'color:#059669'
                             : ($kelengkapan >= 40 ? 'color:#d97706' : 'color:#e11d48');
-                        $badgeStyle  = match($siswa->status) {
-                            'Aktif'         => 'background:#d1fae5;color:#065f46',
-                            'Lulus'         => 'background:#e0f2fe;color:#0369a1',
-                            'Keluar/Mutasi' => 'background:#ffe4e6;color:#9f1239',
-                            default         => 'background:#f1f5f9;color:#475569',
-                        };
+                        $rombelNama  = $siswa->rombel?->nama ?? $siswa->rombel_saat_ini ?? '—';
                     @endphp
                     <tr class="border-b border-slate-100 transition-colors"
                         style="border-left:3px solid transparent;"
@@ -301,20 +270,19 @@
                         </td>
 
                         <td class="py-3 px-4">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-black">
+                                {{ $siswa->tingkat_kelas ?? '—' }}
+                            </span>
+                        </td>
+
+                        <td class="py-3 px-4">
                             <div class="flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 text-sky-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
-                                <span class="text-sm text-slate-700 font-medium">{{ $siswa->rombel_saat_ini ?? 'Tidak diketahui' }}</span>
+                                <span class="text-sm text-slate-700 font-medium">{{ $rombelNama }}</span>
                             </div>
-                        </td>
-
-                        <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.65rem] font-bold"
-                                  style="{{ $badgeStyle }}">
-                                {{ $siswa->status ?? 'Aktif' }}
-                            </span>
                         </td>
 
                         <td class="py-3 px-4">
@@ -370,7 +338,7 @@
             </p>
             @if($siswas->hasPages())
             <div>
-                {{ $siswas->appends(['q' => $search, 'status' => $statusFilter, 'tahun_id' => $tahunId, 'per_page' => $perPage])->links() }}
+                {{ $siswas->links() }}
             </div>
             @endif
         </div>
@@ -411,26 +379,34 @@
                     
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
+                            <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">1</span>
+                            Data Berdasarkan Tahun Pelajaran Aktif
+                        </h4>
+                        <p class="ml-8">Halaman ini menampilkan daftar siswa berdasarkan <strong>Tahun Pelajaran yang sedang aktif</strong>. Data yang muncul hanyalah siswa yang terdaftar pada sesi akademik yang sedang berjalan saat ini. Informasi tahun pelajaran aktif tercantum pada bagian atas halaman.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</span>
                             Monitoring Kelengkapan Berkas
                         </h4>
-                        <p class="ml-8">Di sini Anda bisa memantau tingkat kelengkapan administrasi siswa. Ada indikator presentase (progress bar) pada masing-masing baris. Bar hijau berarti sangat lengkap, oranye berarti cukup, dan merah berarti masih banyak berkas yang kurang.</p>
+                        <p class="ml-8">Setiap baris siswa menampilkan indikator persentase (progress bar). <span class="text-emerald-600 font-bold">Hijau</span> berarti data sangat lengkap (≥80%), <span class="text-amber-600 font-bold">Oranye</span> berarti cukup (≥40%), dan <span class="text-rose-600 font-bold">Merah</span> berarti masih banyak data yang belum dilengkapi.</p>
                     </div>
 
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">2</span>
-                            Mengisi Data Lebih Rinci
+                            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">3</span>
+                            Melihat & Melengkapi Data
                         </h4>
-                        <p class="ml-8">Klik tombol <span class="font-bold text-sky-600">Buka</span> (berwarna biru muda) untuk masuk ke halaman detail Buku Induk siswa secara individu. Anda dapat mengelola nilai, catatan pelanggaran, file scan dokumen, hingga data orang tua di sana.</p>
+                        <p class="ml-8">Klik tombol <span class="font-bold text-sky-600">Buka</span> untuk masuk ke halaman detail Buku Induk siswa. Di halaman tersebut Anda dapat melihat semua informasi secara lengkap, dan melengkapi data melalui tombol <strong>"Lengkapi Data"</strong> yang berisi tab-tab: Identitas, Orang Tua, Periodik, Pendidikan Sebelumnya, Jasmani, Beasiswa, Registrasi, Foto, dan Prestasi Akademik.</p>
                     </div>
 
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
-                            Pencarian Pintar (Live Search)
+                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">4</span>
+                            Filter Tingkat & Rombel
                         </h4>
-                        <p class="ml-8">Gunakan filter canggih di bagian atas untuk menyaring siswa berdasarkan status, angkatan, maupun fitur pencarian teks untuk menemukan data secara instan tanpa perlu memuat ulang halaman.</p>
+                        <p class="ml-8">Gunakan filter <strong>Tingkat</strong> untuk menyaring siswa berdasarkan tingkat kelas, dan filter <strong>Rombel</strong> untuk menyaring berdasarkan kelas/rombongan belajar. Kedua filter ini bekerja bersamaan dan langsung memperbarui tabel secara otomatis.</p>
                     </div>
 
                 </div>

@@ -85,6 +85,7 @@
                 'identitas' => 'Identitas Murid',
                 'orang_tua' => 'Orang Tua / Wali',
                 'periodik' => 'Data Periodik',
+                'pendidikan' => 'Pendidikan Sebelumnya',
                 'jasmani' => 'Keadaan Jasmani',
                 'beasiswa' => 'Beasiswa',
                 'riwayat' => 'Riwayat Sekolah',
@@ -216,6 +217,50 @@
                         <p class="font-bold text-slate-700 text-sm">{{ $value }}</p>
                     </div>
                     @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ─── TAB: PENDIDIKAN SEBELUMNYA ─── --}}
+    <div x-show="tab === 'pendidikan'" x-transition>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 relative bg-slate-50/50">
+                <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Data Pendidikan Sebelumnya</p>
+                
+                {{-- A. Siswa Baru --}}
+                <div class="mb-8">
+                    <h4 class="font-black text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2 mb-4"><span class="w-1 h-5 bg-emerald-500 rounded-full"></span>A. Masuk Menjadi Siswa Baru</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-10">
+                        @foreach([
+                            '1. Asal Siswa' => $bukuInduk->asal_masuk_sekolah ?? '—',
+                            '2. Nama Sekolah Asal' => $bukuInduk->nama_tk_asal ?? $siswa->sekolah_asal ?? '—',
+                            '3. Tanggal Masuk' => $bukuInduk->tgl_masuk_sekolah ? $bukuInduk->tgl_masuk_sekolah->format('d F Y') : '—',
+                        ] as $label => $value)
+                        <div class="space-y-0.5">
+                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest">{{ $label }}</p>
+                            <p class="font-bold text-slate-700 text-sm">{{ $value }}</p>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- B. Pindahan --}}
+                <div class="border-t border-dashed border-slate-200 pt-8">
+                    <h4 class="font-black text-slate-700 border-b border-slate-200 pb-2 flex items-center gap-2 mb-4"><span class="w-1 h-5 bg-amber-500 rounded-full"></span>B. Pindahan Dari Sekolah Lain</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-5 gap-x-10">
+                        @foreach([
+                            '1. Nama Sekolah Asal' => $bukuInduk->pindah_dari ?? '—',
+                            '2. Dari Kelas' => $bukuInduk->kelas_pindah_masuk ? 'Kelas ' . $bukuInduk->kelas_pindah_masuk : '—',
+                            '3. Diterima Tanggal' => $bukuInduk->tgl_pindah_masuk ? $bukuInduk->tgl_pindah_masuk->format('d F Y') : '—',
+                            '4. Di Kelas' => $bukuInduk->kelas_pindah_masuk ? 'Kelas ' . $bukuInduk->kelas_pindah_masuk : '—',
+                        ] as $label => $value)
+                        <div class="space-y-0.5">
+                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest">{{ $label }}</p>
+                            <p class="font-bold text-slate-700 text-sm">{{ $value }}</p>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
