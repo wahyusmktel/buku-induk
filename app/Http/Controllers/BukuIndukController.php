@@ -397,7 +397,21 @@ class BukuIndukController extends Controller
         $is_pdf = true;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf'));
-        $pdf->setPaper('a4', 'portrait');
+        
+        $paperSize = $settings['paper_size'] ?? 'a4';
+        
+        if ($paperSize === 'custom') {
+            // Konversi dari mm ke default unit PDF (points). 1 mm = 2.83465 pt
+            $width = ($settings['paper_width'] ?? 210) * 2.83465;
+            $height = ($settings['paper_height'] ?? 297) * 2.83465;
+            $pdf->setPaper([0, 0, $width, $height], 'portrait');
+        } elseif ($paperSize === 'folio') {
+            // F4 / Folio (215.9mm x 330.2mm)
+            $pdf->setPaper([0, 0, 612.0, 936.0], 'portrait');
+        } else {
+            // a4, legal, letter sudah dikenali dari native DomPDF
+            $pdf->setPaper($paperSize, 'portrait');
+        }
 
         return $pdf->stream("Buku_Induk_{$nisn}_{$siswa->nama}.pdf");
     }

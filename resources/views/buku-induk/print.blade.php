@@ -5,19 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buku Induk — {{ $siswa->nama }}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { 
+            margin: {{ $settings['margin_top'] ?? '2.5' }}cm {{ $settings['margin_right'] ?? '2.5' }}cm {{ $settings['margin_bottom'] ?? '2.5' }}cm {{ $settings['margin_left'] ?? '2.5' }}cm; 
+        }
         body { 
             font-family: 'Helvetica', 'Arial', sans-serif; 
             font-size: 10pt; 
             color: #1f2937; 
             background: white; 
-            line-height: 1.5; 
-        }
-        @page { 
-            margin-top: {{ $settings['margin_top'] ?? '2.5' }}cm; 
-            margin-right: {{ $settings['margin_right'] ?? '2.5' }}cm; 
-            margin-bottom: {{ $settings['margin_bottom'] ?? '2.5' }}cm; 
-            margin-left: {{ $settings['margin_left'] ?? '2.5' }}cm; 
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
         }
         @media print {
             .no-print { display: none !important; }
