@@ -36,11 +36,9 @@
                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-sky-50 text-sky-700 border border-sky-100 uppercase tracking-wider">
                         NISN: {{ $siswa->nisn ?? '-' }}
                     </span>
-                    @if($siswa->nipd)
                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-slate-50 text-slate-700 border border-slate-100 uppercase tracking-wider">
-                        NIPD: {{ $siswa->nipd }}
+                        NIS: {{ $siswa->nis ?? '-' }}
                     </span>
-                    @endif
                     @if($siswa->tingkat_kelas)
                     <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black bg-amber-50 text-amber-700 border border-amber-100 uppercase tracking-wider">
                         Tingkat: {{ $siswa->tingkat_kelas }}
@@ -96,30 +94,24 @@
                 <div class="grid grid-cols-2 gap-y-10 gap-x-6">
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Berat Badan</p>
-                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->berat_badan ?? $siswa->berat_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">kg</span></p>
+                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->berat_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">kg</span></p>
                     </div>
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Tinggi Badan</p>
-                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->tinggi_badan ?? $siswa->tinggi_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">cm</span></p>
-                    </div>
-                    <div>
-                        <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Lingkar Kepala</p>
-                        <p class="text-xl font-black">{{ $siswa->lingkar_kepala ?? '-' }}<span class="text-xs font-medium opacity-50 ml-1">cm</span></p>
+                        <p class="text-3xl font-black">{{ $siswa->keadaanJasmani->tinggi_badan ?? '-' }}<span class="text-sm font-medium opacity-50 ml-1">cm</span></p>
                     </div>
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-60 uppercase mb-2">Jarak Sekolah</p>
-                        <p class="text-xl font-black">{{ $siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? $siswa->jarak_rumah_ke_sekolah_km ?? '-' }}</p>
+                        <p class="text-xl font-black">{{ $siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? '-' }}</p>
                     </div>
-                </div>
-                <div class="mt-10 pt-8 border-t border-white/10 grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Golongan Darah</p>
                         <p class="text-indigo-100 font-black">{{ $siswa->keadaanJasmani->golongan_darah ?? '-' }}</p>
                     </div>
-                    <div>
-                        <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Jumlah Saudara</p>
-                        <p class="text-indigo-100 font-black">{{ $siswa->dataPeriodik->jml_saudara_kandung ?? $siswa->jml_saudara_kandung ?? '0' }} <span class="text-[10px] font-medium opacity-60">Kandung</span> &bull; {{ $siswa->dataPeriodik->jml_saudara_tiri ?? '0' }} <span class="text-[10px] font-medium opacity-60">Tiri</span></p>
-                    </div>
+                </div>
+                <div class="mt-10 pt-8 border-t border-white/10">
+                    <p class="text-[0.65rem] font-bold opacity-50 uppercase mb-1">Jumlah Saudara</p>
+                    <p class="text-indigo-100 font-black">{{ $siswa->dataPeriodik->jml_saudara_kandung ?? '0' }} <span class="text-[10px] font-medium opacity-60">Kandung</span> &bull; {{ $siswa->dataPeriodik->jml_saudara_tiri ?? '0' }} <span class="text-[10px] font-medium opacity-60">Tiri</span> &bull; {{ $siswa->dataPeriodik->jml_saudara_angkat ?? '0' }} <span class="text-[10px] font-medium opacity-60">Angkat</span></p>
                 </div>
             </div>
 
@@ -131,57 +123,12 @@
                 <div class="space-y-4">
                     <div class="p-4 bg-rose-50/50 rounded-2xl border border-rose-100/50">
                         <p class="text-[10px] font-bold text-rose-400 uppercase mb-1">Riwayat Penyakit</p>
-                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->nama_riwayat_penyakit ?? $siswa->riwayat_penyakit ?? 'Tidak ada riwayat penyakit signifikan' }}</p>
+                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->nama_riwayat_penyakit ?? 'Tidak ada riwayat penyakit signifikan' }}</p>
                     </div>
                     <div class="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/50">
                         <p class="text-[10px] font-bold text-amber-500 uppercase mb-1">Kelainan Jasmani / Kebutuhan Khusus</p>
-                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->kelainan_jasmani ?? $siswa->kebutuhan_khusus ?? 'Tidak ada' }}</p>
+                        <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->kelainan_jasmani ?? 'Tidak ada' }}</p>
                     </div>
-                </div>
-            </div>
-
-             <!-- SECTION: BANTUAN & BEASISWA -->
-             <div class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
-                <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-4 bg-emerald-500 rounded-full"></span> Bantuan & Beasiswa
-                </h3>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                        <div>
-                            <p class="text-[0.65rem] font-bold text-slate-500 uppercase">Penerima KIP</p>
-                            <p class="text-xs font-black text-slate-700">{{ $siswa->penerima_kip ?? 'Tidak' }}</p>
-                        </div>
-                        @if($siswa->nomor_kip)
-                            <div class="text-right">
-                                <p class="text-[0.65rem] font-bold text-slate-400 font-mono tracking-tighter">{{ $siswa->nomor_kip }}</p>
-                                <p class="text-[8px] text-slate-400 italic">a.n {{ $siswa->nama_di_kip }}</p>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                        <div>
-                            <p class="text-[0.65rem] font-bold text-slate-500 uppercase">Layak PIP</p>
-                            <p class="text-xs font-black text-slate-700">{{ $siswa->layak_pip ?? 'Tidak' }}</p>
-                        </div>
-                        @if($siswa->alasan_layak_pip)
-                             <p class="text-[10px] text-slate-400 max-w-[120px] text-right italic">{{ $siswa->alasan_layak_pip }}</p>
-                        @endif
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                        <div>
-                            <p class="text-[0.65rem] font-bold text-slate-500 uppercase">Penerima KPS</p>
-                            <p class="text-xs font-black text-slate-700">{{ $siswa->penerima_kps ?? 'Tidak' }}</p>
-                        </div>
-                        @if($siswa->no_kps)
-                             <p class="text-[10px] text-slate-400 font-mono tracking-tighter">{{ $siswa->no_kps }}</p>
-                        @endif
-                    </div>
-                    @if($siswa->nomor_kks)
-                    <div class="flex items-center justify-between p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                        <p class="text-[0.65rem] font-bold text-slate-500 uppercase">Nomor KKS</p>
-                        <p class="text-xs font-black text-slate-700 font-mono">{{ $siswa->nomor_kks }}</p>
-                    </div>
-                    @endif
                 </div>
             </div>
 
@@ -206,16 +153,12 @@
                             <p class="text-base font-bold text-slate-700 font-mono">{{ $siswa->nik ?? '-' }}</p>
                         </div>
                         <div class="space-y-1">
-                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. KK</p>
-                            <p class="text-base font-bold text-slate-700 font-mono">{{ $siswa->no_kk ?? '-' }}</p>
-                        </div>
-                        <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tempat, Tanggal Lahir</p>
                             <p class="text-base font-bold text-slate-700 capitalize">{{ $siswa->tempat_lahir ?? '-' }}, {{ $siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-' }}</p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Jenis Kelamin</p>
-                            <p class="text-base font-bold text-slate-700">{{ $siswa->jk == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
+                            <p class="text-base font-bold text-slate-700">{{ $siswa->jenis_kelamin == 'L' || $siswa->jk == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Agama</p>
@@ -229,61 +172,34 @@
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Bahasa Sehari-hari</p>
                             <p class="text-base font-bold text-slate-700">{{ $siswa->dataPeriodik->bahasa_sehari_hari ?? '-' }}</p>
                         </div>
-                        <div class="space-y-1">
-                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">No. Reg. Akta Lahir</p>
-                            <p class="text-sm font-bold text-slate-700 font-mono overflow-x-auto">{{ $siswa->no_registrasi_akta_lahir ?? '-' }}</p>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION 2: ALAMAT & LOKASI -->
+            <!-- SECTION 2: ALAMAT & KONTAK -->
             <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-10">
                 <h3 class="text-sm font-black text-slate-800 uppercase tracking-[0.15em] mb-10 flex items-center gap-3">
                     <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
-                    Alamat, Kontak & Lokasi
+                    Alamat & Kontak
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div class="space-y-6">
                         <div class="space-y-1">
                             <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap</p>
-                            <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->dataPeriodik->alamat_tinggal ?? $siswa->alamat ?? '-' }}</p>
+                            <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->dataPeriodik->alamat_tinggal ?? '-' }}</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-3 bg-slate-50 rounded-2xl">
-                                <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Bertempat Tinggal Pada</p>
-                                <p class="text-xs font-bold text-slate-600">{{ $siswa->dataPeriodik->bertempat_tinggal_pada ?? $siswa->jenis_tinggal ?? '-' }}</p>
-                            </div>
-                            <div class="p-3 bg-slate-50 rounded-2xl">
-                                <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Transportasi</p>
-                                <p class="text-xs font-bold text-slate-600">{{ $siswa->alat_transportasi ?? '-' }}</p>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50 flex items-center gap-4">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-black text-indigo-400 uppercase tracking-tighter leading-none mb-1">Koordinat Lintang/Bujur</p>
-                                <p class="text-xs font-bold text-indigo-700 font-mono">{{ $siswa->lintang ?? '0' }}, {{ $siswa->bujur ?? '0' }}</p>
-                            </div>
+                        <div class="p-3 bg-slate-50 rounded-2xl w-max">
+                            <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Bertempat Tinggal Pada</p>
+                            <p class="text-xs font-bold text-slate-600">{{ $siswa->dataPeriodik->bertempat_tinggal_pada ?? '-' }}</p>
                         </div>
                     </div>
                     <div class="space-y-6">
                         <div class="space-y-1">
-                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-3">Kontak Siswa / Orang Tua</p>
+                            <p class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest mb-3">Kontak Siswa</p>
                             <div class="space-y-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg></div>
-                                    <p class="text-sm font-bold text-slate-700">{{ $siswa->hp ?? '-' }}</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
-                                    <p class="text-sm font-bold text-slate-700">{{ $siswa->email ?? '-' }}</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-                                    <p class="text-sm font-bold text-slate-700 italic opacity-50">Tlp: {{ $siswa->telepon ?? '-' }}</p>
+                                    <p class="text-sm font-bold text-slate-700">{{ $siswa->nomor_telepon ?? $siswa->telepon ?? '-' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -298,9 +214,9 @@
                 </div>
                 
                 @php
-                    $ayah = $siswa->dataOrangTua->where('jenis', 'Ayah')->first();
-                    $ibu = $siswa->dataOrangTua->where('jenis', 'Ibu')->first();
-                    $wali = $siswa->dataOrangTua->where('jenis', 'Wali')->first();
+                    $ayah = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Ayah')->first() : null;
+                    $ibu = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Ibu')->first() : null;
+                    $wali = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Wali')->first() : null;
                 @endphp
 
                 <div class="p-10">
@@ -312,14 +228,9 @@
                                 <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">Ayah Kandung</h4>
                             </div>
                             <div class="space-y-4">
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ayah</p><p class="text-sm font-bold text-slate-800">{{ $ayah->nama ?? $siswa->nama_ayah ?? '-' }}</p></div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Thn Lahir</p><p class="text-xs font-bold text-slate-700">{{ $siswa->tahun_lahir_ayah ?? '-' }}</p></div>
-                                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Ayah</p><p class="text-xs font-bold text-slate-700 font-mono tracking-tighter">{{ $siswa->nik_ayah ?? '-' }}</p></div>
-                                </div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_ayah ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pekerjaan ?? $siswa->pekerjaan_ayah ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-indigo-600">{{ $siswa->penghasilan_ayah ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ayah</p><p class="text-sm font-bold text-slate-800">{{ $ayah->nama ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan Terakhir</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pendidikan_terakhir ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ayah->pekerjaan ?? '-' }}</p></div>
                             </div>
                         </div>
 
@@ -330,14 +241,9 @@
                                 <h4 class="font-black text-slate-800 uppercase text-xs tracking-widest">Ibu Kandung</h4>
                             </div>
                             <div class="space-y-4">
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ibu</p><p class="text-sm font-bold text-slate-800">{{ $ibu->nama ?? $siswa->nama_ibu ?? '-' }}</p></div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Thn Lahir</p><p class="text-xs font-bold text-slate-700">{{ $siswa->tahun_lahir_ibu ?? '-' }}</p></div>
-                                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Ibu</p><p class="text-xs font-bold text-slate-700 font-mono tracking-tighter">{{ $siswa->nik_ibu ?? '-' }}</p></div>
-                                </div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_ibu ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pekerjaan ?? $siswa->pekerjaan_ibu ?? '-' }}</p></div>
-                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-rose-600">{{ $siswa->penghasilan_ibu ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Ibu</p><p class="text-sm font-bold text-slate-800">{{ $ibu->nama ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan Terakhir</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pendidikan_terakhir ?? '-' }}</p></div>
+                                <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $ibu->pekerjaan ?? '-' }}</p></div>
                             </div>
                         </div>
                     </div>
@@ -350,14 +256,12 @@
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Data Wali Murid</h3>
                     <div class="px-3 py-1 bg-slate-50 text-[10px] font-bold text-slate-400 rounded-full border border-slate-100 uppercase tracking-tighter">Optional</div>
                  </div>
-                 @if($wali || $siswa->nama_wali)
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Wali</p><p class="text-sm font-bold text-slate-800">{{ $wali->nama ?? $siswa->nama_wali ?? '-' }}</p></div>
+                 @if($wali)
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Nama Wali</p><p class="text-sm font-bold text-slate-800">{{ $wali->nama ?? '-' }}</p></div>
                     <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Status Hubungan</p><p class="text-xs font-bold text-slate-700">{{ $wali->status_hubungan_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">NIK Wali</p><p class="text-xs font-bold text-slate-700 font-mono">{{ $siswa->nik_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pendidikan_terakhir ?? $siswa->jenjang_pendidikan_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pekerjaan ?? $siswa->pekerjaan_wali ?? '-' }}</p></div>
-                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Penghasilan</p><p class="text-xs font-bold text-emerald-600">{{ $siswa->penghasilan_wali ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pendidikan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pendidikan_terakhir ?? '-' }}</p></div>
+                    <div><p class="text-[9px] font-black text-slate-400 uppercase mb-0.5">Pekerjaan</p><p class="text-xs font-bold text-slate-700">{{ $wali->pekerjaan ?? '-' }}</p></div>
                  </div>
                  @else
                  <div class="py-6 flex flex-col items-center justify-center text-center opacity-40">
@@ -367,58 +271,44 @@
                  @endif
             </div>
 
-            <!-- SECTION 5: ADMINISTRASI, AKADEMIK & BANK -->
+            <!-- SECTION 5: BEASISWA & REGISTRASI -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
-                <!-- Registrasi & Akademik -->
-                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-10 flex flex-col justify-between">
-                    <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-8">Registrasi & Sekolah</h3>
-                    <div class="space-y-4">
-                        <div class="flex flex-col gap-1 border-l-4 border-slate-50 pl-4 py-1">
-                            <span class="text-[9px] font-black text-slate-400 uppercase">Sekolah Asal</span>
-                            <span class="text-sm font-bold text-slate-700">{{ $siswa->sekolah_asal ?? '-' }}</span>
+                <!-- Beasiswa -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-10 flex flex-col">
+                    <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-8">Riwayat Beasiswa</h3>
+                    @if($siswa->beasiswa && $siswa->beasiswa->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($siswa->beasiswa as $beasiswa)
+                                <div class="flex flex-col gap-1 border-l-4 border-emerald-400 pl-4 py-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase">{{ $beasiswa->tahun ?? '-' }}</span>
+                                    <span class="text-sm font-bold text-slate-700">{{ $beasiswa->jenis_beasiswa ?? '-' }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl">
-                             <span class="text-xs font-bold text-slate-400 uppercase">SKHUN</span>
-                             <span class="text-xs font-black text-slate-800 font-mono tracking-tighter">{{ $siswa->skhun ?? '-' }}</span>
+                    @else
+                        <div class="h-full flex flex-col items-center justify-center text-center opacity-30 py-4">
+                             <p class="text-xs font-bold">Belum ada riwayat beasiswa.</p>
                         </div>
-                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl">
-                             <span class="text-xs font-bold text-slate-400 uppercase">No. Peserta UN</span>
-                             <span class="text-xs font-black text-slate-800 font-mono tracking-tighter">{{ $siswa->no_peserta_un ?? '-' }}</span>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl">
-                             <span class="text-xs font-bold text-slate-400 uppercase">No. Seri Ijazah</span>
-                             <span class="text-xs font-black text-slate-800 font-mono tracking-tighter">{{ $siswa->no_seri_ijazah ?? '-' }}</span>
-                        </div>
-                    </div>
+                    @endif
                 </div>
 
-                <!-- Perbankan -->
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] shadow-xl p-10 text-white relative overflow-hidden">
-                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full"></div>
-                    <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xs font-black uppercase tracking-widest opacity-60">Informasi Perbankan</h3>
-                        <svg class="w-6 h-6 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                    </div>
-                    @if($siswa->nomor_rekening_bank)
-                    <div class="space-y-6 relative z-10">
-                        <div>
-                            <p class="text-[9px] font-black uppercase opacity-40 mb-1">Nama Bank</p>
-                            <p class="text-lg font-black tracking-tight">{{ $siswa->bank }}</p>
+                <!-- Registrasi Siswa -->
+                <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-10 flex flex-col">
+                    <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-8">Registrasi Siswa</h3>
+                    @if($siswa->registrasi && $siswa->registrasi->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($siswa->registrasi as $reg)
+                                <div class="flex flex-col gap-1 border-l-4 border-indigo-400 pl-4 py-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase">{{ $reg->jenis_registrasi ?? '-' }}</span>
+                                    <span class="text-sm font-bold text-slate-700">{{ $reg->keterangan ?? '-' }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                        <div>
-                            <p class="text-[9px] font-black uppercase opacity-40 mb-1">Nomor Rekening</p>
-                            <p class="text-2xl font-black font-mono tracking-[0.2em]">{{ $siswa->nomor_rekening_bank }}</p>
-                        </div>
-                        <div class="pt-4 border-t border-white/10">
-                            <p class="text-[9px] font-black uppercase opacity-40 mb-1">Atas Nama</p>
-                            <p class="text-xs font-bold uppercase tracking-widest text-slate-300">{{ $siswa->rekening_atas_nama ?? $siswa->nama }}</p>
-                        </div>
-                    </div>
                     @else
-                    <div class="h-full flex flex-col items-center justify-center text-center opacity-30 py-10">
-                         <p class="text-xs font-bold">Data transaksi/rekening bank belum tercatat.</p>
-                    </div>
+                        <div class="h-full flex flex-col items-center justify-center text-center opacity-30 py-4">
+                             <p class="text-xs font-bold">Belum ada catatan registrasi keluar/pindah/tamat.</p>
+                        </div>
                     @endif
                 </div>
             </div>

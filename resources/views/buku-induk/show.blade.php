@@ -47,11 +47,11 @@
                         </span>
                         <span class="flex items-center gap-1.5 text-slate-500 font-medium">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
-                            No. Induk: <span class="font-bold text-slate-700">{{ $bukuInduk->no_induk ?? '—' }}</span>
+                            NIS: <span class="font-bold text-slate-700">{{ $siswa->nis ?? '-' }}</span>
                         </span>
                         <span class="flex items-center gap-1.5 text-slate-500 font-medium">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
-                            Kelas: <span class="font-bold text-slate-700">{{ $siswa->rombel_saat_ini ?? '-' }}</span>
+                            Tingkat: <span class="font-bold text-slate-700">{{ $siswa->tingkat_kelas ?? '-' }}</span>
                         </span>
                     </div>
                 </div>
@@ -104,20 +104,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-12">
                     @php
                         $fields = [
+                            'NIK' => $siswa->nik,
                             'Nama Lengkap' => $siswa->nama,
-                            'Nama Panggilan' => $bukuInduk->nama_panggilan,
-                            'Jenis Kelamin' => $siswa->jk == 'L' ? 'Laki-laki' : 'Perempuan',
+                            'Nama Panggilan' => $siswa->nama_panggilan,
+                            'Jenis Kelamin' => ($siswa->jenis_kelamin == 'L' || $siswa->jk == 'L') ? 'Laki-laki' : 'Perempuan',
                             'Tempat, Tgl Lahir' => ($siswa->tempat_lahir ?? '-') . ', ' . ($siswa->tanggal_lahir ? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d F Y') : '-'),
                             'Agama' => $siswa->agama,
-                            'Kewarganegaraan' => $bukuInduk->kewarganegaraan ?? $siswa->kewarganegaraan,
-                            'Anak ke' => $siswa->anak_ke_berapa,
-                            'Jml Saudara Kandung' => $siswa->jml_saudara_kandung,
-                            'Jml Saudara Tiri' => $bukuInduk->jml_saudara_tiri,
-                            'Jml Saudara Angkat' => $bukuInduk->jml_saudara_angkat,
-                            'Bahasa Sehari-hari' => $bukuInduk->bahasa_sehari_hari,
-                            'Golongan Darah' => $bukuInduk->golongan_darah,
-                            'Bertempat Tinggal Dengan' => $bukuInduk->bertempat_tinggal_dengan,
-                            'Jarak ke Sekolah' => $siswa->jarak_rumah_ke_sekolah_km ? $siswa->jarak_rumah_ke_sekolah_km . ' km' : null,
+                            'Kewarganegaraan' => $siswa->kewarganegaraan,
+                            'Jml Saudara Kandung' => $siswa->dataPeriodik->jml_saudara_kandung ?? $siswa->jml_saudara_kandung ?? 0,
+                            'Jml Saudara Tiri' => $siswa->dataPeriodik->jml_saudara_tiri ?? 0,
+                            'Jml Saudara Angkat' => $siswa->dataPeriodik->jml_saudara_angkat ?? 0,
+                            'Bahasa Sehari-hari' => $siswa->dataPeriodik->bahasa_sehari_hari ?? '-',
+                            'Golongan Darah' => $siswa->keadaanJasmani->golongan_darah ?? '-',
+                            'No. Telepon' => $siswa->nomor_telepon ?? $siswa->telepon ?? '-',
+                            'Jarak ke Sekolah' => ($siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? $siswa->jarak_rumah_ke_sekolah_km ?? '-') . ' km',
                         ];
                     @endphp
                     @foreach($fields as $label => $value)
@@ -129,30 +129,44 @@
 
                     <div class="md:col-span-2 space-y-1">
                         <p class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest">Alamat Tempat Tinggal</p>
-                        <p class="font-bold text-slate-700">{{ $siswa->alamat ?? '—' }}, RT {{ $siswa->rt }}/RW {{ $siswa->rw }}, {{ $siswa->kelurahan }}, {{ $siswa->kecamatan }}, Kode Pos {{ $siswa->kode_pos }}</p>
+                        <p class="font-bold text-slate-700">{{ $siswa->dataPeriodik->alamat_tinggal ?? $siswa->alamat ?? '—' }}</p>
                     </div>
 
-                    @if($bukuInduk->riwayat_penyakit)
-                    <div class="md:col-span-2 space-y-1">
-                        <p class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest">Riwayat Penyakit</p>
-                        <p class="font-bold text-slate-700">{{ $bukuInduk->riwayat_penyakit }}</p>
+                    <div class="space-y-1">
+                        <p class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest">Bertempat Tinggal Pada</p>
+                        <p class="font-bold text-slate-700">{{ $siswa->dataPeriodik->bertempat_tinggal_pada ?? $siswa->jenis_tinggal ?? '—' }}</p>
                     </div>
-                    @endif
                 </div>
             </div>
             {{-- Right: Physical Stats --}}
             <div class="space-y-6">
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200">
-                    <p class="text-xs font-black uppercase tracking-widest opacity-70 mb-5">Data Fisik Saat Masuk</p>
+                    <p class="text-xs font-black uppercase tracking-widest opacity-70 mb-5">Keadaan Jasmani Saat Masuk</p>
                     <div class="grid grid-cols-2 gap-5">
-                        <div><p class="text-[0.65rem] opacity-70 mb-1">Berat Badan</p><p class="text-2xl font-black">{{ $siswa->berat_badan ?? '—' }}<span class="text-sm font-medium opacity-60"> kg</span></p></div>
-                        <div><p class="text-[0.65rem] opacity-70 mb-1">Tinggi Badan</p><p class="text-2xl font-black">{{ $siswa->tinggi_badan ?? '—' }}<span class="text-sm font-medium opacity-60"> cm</span></p></div>
-                        <div><p class="text-[0.65rem] opacity-70 mb-1">Lingkar Kepala</p><p class="text-xl font-black">{{ $siswa->lingkar_kepala ?? '—' }}<span class="text-xs font-medium opacity-60"> cm</span></p></div>
+                        <div><p class="text-[0.65rem] opacity-70 mb-1">Berat Badan</p><p class="text-2xl font-black">{{ $siswa->keadaanJasmani->berat_badan ?? '-' }}<span class="text-sm font-medium opacity-60"> kg</span></p></div>
+                        <div><p class="text-[0.65rem] opacity-70 mb-1">Tinggi Badan</p><p class="text-2xl font-black">{{ $siswa->keadaanJasmani->tinggi_badan ?? '-' }}<span class="text-sm font-medium opacity-60"> cm</span></p></div>
                     </div>
                 </div>
-                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-                    <p class="text-xs font-black text-slate-700 uppercase tracking-widest mb-4">Beasiswa</p>
-                    <p class="text-sm text-slate-600 font-medium">{{ $bukuInduk->beasiswa ?? 'Tidak ada catatan beasiswa.' }}</p>
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-3">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Riwayat Penyakit Khusus</p>
+                    <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->nama_riwayat_penyakit ?? 'Tidak ada riwayat penyakit signifikan' }}</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2">Kelainan Jasmani / Berkebutuhan Khusus</p>
+                    <p class="text-sm font-bold text-slate-700 leading-relaxed">{{ $siswa->keadaanJasmani->kelainan_jasmani ?? 'Tidak ada' }}</p>
+                </div>
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 overflow-hidden">
+                    <p class="text-xs font-black text-slate-700 uppercase tracking-widest mb-4">Riwayat Beasiswa</p>
+                    @if($siswa->beasiswa && $siswa->beasiswa->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($siswa->beasiswa as $beasiswa)
+                            <div class="flex flex-col gap-1 border-l-4 border-emerald-400 pl-3">
+                                <span class="text-[9px] font-black text-slate-400 uppercase">{{ $beasiswa->tahun ?? '-' }}</span>
+                                <span class="text-sm font-bold text-slate-700">{{ $beasiswa->jenis_beasiswa ?? '-' }}</span>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-slate-600 font-medium">Tidak ada riwayat beasiswa dicatat.</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -225,28 +239,18 @@
     <div x-show="tab === 'orang_tua'" x-transition>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             @php
+                $ayah = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Ayah')->first() : null;
+                $ibu = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Ibu')->first() : null;
                 $parentSections = [
                     'Ayah' => [
-                        'Nama Ayah' => $siswa->nama_ayah,
-                        'Tempat, Tgl Lahir' => ($bukuInduk->tempat_lahir_ayah ?? '-') . ', ' . ($bukuInduk->tanggal_lahir_ayah ? $bukuInduk->tanggal_lahir_ayah->format('d F Y') : ($siswa->tahun_lahir_ayah ?? '-')),
-                        'Agama' => $bukuInduk->agama_ayah,
-                        'Kewarganegaraan' => $bukuInduk->kewarganegaraan_ayah ?? 'WNI',
-                        'Pendidikan' => $siswa->jenjang_pendidikan_ayah,
-                        'Pekerjaan' => $siswa->pekerjaan_ayah,
-                        'Penghasilan / th' => $siswa->penghasilan_ayah,
-                        'Alamat' => $bukuInduk->alamat_ayah,
-                        'NIK Ayah' => $siswa->nik_ayah,
+                        'Nama Ayah' => $ayah->nama ?? '-',
+                        'Pendidikan' => $ayah->pendidikan_terakhir ?? '-',
+                        'Pekerjaan' => $ayah->pekerjaan ?? '-',
                     ],
                     'Ibu' => [
-                        'Nama Ibu' => $siswa->nama_ibu,
-                        'Tempat, Tgl Lahir' => ($bukuInduk->tempat_lahir_ibu ?? '-') . ', ' . ($bukuInduk->tanggal_lahir_ibu ? $bukuInduk->tanggal_lahir_ibu->format('d F Y') : ($siswa->tahun_lahir_ibu ?? '-')),
-                        'Agama' => $bukuInduk->agama_ibu,
-                        'Kewarganegaraan' => $bukuInduk->kewarganegaraan_ibu ?? 'WNI',
-                        'Pendidikan' => $siswa->jenjang_pendidikan_ibu,
-                        'Pekerjaan' => $siswa->pekerjaan_ibu,
-                        'Penghasilan / th' => $siswa->penghasilan_ibu,
-                        'Alamat' => $bukuInduk->alamat_ibu,
-                        'NIK Ibu' => $siswa->nik_ibu,
+                        'Nama Ibu' => $ibu->nama ?? '-',
+                        'Pendidikan' => $ibu->pendidikan_terakhir ?? '-',
+                        'Pekerjaan' => $ibu->pekerjaan ?? '-',
                     ],
                 ];
             @endphp
@@ -273,13 +277,12 @@
                 </h3>
                 <div class="space-y-4">
                     @php
+                        $wali = $siswa->dataOrangTua ? $siswa->dataOrangTua->where('jenis', 'Wali')->first() : null;
                         $waliFields = [
-                            'Nama Wali' => $bukuInduk->nama_wali_bi ?? $siswa->nama_wali,
-                            'Hubungan dengan Siswa' => $bukuInduk->hubungan_wali,
-                            'Pendidikan' => $bukuInduk->pendidikan_wali_bi ?? $siswa->jenjang_pendidikan_wali,
-                            'Pekerjaan' => $bukuInduk->pekerjaan_wali_bi ?? $siswa->pekerjaan_wali,
-                            'Alamat' => $bukuInduk->alamat_wali_bi,
-                            'No. Telepon' => $bukuInduk->telp_wali_bi,
+                            'Nama Wali' => $wali->nama ?? '-',
+                            'Hubungan dengan Siswa' => $wali->status_hubungan_wali ?? '-',
+                            'Pendidikan' => $wali->pendidikan_terakhir ?? '-',
+                            'Pekerjaan' => $wali->pekerjaan ?? '-',
                         ];
                     @endphp
                     @foreach($waliFields as $label => $value)
@@ -381,65 +384,30 @@
         </div>
     </div>
 
-    {{-- TAB: RIWAYAT SEKOLAH --}}
+    {{-- TAB: RIWAYAT SEKOLAH / REGISTRASI --}}
     <div x-show="tab === 'riwayat'" x-transition>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-sky-500 rounded-full"></span>Perkembangan Murid
-                </h3>
-                <div class="space-y-4">
-                    @foreach([
-                        'Asal Masuk Sekolah' => $bukuInduk->asal_masuk_sekolah,
-                        'Nama TK / Paud Asal' => $bukuInduk->nama_tk_asal,
-                        'Sekolah Asal (Dapodik)' => $siswa->sekolah_asal,
-                        'Tanggal Masuk Sekolah' => $bukuInduk->tgl_masuk_sekolah?->format('d F Y'),
-                        'Pindahan dari Sekolah' => $bukuInduk->pindah_dari,
-                        'Masuk di Kelas' => $bukuInduk->kelas_pindah_masuk,
-                        'Tanggal Pindah Masuk' => $bukuInduk->tgl_pindah_masuk?->format('d F Y'),
-                    ] as $label => $value)
-                    <div class="flex justify-between items-start py-2 border-b border-slate-50">
-                        <span class="text-sm font-bold text-slate-400">{{ $label }}</span>
-                        <span class="text-sm font-bold text-slate-700 text-right max-w-[60%]">{{ $value ?? '—' }}</span>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>Registrasi & Catatan Siswa
+            </h3>
+            <div class="space-y-6">
+                @if($siswa->registrasi && $siswa->registrasi->count() > 0)
+                    @foreach($siswa->registrasi as $reg)
+                    <div class="flex flex-col gap-1 border-l-4 border-indigo-400 pl-4 py-2 bg-indigo-50/10 rounded-r-xl">
+                        <div class="flex items-center gap-3">
+                            <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-widest rounded-lg">{{ $reg->jenis_registrasi ?? '-' }}</span>
+                            @if($reg->tanggal)
+                            <span class="text-[10px] text-slate-400 font-bold"><svg class="w-3 h-3 inline pb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> {{ \Carbon\Carbon::parse($reg->tanggal)->format('d F Y') }}</span>
+                            @endif
+                        </div>
+                        <span class="text-sm font-bold text-slate-700 mt-1">{{ $reg->keterangan ?? '-' }}</span>
                     </div>
                     @endforeach
-                </div>
-            </div>
-            <div class="space-y-6">
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>Tamat Belajar / Lulus
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach([
-                            'Tanggal Lulus' => $bukuInduk->tgl_lulus?->format('d F Y'),
-                            'Nomor Ijazah' => $bukuInduk->no_ijazah ?? $siswa->no_seri_ijazah,
-                            'No. Peserta UN' => $siswa->no_peserta_un,
-                            'Melanjutkan ke Sekolah' => $bukuInduk->lanjut_ke,
-                        ] as $label => $value)
-                        <div class="flex justify-between items-start py-2 border-b border-slate-50">
-                            <span class="text-sm font-bold text-slate-400">{{ $label }}</span>
-                            <span class="text-sm font-bold text-slate-700 text-right max-w-[60%]">{{ $value ?? '—' }}</span>
-                        </div>
-                        @endforeach
+                @else
+                    <div class="text-center py-6">
+                        <p class="text-sm font-bold text-slate-400">Belum ada catatan registrasi keluar, pindah, atau tamat dicatat.</p>
                     </div>
-                </div>
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-rose-500 rounded-full"></span>Meninggalkan Sekolah
-                    </h3>
-                    <div class="space-y-4">
-                        @foreach([
-                            'Tanggal Keluar' => $bukuInduk->tgl_keluar?->format('d F Y'),
-                            'Alasan Keluar' => $bukuInduk->alasan_keluar,
-                        ] as $label => $value)
-                        <div class="flex justify-between items-start py-2 border-b border-slate-50">
-                            <span class="text-sm font-bold text-slate-400">{{ $label }}</span>
-                            <span class="text-sm font-bold text-slate-700 text-right max-w-[60%]">{{ $value ?? '—' }}</span>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>

@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-<div class="max-w-5xl mx-auto" x-data="{ section: 'identitas' }">
+<div class="max-w-5xl mx-auto" x-data="{ section: localStorage.getItem('editBiTab_{{ $siswa->nisn }}') || 'identitas' }" x-init="$watch('section', val => localStorage.setItem('editBiTab_{{ $siswa->nisn }}', val))">
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         {{-- Header --}}
@@ -22,8 +22,8 @@
 
         {{-- Section Nav --}}
         <div class="border-b border-slate-100 bg-slate-50/50 px-8 flex gap-1 overflow-x-auto">
-            @foreach(['identitas' => 'Identitas', 'orang_tua' => 'Orang Tua', 'masuk_keluar' => 'Masuk/Keluar'] as $key => $label)
-            <button @click="section = '{{ $key }}'"
+            @foreach(['identitas' => 'Identitas Murid', 'orang_tua' => 'Orang Tua / Wali'] as $key => $label)
+            <button type="button" @click="section = '{{ $key }}'"
                     :class="section === '{{ $key }}' ? 'border-b-2 border-indigo-600 text-indigo-700 font-black' : 'text-slate-500 hover:text-slate-700'"
                     class="px-4 py-3.5 text-sm font-semibold transition-all whitespace-nowrap cursor-pointer">
                 {{ $label }}
@@ -51,30 +51,50 @@
 
             {{-- SECTION: IDENTITAS --}}
             <div x-show="section === 'identitas'" x-transition>
-                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Data Identitas Tambahan</p>
+                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Data Identitas Murid</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @php
+                        $dt = $siswa->tanggal_lahir ? (\Carbon\Carbon::parse($siswa->tanggal_lahir)->format('Y-m-d')) : '';
                         $fields = [
-                            ['name' => 'no_induk', 'label' => 'Nomor Buku Induk', 'type' => 'text', 'value' => $bukuInduk->no_induk ?? $siswa->nipd],
-                            ['name' => 'nama_panggilan', 'label' => 'Nama Panggilan', 'type' => 'text', 'value' => $bukuInduk->nama_panggilan ?? $siswa->nama_panggilan],
-                            ['name' => 'bahasa_sehari_hari', 'label' => 'Bahasa Sehari-hari', 'type' => 'text', 'value' => $bukuInduk->bahasa_sehari_hari ?? $siswa->bahasa_sehari_hari, 'placeholder' => 'contoh: Indonesia'],
+                            ['name' => 'nik', 'label' => 'NIK (KTP)', 'type' => 'text', 'value' => $siswa->nik],
+                            ['name' => 'nama', 'label' => 'Nama Lengkap', 'type' => 'text', 'value' => $siswa->nama],
+                            ['name' => 'nama_panggilan', 'label' => 'Nama Panggilan', 'type' => 'text', 'value' => $siswa->nama_panggilan],
+                            ['name' => 'tempat_lahir', 'label' => 'Tempat Lahir', 'type' => 'text', 'value' => $siswa->tempat_lahir],
+                            ['name' => 'tanggal_lahir', 'label' => 'Tanggal Lahir', 'type' => 'date', 'value' => $dt],
+                            ['name' => 'telepon', 'label' => 'Nomor Telepon', 'type' => 'text', 'value' => $siswa->telepon],
                         ];
                     @endphp
                     @foreach($fields as $field)
                     <div class="space-y-1.5">
                         <label class="text-xs font-black text-slate-500 uppercase tracking-widest">{{ $field['label'] }}</label>
                         <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" value="{{ old($field['name'], $field['value']) }}"
-                               placeholder="{{ $field['placeholder'] ?? '' }}"
                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700">
                     </div>
                     @endforeach
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Agama</label>
+                        <select name="agama" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                            @foreach(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'] as $agm)
+                            <option value="{{ $agm }}" {{ old('agama', $siswa->agama) == $agm ? 'selected' : '' }}>{{ $agm }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jenis Kelamin</label>
+                        <select name="jk" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700">
+                             <option value="L" {{ old('jk', $siswa->jk) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                             <option value="P" {{ old('jk', $siswa->jk) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                        </select>
+                    </div>
 
                     <div class="space-y-1.5">
                         <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Golongan Darah</label>
                         <select name="golongan_darah" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
                             <option value="">— Tidak Tahu —</option>
                             @foreach(['A', 'B', 'AB', 'O', 'A+', 'B+', 'AB+', 'O+'] as $gol)
-                            <option value="{{ $gol }}" {{ old('golongan_darah', $bukuInduk->golongan_darah ?? $siswa->golongan_darah) == $gol ? 'selected' : '' }}>{{ $gol }}</option>
+                            <option value="{{ $gol }}" {{ old('golongan_darah', $siswa->keadaanJasmani->golongan_darah ?? '') == $gol ? 'selected' : '' }}>{{ $gol }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -82,51 +102,83 @@
                     <div class="space-y-1.5">
                         <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Kewarganegaraan</label>
                         <select name="kewarganegaraan" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
-                            @php $kewarganegaraan = old('kewarganegaraan', $bukuInduk->kewarganegaraan ?? $siswa->kewarganegaraan ?? 'WNI'); @endphp
+                            @php $kewarganegaraan = old('kewarganegaraan', $siswa->kewarganegaraan ?? 'WNI'); @endphp
                             <option value="WNI" {{ $kewarganegaraan == 'WNI' ? 'selected' : '' }}>WNI</option>
                             <option value="WNA" {{ $kewarganegaraan == 'WNA' ? 'selected' : '' }}>WNA</option>
                         </select>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Bertempat Tinggal Dengan</label>
-                        <select name="bertempat_tinggal_dengan" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Bahasa Sehari-hari</label>
+                        <input type="text" name="bahasa_sehari_hari" value="{{ old('bahasa_sehari_hari', $siswa->dataPeriodik->bahasa_sehari_hari ?? '') }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700">
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Kandung</label>
+                        <input type="number" name="jml_saudara_kandung" min="0" value="{{ old('jml_saudara_kandung', $siswa->dataPeriodik->jml_saudara_kandung ?? $siswa->jml_saudara_kandung ?? 0) }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Tiri</label>
+                        <input type="number" name="jml_saudara_tiri" min="0" value="{{ old('jml_saudara_tiri', $siswa->dataPeriodik->jml_saudara_tiri ?? 0) }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Angkat</label>
+                        <input type="number" name="jml_saudara_angkat" min="0" value="{{ old('jml_saudara_angkat', $siswa->dataPeriodik->jml_saudara_angkat ?? 0) }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
+                    </div>
+
+                    <div class="md:col-span-2 lg:col-span-3 space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Alamat Tempat Tinggal</label>
+                        <textarea name="alamat" rows="2"
+                                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">{{ old('alamat', $siswa->dataPeriodik->alamat_tinggal ?? $siswa->alamat) }}</textarea>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Bertempat Tinggal Pada</label>
+                        <select name="jenis_tinggal" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
                             <option value="">— Pilih —</option>
                             @php
-                                $tinggalDengan = old('bertempat_tinggal_dengan', $bukuInduk->bertempat_tinggal_dengan ?? ($siswa->jenis_tinggal ? ucwords(str_replace('_', ' ', $siswa->jenis_tinggal)) : ''));
+                                $tPada = old('jenis_tinggal', $siswa->dataPeriodik->bertempat_tinggal_pada ?? ($siswa->jenis_tinggal ? ucwords(str_replace('_', ' ', $siswa->jenis_tinggal)) : ''));
                             @endphp
                             @foreach(['Orang Tua', 'Wali', 'Asrama/Kos', 'Kerabat'] as $opt)
-                            <option value="{{ $opt }}" {{ $tinggalDengan == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                            <option value="{{ $opt }}" {{ $tPada == $opt ? 'selected' : '' }}>{{ $opt }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Kandung</label>
-                        <input type="number" name="jml_saudara_kandung" min="0" value="{{ old('jml_saudara_kandung', $siswa->jml_saudara_kandung ?? 0) }}"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700 bg-slate-50" readonly title="Data dari Dapodik">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Tiri</label>
-                        <input type="number" name="jml_saudara_tiri" min="0" value="{{ old('jml_saudara_tiri', $bukuInduk->jml_saudara_tiri ?? '') }}"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jml Saudara Angkat</label>
-                        <input type="number" name="jml_saudara_angkat" min="0" value="{{ old('jml_saudara_angkat', $bukuInduk->jml_saudara_angkat ?? '') }}"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Jarak ke Sekolah (km)</label>
+                        <input type="number" step="0.1" name="jarak_rumah_ke_sekolah_km" value="{{ old('jarak_rumah_ke_sekolah_km', $siswa->dataPeriodik->jarak_tempat_tinggal_ke_sekolah ?? $siswa->jarak_rumah_ke_sekolah_km ?? '') }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 font-bold text-slate-700">
                     </div>
 
-                    <div class="md:col-span-2 lg:col-span-3 space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Riwayat Penyakit Berat</label>
-                        <textarea name="riwayat_penyakit" rows="3" placeholder="Contoh: Tifus (2022), Bronkitis..."
-                                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">{{ old('riwayat_penyakit', $bukuInduk->riwayat_penyakit ?? $siswa->riwayat_penyakit) }}</textarea>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Berat Badan (kg)</label>
+                        <input type="number" step="0.1" name="berat_badan" value="{{ old('berat_badan', $siswa->keadaanJasmani->berat_badan ?? '') }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 font-bold text-slate-700">
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Tinggi Badan (cm)</label>
+                        <input type="number" step="0.1" name="tinggi_badan" value="{{ old('tinggi_badan', $siswa->keadaanJasmani->tinggi_badan ?? '') }}"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 font-bold text-slate-700">
                     </div>
 
-                    <div class="md:col-span-2 lg:col-span-3 space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Catatan Beasiswa / PIP</label>
-                        <textarea name="beasiswa" rows="3" placeholder="Contoh: PIP 2023, Beasiswa Daerah 2024..."
-                                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">{{ old('beasiswa', $bukuInduk->beasiswa) }}</textarea>
+                    <div class="md:col-span-2 space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Riwayat Penyakit Khusus</label>
+                        <textarea name="riwayat_penyakit" rows="2" placeholder="Contoh: Tifus..."
+                                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">{{ old('riwayat_penyakit', $siswa->keadaanJasmani->nama_riwayat_penyakit ?? '') }}</textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2 space-y-1.5">
+                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Kelainan Jasmani / Berkebutuhan Khusus</label>
+                        <textarea name="kebutuhan_khusus" rows="2" placeholder="Contoh: Tunanetra..."
+                                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">{{ old('kebutuhan_khusus', $siswa->keadaanJasmani->kelainan_jasmani ?? '') }}</textarea>
                     </div>
                 </div>
             </div>
@@ -219,71 +271,7 @@
                     </div>
                 </div>
             </div>
-
-            {{-- SECTION: MASUK / KELUAR --}}
-            <div x-show="section === 'masuk_keluar'" x-transition>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    {{-- Masuk --}}
-                    <div class="space-y-5">
-                        <h4 class="font-black text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-2"><span class="w-1 h-5 bg-sky-500 rounded-full"></span>Perkembangan Murid / Masuk</h4>
-
-                        {{-- Sekolah Asal (dari Dapodik, readonly) --}}
-                        @if($siswa->sekolah_asal)
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Sekolah Asal (Dapodik)</label>
-                            <input type="text" value="{{ $siswa->sekolah_asal }}" disabled
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-400 cursor-not-allowed">
-                        </div>
-                        @endif
-
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Asal Masuk Sekolah</label>
-                            <select name="asal_masuk_sekolah" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
-                                <option value="">— Pilih —</option>
-                                @foreach(['TK/Paud', 'Rumah (Belum Sekolah)', 'SD Lain (Pindahan)'] as $opt)
-                                <option value="{{ $opt }}" {{ old('asal_masuk_sekolah', $bukuInduk->asal_masuk_sekolah) == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @foreach(['nama_tk_asal' => ['Nama TK/Paud Asal', 'text'], 'tgl_masuk_sekolah' => ['Tanggal Masuk Sekolah', 'date'], 'pindah_dari' => ['Pindahan dari Sekolah', 'text'], 'kelas_pindah_masuk' => ['Masuk di Kelas', 'text'], 'tgl_pindah_masuk' => ['Tanggal Pindah Masuk', 'date']] as $name => [$label, $type])
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest">{{ $label }}</label>
-                            <input type="{{ $type }}" name="{{ $name }}" value="{{ old($name, $type === 'date' ? ($bukuInduk->$name?->format('Y-m-d') ?? '') : $bukuInduk->$name) }}"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
-                        </div>
-                        @endforeach
-                    </div>
-                    {{-- Keluar / Lulus --}}
-                    <div class="space-y-5">
-                        <h4 class="font-black text-slate-700 border-b border-slate-100 pb-2 flex items-center gap-2"><span class="w-1 h-5 bg-emerald-500 rounded-full"></span>Tamat / Keluar</h4>
-                        @foreach([
-                            'tgl_lulus'     => ['Tanggal Lulus', 'date'],
-                            'no_ijazah'     => ['Nomor Ijazah', 'text', 'no_seri_ijazah'],
-                            'lanjut_ke'     => ['Melanjutkan ke Sekolah', 'text'],
-                            'tgl_keluar'    => ['Tanggal Keluar', 'date'],
-                            'alasan_keluar' => ['Alasan Keluar', 'text'],
-                        ] as $name => $fieldMeta)
-                        @php
-                            [$lbl, $type] = $fieldMeta;
-                            $siswaFallbackKey = $fieldMeta[2] ?? null;
-                            if ($type === 'date') {
-                                $val = old($name, $bukuInduk->$name?->format('Y-m-d') ?? '');
-                            } elseif ($siswaFallbackKey) {
-                                $val = old($name, $bukuInduk->$name ?? $siswa->$siswaFallbackKey);
-                            } else {
-                                $val = old($name, $bukuInduk->$name);
-                            }
-                        @endphp
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-black text-slate-500 uppercase tracking-widest">{{ $lbl }}</label>
-                            <input type="{{ $type }}" name="{{ $name }}" value="{{ $val }}"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 font-bold text-slate-700">
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
+            
             {{-- Submit --}}
             <div class="mt-10 pt-6 border-t border-slate-100 flex gap-3">
                 <a href="{{ route('buku-induk.show', $siswa->nisn) }}" class="flex-1 py-3 text-center text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all">Batal</a>
