@@ -251,9 +251,9 @@
 
                         <!-- Tingkat Pendidikan -->
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tingkat Pendidikan</label>
-                            <select name="tingkat" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-inner">
-                                <option value="">Pilih Tingkat (Opsional)</option>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tingkat Pendidikan <span class="text-red-500">*</span></label>
+                            <select name="tingkat" required class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-inner">
+                                <option value="">Pilih Tingkat</option>
                                 <template x-for="t in tingkatOptions" :key="t">
                                     <option :value="t" x-text="'Tingkat ' + t" :selected="t == '{{ old('tingkat') }}'"></option>
                                 </template>
@@ -274,7 +274,7 @@
                         <!-- Nama Rombel -->
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Rombel / Kelas <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Contoh: X RPL 1"
+                            <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Contoh: 1-A"
                                    class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-white focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-sm">
                             @error('nama') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -282,8 +282,9 @@
                         <!-- Kurikulum -->
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kurikulum</label>
-                            <input type="text" name="kurikulum" value="{{ old('kurikulum') }}" placeholder="Contoh: Kurikulum Merdeka"
-                                   class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-inner">
+                            <select name="kurikulum" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-inner">
+                                <option value="Kurikulum SD Merdeka" {{ old('kurikulum') == 'Kurikulum SD Merdeka' ? 'selected' : '' }}>Kurikulum SD Merdeka</option>
+                            </select>
                         </div>
                     </div>
 
