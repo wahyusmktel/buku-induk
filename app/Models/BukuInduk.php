@@ -16,7 +16,7 @@ class BukuInduk extends Model
         'riwayat_penyakit', 'jml_saudara_tiri', 'jml_saudara_angkat', 'bertempat_tinggal_dengan',
         'tgl_masuk_sekolah', 'asal_masuk_sekolah', 'nama_tk_asal',
         'pindah_dari', 'kelas_pindah_masuk', 'tgl_pindah_masuk',
-        'tgl_keluar', 'alasan_keluar', 'tgl_lulus', 'no_ijazah', 'lanjut_ke', 'beasiswa',
+        'tgl_keluar', 'alasan_keluar', 'tgl_lulus', 'no_ijazah', 'tanggal_ijazah', 'lanjut_ke', 'beasiswa',
         // Data Ayah
         'nama_ayah',
         'tempat_lahir_ayah', 'tanggal_lahir_ayah', 'agama_ayah', 'kewarganegaraan_ayah', 'alamat_ayah',

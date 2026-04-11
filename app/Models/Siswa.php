@@ -87,4 +87,9 @@ class Siswa extends Model
     {
         return $this->hasMany(RegistrasiSiswa::class);
     }
+
+    public function prestasiEkstrakurikulers()
+    {
+        return $this->hasMany(PrestasiEkstrakurikuler::class);
+    }
 }

@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<div class="space-y-8 max-w-6xl mx-auto" x-data="{ tab: 'identitas' }">
+<div class="space-y-8 max-w-6xl mx-auto" x-data="{ tab: '{{ request('tab', 'identitas') }}' }">
 
     {{-- Toast --}}
     @if(session('success'))
@@ -129,6 +129,7 @@
                 'riwayat' => 'Riwayat Sekolah',
                 'photo' => 'Foto Siswa',
                 'akademik' => 'Prestasi Akademik',
+                'ekskul' => 'Ekstrakurikuler',
                 'jejak' => 'Jejak Rombel',
             ] as $key => $label)
             <button @click="tab = '{{ $key }}'"
@@ -434,77 +435,243 @@
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-black text-slate-800">Prestasi Belajar</h3>
-                    <p class="text-sm text-slate-500 mt-0.5">Catatan nilai, kepribadian, dan kehadiran per semester</p>
+                    <h3 class="text-lg font-black text-slate-800">Prestasi Belajar (Tahun Pelajaran Aktif)</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Catatan nilai, kepribadian, dan kehadiran pada semester saat ini</p>
                 </div>
                 @hasanyrole('Super Admin|Operator|Tata Usaha')
                 <a href="{{ route('buku-induk.edit', $siswa->nisn) }}" class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Input Nilai
+                    Input / Update Nilai
                 </a>
                 @endhasanyrole
             </div>
-            <div class="overflow-x-auto">
+
+            <div class="p-8">
+                @php
+                    $activeSmtInt = strtolower($activeTahunPelajaran?->semester ?? '') == 'ganjil' ? 1 : 2;
+                    $activePrestasi = null;
+                    if ($currentRombel && $activeTahunPelajaran) {
+                        $activePrestasi = $bukuInduk->prestasis()
+                            ->where('kelas', $currentRombel->tingkat)
+                            ->where('semester', $activeSmtInt)
+                            ->first();
+                    }
+                @endphp
+
+                @if(!$activePrestasi)
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4 border border-slate-200">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-800 tracking-tight">Belum Ada Data</h4>
+                        <p class="text-slate-500 font-medium mt-2 max-w-md">Siswa ini belum memiliki catatan nilai untuk Tahun Pelajaran aktif ({{ $activeTahunPelajaran?->tahun }} - {{ $activeTahunPelajaran?->semester }}) di Tingkat Kelas {{ $currentRombel?->tingkat ?? '—' }}.</p>
+                    </div>
+                @else
+                    <div class="space-y-8">
+                        {{-- IDENTITAS SEMESTER --}}
+                        <div class="flex flex-wrap gap-4">
+                            <span class="px-4 py-2 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-sm rounded-xl tracking-tight">Tahun Pelajaran: {{ $activeTahunPelajaran->tahun }}</span>
+                            <span class="px-4 py-2 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-sm rounded-xl tracking-tight">Semester: {{ $activeTahunPelajaran->semester }} ({{ $activeSmtInt }})</span>
+                            <span class="px-4 py-2 bg-indigo-50 border border-indigo-100 text-indigo-700 font-bold text-sm rounded-xl tracking-tight">Kelas: {{ $currentRombel->tingkat }}</span>
+                        </div>
+
+                        {{-- TABEL MATA PELAJARAN --}}
+                        <div>
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">1. Penilaian Hasil Belajar</p>
+                            <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50">
+                                        <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                            <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                            <th class="px-6 py-3 border-r border-slate-100">Nama Mata Pelajaran</th>
+                                            <th class="px-6 py-3 w-48 text-center">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 bg-white">
+                                        @foreach($mataPelajarans as $index => $mapel)
+                                            @php
+                                                $nilaiItem = $activePrestasi->nilais->where('mata_pelajaran_id', $mapel->id)->first();
+                                            @endphp
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">{{ $index + 1 }}</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">{{ $mapel->nama }}</td>
+                                                <td class="px-6 py-3 text-center font-bold {{ ($nilaiItem?->nilai ?? 0) < 65 && $nilaiItem?->nilai !== null ? 'text-rose-600' : 'text-slate-800' }}">
+                                                    {{ $nilaiItem?->nilai ?? '—' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot class="bg-slate-50 border-t border-slate-200">
+                                        <tr>
+                                            <td colspan="2" class="px-6 py-4 text-right font-black text-slate-600 uppercase text-xs tracking-wider border-r border-slate-100">Jumlah & Rata-rata</td>
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center justify-center gap-3">
+                                                    <span class="text-sm font-black text-slate-800" title="Jumlah Nilai">Σ {{ $activePrestasi->jumlah_nilai ?? 0 }}</span>
+                                                    <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100" title="Rata-rata">Rata: {{ $activePrestasi->rata_rata ?? 0 }}</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {{-- KEPRIBADIAN --}}
+                            <div>
+                                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">2. Kepribadian</p>
+                                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden h-full">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-slate-50">
+                                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                                <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                                <th class="px-6 py-3 border-r border-slate-100">Keterangan</th>
+                                                <th class="px-6 py-3 w-32 text-center">Nilai</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 bg-white">
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">1</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Sikap</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->sikap ?? '—' }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">2</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Kerajinan</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->kerajinan ?? '—' }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">3</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Kerapihan</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->kebersihan_kerapian ?? '—' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {{-- KETIDAKHADIRAN --}}
+                            <div>
+                                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">3. Ketidakhadiran</p>
+                                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden h-full">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-slate-50">
+                                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                                <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                                <th class="px-6 py-3 border-r border-slate-100">Keterangan</th>
+                                                <th class="px-6 py-3 w-32 text-center">Hari</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 bg-white">
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">1</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Sakit</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->hadir_sakit ?? 0 }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">2</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Izin</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->hadir_izin ?? 0 }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">3</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Tanpa Keterangan</td>
+                                                <td class="px-6 py-3 text-center font-bold text-slate-800">{{ $activePrestasi->hadir_alpha ?? 0 }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PERINGKAT & KENAIKAN --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm mt-15">
+                            <div class="space-y-1.5 align-top border-b pb-4 md:border-b-0 md:pb-0 md:border-r border-slate-200 pl-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Peringkat / Ranking Kelas</label>
+                                <p class="text-2xl font-black text-slate-800 tracking-tighter">{{ $activePrestasi->peringkat ?? '—' }}</p>
+                            </div>
+                            <div class="space-y-1.5 align-top pl-2 md:pl-4">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Keterangan Kenaikan Kelas</label>
+                                <div>
+                                    @if($activePrestasi->keterangan_kenaikan)
+                                    <span class="inline-flex items-center px-4 py-1.5 rounded-xl text-sm font-black tracking-wide border {{ $activePrestasi->keterangan_kenaikan == 'Naik' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-rose-100 text-rose-700 border-rose-200' }}">
+                                        {{ $activePrestasi->keterangan_kenaikan }}
+                                    </span>
+                                    @else
+                                    <span class="text-2xl font-black text-slate-300 tracking-tighter">—</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- ─── TAB: EKSTRAKURIKULER ─── --}}
+    <div x-show="tab === 'ekskul'" x-transition>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-black text-slate-800">Ekstrakurikuler</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Catatan nilai ekstrakurikuler per semester</p>
+                </div>
+                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                <a href="{{ route('buku-induk.edit', $siswa->nisn) }}" class="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Input Nilai (Via Tab Akademik)
+                </a>
+                @endhasanyrole
+            </div>
+            <div class="overflow-x-auto p-8">
+                @php
+                    // Get all unique ekstrakurikuler the student has ever taken to define columns
+                    $studentEkskulIds = $siswa->prestasiEkstrakurikulers->pluck('ekstrakurikuler_id')->unique();
+                    $activeEkskuls = $ekstrakurikulers->whereIn('id', $studentEkskulIds);
+                @endphp
+                @if($activeEkskuls->isEmpty())
+                    <div class="text-center py-6">
+                        <p class="text-sm font-bold text-slate-400">Siswa ini belum pernah memiliki nilai Ekstrakurikuler.</p>
+                    </div>
+                @else
                 <table class="w-full text-sm text-left">
                     <thead class="bg-slate-50/80 text-slate-400 text-[0.65rem] uppercase font-extrabold tracking-widest text-center">
                         <tr>
-                            <th class="px-6 py-3 text-left">Kls</th>
-                            <th class="px-3 py-3">Smt</th>
-                            <th class="px-3 py-3">T. Pelajaran</th>
-                            @foreach($mataPelajarans as $mapel)
-                            <th class="px-3 py-3 min-w-[60px]">{{ $mapel->nama }}</th>
+                            <th class="px-6 py-3 text-left w-16">Kelas</th>
+                            <th class="px-3 py-3 w-16 border-r border-slate-100">Semester</th>
+                            @foreach($activeEkskuls as $ekskul)
+                            <th class="px-3 py-3">{{ $ekskul->nama_ekstrakurikuler }}</th>
                             @endforeach
-                            <th class="px-3 py-3 border-l border-slate-100">Jml</th>
-                            <th class="px-3 py-3">Rata</th>
-                            <th class="px-3 py-3">Rank</th>
-                            <th class="px-3 py-3 border-l border-slate-100">Sakit</th>
-                            <th class="px-3 py-3">Izin</th>
-                            <th class="px-3 py-3">Alpha</th>
-                            <th class="px-3 py-3 border-l border-slate-100">Naik?</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         @foreach(range(1, 6) as $kelas)
                         @foreach([1, 2] as $semester)
-                        @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
+                        @php
+                            $semesterEkskuls = $siswa->prestasiEkstrakurikulers->where('kelas', $kelas)->where('semester', $semester);
+                        @endphp
                         <tr class="hover:bg-indigo-50/30 transition-colors {{ $semester == 1 ? '' : 'bg-slate-50/20' }}">
                             <td class="px-6 py-3 font-black text-slate-700">
                                 @if($semester == 1)
                                 <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-black">{{ $kelas }}</span>
                                 @endif
                             </td>
-                            <td class="px-3 py-3 text-slate-500 font-medium text-center">{{ $semester }}</td>
-                            <td class="px-3 py-3 text-slate-500 text-xs font-mono text-center">{{ $p?->tahun_pelajaran ?? '—' }}</td>
-                            
-                            @foreach($mataPelajarans as $mapel)
+                            <td class="px-3 py-3 text-slate-500 font-medium text-center border-r border-slate-100">{{ $semester }}</td>
+                            @foreach($activeEkskuls as $ekskul)
                                 @php
-                                    $nilai = $p ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai : null;
+                                    $predikat = $semesterEkskuls->where('ekstrakurikuler_id', $ekskul->id)->first()?->predikat;
                                 @endphp
-                                <td class="px-3 py-3 text-center font-bold {{ ($nilai ?? 0) < 65 && $nilai !== null ? 'text-rose-600' : 'text-slate-700' }}">
-                                    {{ $nilai ?? '—' }}
+                                <td class="px-3 py-3 text-center font-bold text-slate-700">
+                                    {{ $predikat ?? '—' }}
                                 </td>
                             @endforeach
-                            
-                            <td class="px-3 py-3 text-center font-black text-slate-800 border-l border-slate-100">{{ $p?->jumlah_nilai ?? '—' }}</td>
-                            <td class="px-3 py-3 text-center font-bold text-indigo-700">{{ $p?->rata_rata ?? '—' }}</td>
-                            <td class="px-3 py-3 text-center font-black text-slate-700">{{ $p?->peringkat ?? '—' }}</td>
-                            <td class="px-3 py-3 text-center text-rose-600 font-bold border-l border-slate-100">{{ $p?->hadir_sakit ?? '—' }}</td>
-                            <td class="px-3 py-3 text-center text-amber-600 font-bold">{{ $p?->hadir_izin ?? '—' }}</td>
-                            <td class="px-3 py-3 text-center text-slate-500 font-bold">{{ $p?->hadir_alpha ?? '—' }}</td>
-                            <td class="px-3 py-3 border-l border-slate-100">
-                                @if($p && $semester == 2)
-                                    <span class="px-2 py-0.5 text-xs font-bold rounded-full {{ $p->keterangan_kenaikan == 'Naik' ? 'bg-emerald-100 text-emerald-700' : ($p->keterangan_kenaikan ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-500') }}">
-                                        {{ $p->keterangan_kenaikan ?? '—' }}
-                                    </span>
-                                @else
-                                    <span class="text-slate-300">—</span>
-                                @endif
-                            </td>
                         </tr>
                         @endforeach
                         @endforeach
                     </tbody>
                 </table>
+                @endif
             </div>
         </div>
     </div>

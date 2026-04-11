@@ -33,6 +33,7 @@ use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\EkstrakurikulerController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityController;
@@ -110,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Mata Pelajaran Management
         Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
+        Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->except(['create', 'show', 'edit']);
 
         // Settings (Konfigurasi Sistem)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
@@ -123,4 +125,3 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/siswas/{siswa}', [SiswaController::class, 'destroy'])->name('siswas.destroy');
     });
 });
-

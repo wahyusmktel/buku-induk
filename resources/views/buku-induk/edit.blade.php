@@ -79,7 +79,8 @@
                 'beasiswa' => 'Beasiswa',
                 'registrasi' => 'Meninggalkan Sekolah',
                 'photo' => 'Foto Siswa',
-                'akademik' => 'Prestasi Akademik'
+                'akademik' => 'Prestasi Akademik',
+                'ekskul' => 'Ekstrakurikuler'
             ] as $key => $label)
             <button type="button" @click="section = '{{ $key }}'"
                     :class="section === '{{ $key }}' ? 'border-b-2 border-indigo-600 text-indigo-700 font-black' : 'text-slate-500 hover:text-slate-700'"
@@ -405,8 +406,18 @@
             </div>
 
             {{-- SECTION: MENINGGALKAN SEKOLAH --}}
-            <div x-show="section === 'registrasi'" x-transition x-data="{ items: {{ $siswa->registrasi->count() > 0 ? Js::from($siswa->registrasi) : '[{}]' }} }">
-                <div class="space-y-4">
+            <div x-show="section === 'registrasi'" x-transition>
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 mb-6 relative bg-slate-50/50">
+                    <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Data Kelulusan (Tamat Belajar)</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="space-y-1.5"><label class="text-xs font-black text-slate-500 uppercase">1. Tanggal Lulus</label><input type="date" name="tamat[tgl_lulus]" value="{{ old('tamat.tgl_lulus', $bukuInduk->tgl_lulus) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700"></div>
+                        <div class="space-y-1.5"><label class="text-xs font-black text-slate-500 uppercase">2. Nomor Seri Ijazah</label><input type="text" name="tamat[no_ijazah]" value="{{ old('tamat.no_ijazah', $bukuInduk->no_ijazah) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="DN-..."></div>
+                        <div class="space-y-1.5"><label class="text-xs font-black text-slate-500 uppercase">3. Tanggal Ijazah</label><input type="date" name="tamat[tanggal_ijazah]" value="{{ old('tamat.tanggal_ijazah', $bukuInduk->tanggal_ijazah) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700"></div>
+                        <div class="space-y-1.5"><label class="text-xs font-black text-slate-500 uppercase">4. Melanjutkan Ke</label><input type="text" name="tamat[lanjut_ke]" value="{{ old('tamat.lanjut_ke', $bukuInduk->lanjut_ke) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-700" placeholder="Misal: SMP 1..."></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4" x-data="{ items: {{ $siswa->registrasi->count() > 0 ? Js::from($siswa->registrasi) : '[{}]' }} }">
                     <template x-for="(item, index) in items" :key="index">
                         <div class="p-6 border border-slate-200 rounded-2xl bg-white relative">
                             <button type="button" @click="items.splice(index, 1)" class="absolute top-4 right-4 p-2 text-rose-500 hover:bg-rose-50 rounded-full" title="Hapus"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
@@ -494,6 +505,30 @@
                     @endhasanyrole
                 </div>
             </div>
+
+            {{-- SECTION: EKSTRAKURIKULER --}}
+            <div x-show="section === 'ekskul'" x-transition>
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 mb-6 relative bg-slate-50/50">
+                    <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Data Ekstrakurikuler</p>
+                    <div class="flex items-start gap-4 mb-6 relative">
+                        <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl shrink-0">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">Nilai Ekstrakurikuler Bersifat Per-Semester</h4>
+                            <p class="text-sm text-slate-500 mt-1 leading-relaxed">
+                                Sama halnya dengan nilai mata pelajaran akademik, Kepribadian, dan Absensi, nilai kegiatan Ekstrakurikuler diisi untuk setiap semesternya. Anda dapat menginput nilai Ekstrakurikuler (Predikat A, B, C) secara bersamaan melalui form <strong>Update Nilai Semester</strong>.
+                            </p>
+                        </div>
+                    </div>
+                    @hasanyrole('Super Admin|Operator|Tata Usaha')
+                    <button type="button" x-on:click="$dispatch('open-prestasi-modal')" class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Buka Form Input Nilai Semester
+                    </button>
+                    @endhasanyrole
+                </div>
+            </div>
             
             {{-- Submit --}}
             <div class="mt-10 pt-6 border-t border-slate-100 flex gap-3">
@@ -507,70 +542,266 @@
 
     {{-- MODAL: Input Prestasi (di luar form utama) --}}
     @hasanyrole('Super Admin|Operator|Tata Usaha')
-    <div x-data="{ open: false }" @open-prestasi-modal.window="open = true"
-         x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-white rounded-t-3xl flex items-center justify-between">
-                <h3 class="text-xl font-extrabold tracking-tight">Input / Update Nilai Semester</h3>
-                <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-            </div>
-            <form action="{{ route('prestasi.store', $siswa->nisn) }}" method="POST" class="p-8 space-y-6">
-                @csrf
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Kelas</label>
-                        <select name="kelas" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
-                            @foreach(range(1,6) as $k)<option value="{{ $k }}">Kelas {{ $k }}</option>@endforeach
-                        </select>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Semester</label>
-                        <select name="semester" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
-                            <option value="1">Ganjil (1)</option><option value="2">Genap (2)</option>
-                        </select>
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Tahun Pelajaran</label>
-                        <input type="text" name="tahun_pelajaran" placeholder="2024/2025" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-700">
-                    </div>
-                </div>
-                <div>
-                    <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Nilai Mata Pelajaran</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                        @foreach($mataPelajarans as $mapel)
-                        <div class="space-y-1">
-                            <label class="text-[0.65rem] font-bold text-slate-400">{{ $mapel->nama }}</label>
-                            <input type="number" name="nilai[{{ $mapel->id }}]" min="0" max="100" step="0.5" placeholder="—"
-                                   class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm">
+    <div x-data="{ 
+            open: false,
+            isMax: false,
+            posX: 0,
+            posY: 0,
+            dragging: false,
+            startX: 0,
+            startY: 0,
+            startDrag(e) {
+                if(this.isMax) return;
+                this.dragging = true;
+                this.startX = e.clientX - this.posX;
+                this.startY = e.clientY - this.posY;
+            },
+            doDrag(e) {
+                if(!this.dragging) return;
+                this.posX = e.clientX - this.startX;
+                this.posY = e.clientY - this.startY;
+            },
+            stopDrag() {
+                this.dragging = false;
+            }
+         }" 
+         @open-prestasi-modal.window="open = true"
+         @mousemove.window="doDrag" 
+         @mouseup.window="stopDrag"
+         x-show="open" x-transition 
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div :class="{
+                'w-full h-full max-w-none max-h-none rounded-none m-0': isMax,
+                'w-full max-w-5xl max-h-[90vh] rounded-3xl': !isMax,
+                'transition-all duration-300': !dragging 
+             }" 
+             :style="(!isMax && posX !== undefined) ? `transform: translate(${posX}px, ${posY}px)` : ''"
+             class="bg-white shadow-2xl overflow-hidden flex flex-col border border-white/20">
+
+            @if(!$currentRombel || !$activeTahunPelajaran)
+                <div @mousedown="startDrag($event)" class="bg-gradient-to-r from-rose-600 to-red-600 px-8 py-5 text-white flex items-center justify-between shrink-0 cursor-move select-none">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 14c-.77 1.333.192 3 1.732 3z"/></svg>
                         </div>
-                        @endforeach
+                        <div>
+                            <h3 class="text-xl font-extrabold tracking-tight">Peringatan: Siswa Belum Di-Mapping</h3>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button type="button" @click="open = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Peringkat</label><input type="number" name="peringkat" min="1" placeholder="—" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Sakit (hari)</label><input type="number" name="hadir_sakit" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Izin (hari)</label><input type="number" name="hadir_izin" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Alpha (hari)</label><input type="number" name="hadir_alpha" min="0" value="0" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
+                <div class="p-8 flex-1 overflow-y-auto flex flex-col items-center justify-center text-center">
+                    <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mb-5 border-4 border-white shadow-sm">
+                        <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 14c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black text-slate-800 tracking-tight">Belum Maping Rombel</h4>
+                    <p class="text-slate-500 font-medium mt-2 max-w-md">Siswa ini belum dimasukkan ke dalam Rombongan Belajar pada Semester / Tahun Pelajaran aktif. Silahkan lakukan mapping terlebih dahulu.</p>
+                    <a href="{{ route('rombels.index') }}" class="mt-8 inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-rose-200 cursor-pointer">
+                        Pergi Ke Maping Rombel
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </a>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Sikap</label>
-                        <select name="sikap" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kerajinan</label>
-                        <select name="kerajinan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kebersihan</label>
-                        <select name="kebersihan_kerapian" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Baik</option><option>Cukup</option><option>Kurang</option></select></div>
+            @else
+                <div @mousedown="startDrag($event)" class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-5 text-white flex items-center justify-between shrink-0 cursor-move select-none">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-extrabold tracking-tight">Input / Update Nilai Semester</h3>
+                            <p class="text-indigo-100 text-xs font-medium mt-0.5">Nilai dimasukkan berdasarkan Tahun Pelajaran & Semester yang sedang aktif.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button type="button" @click="isMax = !isMax; if(!isMax) { posX = 0; posY = 0; }" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                            <svg x-show="!isMax" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                            <svg x-show="isMax" class="w-4 h-4" x-cloak fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10V6h4m-4 0l5 5m11 5V6h-4m4 0l-5 5"/></svg>
+                        </button>
+                        <button type="button" @click="open = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Kenaikan Kelas</label>
-                        <select name="keterangan_kenaikan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"><option value="">—</option><option>Naik</option><option>Tidak Naik</option></select></div>
-                    <div class="space-y-1.5"><label class="text-[0.65rem] font-bold text-slate-400 uppercase">Tgl Keputusan</label>
-                        <input type="date" name="tgl_keputusan_kenaikan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm"></div>
-                </div>
-                <div class="flex gap-3 pt-4">
-                    <button type="button" @click="open = false" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">Batal</button>
-                    <button type="submit" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer">Simpan Nilai</button>
-                </div>
-            </form>
+
+                <form action="{{ route('prestasi.store', $siswa->nisn) }}" method="POST" class="flex flex-col flex-1 overflow-hidden" id="formInputNilai">
+                    @csrf
+                    <div class="p-8 flex-1 overflow-y-auto space-y-8">
+                        
+                        {{-- IDENTITAS SEMESTER (READONLY) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Kelas</label>
+                                <input type="hidden" name="kelas" value="{{ $currentRombel->tingkat }}">
+                                <input type="text" value="Kelas {{ $currentRombel->tingkat }}" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-500 cursor-not-allowed">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Semester</label>
+                                <input type="hidden" name="semester" value="{{ strtolower($activeTahunPelajaran->semester) == 'ganjil' ? 1 : 2 }}">
+                                <input type="text" value="{{ $activeTahunPelajaran->semester }} ({{ strtolower($activeTahunPelajaran->semester) == 'ganjil' ? 1 : 2 }})" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-500 cursor-not-allowed">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-black text-slate-500 uppercase tracking-widest">Tahun Pelajaran</label>
+                                <input type="text" name="tahun_pelajaran" value="{{ $activeTahunPelajaran->tahun }}" readonly class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-500 cursor-not-allowed">
+                            </div>
+                        </div>
+
+                        {{-- TABEL MATA PELAJARAN --}}
+                        <div>
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Daftar Mata Pelajaran</p>
+                            <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50">
+                                        <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                            <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                            <th class="px-6 py-3 border-r border-slate-100">Nama Mata Pelajaran</th>
+                                            <th class="px-6 py-3 w-48">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 bg-white">
+                                        @foreach($mataPelajarans as $index => $mapel)
+                                        <tr class="hover:bg-slate-50/50 transition-colors">
+                                            <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">{{ $index + 1 }}</td>
+                                            <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">{{ $mapel->nama }}</td>
+                                            <td class="px-6 py-2">
+                                                <input type="number" name="nilai[{{ $mapel->id }}]" min="0" max="100" step="0.5" placeholder="—"
+                                                       value="{{ $activePrestasi ? $activePrestasi->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai : '' }}"
+                                                       class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-center">
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {{-- TABEL KETIDAKHADIRAN & KEPRIBADIAN --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {{-- KETIDAKHADIRAN --}}
+                            <div>
+                                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Ketidakhadiran</p>
+                                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-slate-50">
+                                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                                <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                                <th class="px-6 py-3 border-r border-slate-100">Keterangan</th>
+                                                <th class="px-6 py-3 w-32">Hari/Nilai</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 bg-white">
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">1</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Sakit</td>
+                                                <td class="px-6 py-2"><input type="number" name="hadir_sakit" min="0" value="{{ $activePrestasi->hadir_sakit ?? 0 }}" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center"></td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">2</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Izin</td>
+                                                <td class="px-6 py-2"><input type="number" name="hadir_izin" min="0" value="{{ $activePrestasi->hadir_izin ?? 0 }}" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center"></td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">3</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Tanpa Keterangan</td>
+                                                <td class="px-6 py-2"><input type="number" name="hadir_alpha" min="0" value="{{ $activePrestasi->hadir_alpha ?? 0 }}" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {{-- KEPRIBADIAN --}}
+                            <div>
+                                <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Kepribadian</p>
+                                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead class="bg-slate-50">
+                                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                                <th class="px-6 py-3 w-16 text-center border-r border-slate-100">No</th>
+                                                <th class="px-6 py-3 border-r border-slate-100">Keterangan</th>
+                                                <th class="px-6 py-3 w-32">Nilai</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 bg-white">
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">1</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Sikap</td>
+                                                <td class="px-6 py-2">
+                                                    <select name="sikap" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center">
+                                                        <option value="">—</option>
+                                                        <option value="A" {{ ($activePrestasi?->sikap ?? '') == 'A' ? 'selected' : '' }}>A</option>
+                                                        <option value="B" {{ ($activePrestasi?->sikap ?? '') == 'B' ? 'selected' : '' }}>B</option>
+                                                        <option value="C" {{ ($activePrestasi?->sikap ?? '') == 'C' ? 'selected' : '' }}>C</option>
+                                                        <option value="D" {{ ($activePrestasi?->sikap ?? '') == 'D' ? 'selected' : '' }}>D</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">2</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Kerajinan</td>
+                                                <td class="px-6 py-2">
+                                                    <select name="kerajinan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center">
+                                                        <option value="">—</option>
+                                                        <option value="A" {{ ($activePrestasi?->kerajinan ?? '') == 'A' ? 'selected' : '' }}>A</option>
+                                                        <option value="B" {{ ($activePrestasi?->kerajinan ?? '') == 'B' ? 'selected' : '' }}>B</option>
+                                                        <option value="C" {{ ($activePrestasi?->kerajinan ?? '') == 'C' ? 'selected' : '' }}>C</option>
+                                                        <option value="D" {{ ($activePrestasi?->kerajinan ?? '') == 'D' ? 'selected' : '' }}>D</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50/50">
+                                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">3</td>
+                                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">Kerapihan</td>
+                                                <td class="px-6 py-2">
+                                                    <select name="kebersihan_kerapian" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-slate-700 text-sm text-center">
+                                                        <option value="">—</option>
+                                                        <option value="A" {{ ($activePrestasi?->kebersihan_kerapian ?? '') == 'A' ? 'selected' : '' }}>A</option>
+                                                        <option value="B" {{ ($activePrestasi?->kebersihan_kerapian ?? '') == 'B' ? 'selected' : '' }}>B</option>
+                                                        <option value="C" {{ ($activePrestasi?->kebersihan_kerapian ?? '') == 'C' ? 'selected' : '' }}>C</option>
+                                                        <option value="D" {{ ($activePrestasi?->kebersihan_kerapian ?? '') == 'D' ? 'selected' : '' }}>D</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- PERINGKAT & KENAIKAN --}}
+                        <div>
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Peringkat & Kenaikan Kelas</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-amber-50/50 p-6 rounded-2xl border border-amber-200/50">
+                                <div class="space-y-1.5 align-top flex items-center justify-between border-b pb-4 md:border-b-0 md:pb-0 md:border-r border-amber-200/50 pr-4">
+                                    <label class="text-xs font-black text-amber-900 uppercase">Peringkat / Ranking Kelas</label>
+                                    <input type="number" name="peringkat" min="1" placeholder="—" value="{{ $activePrestasi->peringkat ?? '' }}" class="w-32 px-4 py-2.5 rounded-xl border border-amber-200 bg-white font-bold text-slate-700 text-center shadow-sm">
+                                </div>
+                                <div class="space-y-1.5 align-top flex items-center justify-between pl-0 md:pl-4">
+                                    <label class="text-xs font-black text-amber-900 uppercase">Keterangan Kenaikan Kelas</label>
+                                    <select name="keterangan_kenaikan" class="w-40 px-4 py-2.5 rounded-xl border border-amber-200 bg-white font-bold text-slate-700 text-center shadow-sm">
+                                        <option value="">— Keterangan —</option>
+                                        <option value="Naik" {{ ($activePrestasi?->keterangan_kenaikan ?? '') == 'Naik' ? 'selected' : '' }}>Naik</option>
+                                        <option value="Tidak Naik" {{ ($activePrestasi?->keterangan_kenaikan ?? '') == 'Tidak Naik' ? 'selected' : '' }}>Tidak Naik</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-end shrink-0 gap-3">
+                        <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
+                        <button type="submit" form="formInputNilai" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all cursor-pointer flex items-center gap-2">
+                            Simpan Nilai Semester
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </button>
+                    </div>
+                </form>
+            @endif
         </div>
     </div>
     @endhasanyrole

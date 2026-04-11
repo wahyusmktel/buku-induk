@@ -59,6 +59,32 @@
                     Dashboard
                 </a>
 
+                <div x-data="{ open: {{ (request()->routeIs('mata-pelajaran.*') || request()->routeIs('ekstrakurikuler.*')) ? 'true' : 'false' }} }">
+                    <button @click="open = !open" 
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
+                                   {{ (request()->routeIs('mata-pelajaran.*') || request()->routeIs('ekstrakurikuler.*')) 
+                                      ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                                      : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 transition-colors {{ (request()->routeIs('mata-pelajaran.*') || request()->routeIs('ekstrakurikuler.*')) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            Data Referensi
+                        </div>
+                        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 -translate-y-2" 
+                         x-transition:enter-end="opacity-100 translate-y-0" 
+                         class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
+                        <a href="{{ route('mata-pelajaran.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('mata-pelajaran.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Mata Pelajaran
+                        </a>
+                        <a href="{{ route('ekstrakurikuler.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('ekstrakurikuler.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Ekstrakurikuler
+                        </a>
+                    </div>
+                </div>
+
                 <div x-data="{ open: {{ (request()->routeIs('siswas.*') || request()->routeIs('rombels.*')) ? 'true' : 'false' }} }">
                     <button @click="open = !open" 
                             class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
@@ -78,10 +104,10 @@
                          x-transition:enter-end="opacity-100 translate-y-0" 
                          class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
                         <a href="{{ route('siswas.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('siswas.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
-                            • Daftar Siswa
+                            Daftar Siswa
                         </a>
                         <a href="{{ route('rombels.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('rombels.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
-                            • Rombongan Belajar
+                            Rombongan Belajar
                         </a>
                     </div>
                 </div>
@@ -155,14 +181,7 @@
 
                 <div class="pt-5 mt-5 border-t border-slate-100">
                     <p class="px-3 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Pengaturan</p>
-                    <a href="{{ route('mata-pelajaran.index') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
-                              {{ request()->routeIs('mata-pelajaran.*') 
-                                 ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
-                                 : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
-                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('mata-pelajaran.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                        Konfigurasi Mapel
-                    </a>
+
                     <a href="{{ route('settings.index') }}" 
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
                               {{ request()->routeIs('settings.*') 

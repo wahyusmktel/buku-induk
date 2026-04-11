@@ -128,7 +128,13 @@ class BukuIndukController extends Controller
             }
         }
 
-        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'kelengkapan'));
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
+
+        $activeTahunPelajaran = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+        $siswaActive = \App\Models\Siswa::where('nisn', $bukuInduk->nisn)->where('tahun_pelajaran_id', $activeTahunPelajaran?->id)->first();
+        $currentRombel = $siswaActive ? $siswaActive->rombel : null;
+
+        return view('buku-induk.show', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'kelengkapan', 'ekstrakurikulers', 'activeTahunPelajaran', 'currentRombel'));
     }
 
     /**
@@ -149,8 +155,22 @@ class BukuIndukController extends Controller
 
         $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
         $jenjang = \App\Models\Setting::where('key', 'jenjang_pendidikan')->first()?->value ?? 'SD';
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
 
-        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang', 'kelengkapan'));
+        $activeTahunPelajaran = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
+        $siswaActive = \App\Models\Siswa::where('nisn', $nisn)->where('tahun_pelajaran_id', $activeTahunPelajaran?->id)->first();
+        $currentRombel = $siswaActive ? $siswaActive->rombel : null;
+
+        $activeSmtInt = strtolower($activeTahunPelajaran?->semester ?? '') == 'ganjil' ? 1 : 2;
+        $activePrestasi = null;
+        if ($currentRombel && $activeTahunPelajaran) {
+            $activePrestasi = $bukuInduk->prestasis()
+                ->where('kelas', $currentRombel->tingkat)
+                ->where('semester', $activeSmtInt)
+                ->first();
+        }
+
+        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang', 'kelengkapan', 'ekstrakurikulers', 'activeTahunPelajaran', 'currentRombel', 'activePrestasi'));
     }
 
     /**
@@ -186,6 +206,7 @@ class BukuIndukController extends Controller
             'jasmani' => 'nullable|array',
             'beasiswa' => 'nullable|array',
             'registrasi' => 'nullable|array',
+            'tamat' => 'nullable|array',
             'pendidikan_sebelumnya' => 'nullable|array',
 
             'foto_1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -335,6 +356,15 @@ class BukuIndukController extends Controller
                 ]);
             }
 
+            if (isset($validated['tamat'])) {
+                $bukuInduk->fill([
+                    'tgl_lulus' => $validated['tamat']['tgl_lulus'] ?? null,
+                    'no_ijazah' => $validated['tamat']['no_ijazah'] ?? null,
+                    'tanggal_ijazah' => $validated['tamat']['tanggal_ijazah'] ?? null,
+                    'lanjut_ke' => $validated['tamat']['lanjut_ke'] ?? null,
+                ]);
+            }
+
             // 8. Proses Foto
             if ($request->hasFile('foto_1')) {
                 if ($bukuInduk->foto_1) Storage::disk('public')->delete($bukuInduk->foto_1);
@@ -394,6 +424,7 @@ class BukuIndukController extends Controller
             }
         }
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
 
         // Pre-process gambar via GD agar DomPDF bisa render berwarna (fix PNG grayscale bug)
         $imageKeys = ['sekolah_kop', 'kepsek_ttd', 'sekolah_stempel'];
@@ -434,7 +465,7 @@ class BukuIndukController extends Controller
 
         $is_pdf = true;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf'))
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'ekstrakurikulers', 'is_pdf'))
             ->setOption('isPhpEnabled', true);
         
         $paperSize = $settings['paper_size'] ?? 'a4';

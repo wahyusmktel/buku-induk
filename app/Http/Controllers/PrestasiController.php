@@ -34,6 +34,8 @@ class PrestasiController extends Controller
             'keterangan_kenaikan'  => 'nullable|string|max:50',
             'tgl_keputusan_kenaikan' => 'nullable|date',
             'catatan_guru'         => 'nullable|string',
+            'ekstrakurikuler'      => 'nullable|array',
+            'ekstrakurikuler.*'    => 'nullable|string|max:50',
         ]);
 
         $validated['buku_induk_id'] = $bukuInduk->id;
@@ -64,10 +66,32 @@ class PrestasiController extends Controller
                 }
             }
         }
+
+        if (array_key_exists('ekstrakurikuler', $validated)) {
+            // Hapus yang lama pada kelas dan smt yang sama
+            \App\Models\PrestasiEkstrakurikuler::where('siswa_id', $bukuInduk->siswa_id)
+                ->where('kelas', $validated['kelas'])
+                ->where('semester', $validated['semester'])
+                ->delete();
+
+            if (!empty($validated['ekstrakurikuler'])) {
+                foreach ($validated['ekstrakurikuler'] as $eksId => $predikat) {
+                    if (!empty(trim($predikat))) {
+                        \App\Models\PrestasiEkstrakurikuler::create([
+                            'siswa_id' => $bukuInduk->siswa_id,
+                            'ekstrakurikuler_id' => $eksId,
+                            'kelas' => $validated['kelas'],
+                            'semester' => $validated['semester'],
+                            'predikat' => trim($predikat)
+                        ]);
+                    }
+                }
+            }
+        }
         
         $prestasi->recalculateTotals();
 
-        return redirect()->route('buku-induk.show', $nisn)
+        return redirect()->route('buku-induk.show', ['nisn' => $nisn, 'tab' => 'akademik'])
             ->with('success', "Data prestasi Kelas {$validated['kelas']} Semester {$validated['semester']} berhasil disimpan.");
     }
 

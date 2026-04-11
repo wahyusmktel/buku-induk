@@ -264,7 +264,6 @@
                         <th rowspan="2" style="width: 28px;">Jml</th>
                         <th rowspan="2" style="width: 28px;">Rata²</th>
                         <th rowspan="2" style="width: 28px;">Rank</th>
-                        <th colspan="3">Kehadiran</th>
                         <th rowspan="2" style="width: 38px;">Naik?</th>
                     </tr>
                     <tr>
@@ -273,7 +272,6 @@
                             {{ substr($mapel->nama, 0, 7) }}{{ strlen($mapel->nama) > 7 ? '.' : '' }}
                         </th>
                         @endforeach
-                        <th style="width: 14px;">S</th><th style="width: 14px;">I</th><th style="width: 14px;">A</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -297,9 +295,6 @@
                         <td><strong>{{ $p?->jumlah_nilai ? number_format($p->jumlah_nilai, 0) : '' }}</strong></td>
                         <td style="font-size: 7.5pt;">{{ $p?->rata_rata ?? '' }}</td>
                         <td>{{ $p?->peringkat ?? '' }}</td>
-                        <td>{{ $p?->hadir_sakit ?? '' }}</td>
-                        <td>{{ $p?->hadir_izin ?? '' }}</td>
-                        <td>{{ $p?->hadir_alpha ?? '' }}</td>
                         <td style="font-size:7pt;">{{ ($p && $semester == 2) ? ($p->keterangan_kenaikan ?? '') : '' }}</td>
                     </tr>
                     @endforeach
@@ -308,25 +303,134 @@
             </table>
         </div>
 
+        </div>
+
+        <div style="margin-top: 15px;">
+            <table style="width: 100%; border: none; border-collapse: collapse; margin-bottom: 20px;">
+                <tr>
+                    {{-- Grid Ekstrakurikuler --}}
+                    @php
+                        $studentEkskulIds = $siswa->prestasiEkstrakurikulers->pluck('ekstrakurikuler_id')->unique();
+                        $activeEkskuls = $ekstrakurikulers->whereIn('id', $studentEkskulIds);
+                    @endphp
+                    @if($activeEkskuls->count() > 0)
+                    <td style="vertical-align: top; padding-right: 10px;">
+                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Ekstrakurikuler</p>
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25px;">Kls</th>
+                                    <th style="width: 25px;">Smt</th>
+                                    @foreach($activeEkskuls as $ekskul)
+                                    <th>{{ $ekskul->nama_ekstrakurikuler }}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(range(1, 6) as $kelas)
+                                @foreach([1, 2] as $semester)
+                                @php $eks = $siswa->prestasiEkstrakurikulers->where('kelas', $kelas)->where('semester', $semester); @endphp
+                                <tr>
+                                    @if($semester == 1)
+                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
+                                    @endif
+                                    <td>{{ $semester }}</td>
+                                    @foreach($activeEkskuls as $ekskul)
+                                    <td>{{ $eks->where('ekstrakurikuler_id', $ekskul->id)->first()?->predikat ?? '' }}</td>
+                                    @endforeach
+                                </tr>
+                                @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </td>
+                    @endif
+
+                    {{-- Grid Kepribadian --}}
+                    <td style="vertical-align: top; padding-right: 10px;">
+                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Kepribadian</p>
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25px;">Kls</th>
+                                    <th style="width: 25px;">Smt</th>
+                                    <th style="width: 40px;">Sikap</th>
+                                    <th style="width: 45px;">Kerajinan</th>
+                                    <th style="width: 40px;">Kerapian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(range(1, 6) as $kelas)
+                                @foreach([1, 2] as $semester)
+                                @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
+                                <tr>
+                                    @if($semester == 1)
+                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
+                                    @endif
+                                    <td>{{ $semester }}</td>
+                                    <td>{{ $p?->sikap ?? '' }}</td>
+                                    <td>{{ $p?->kerajinan ?? '' }}</td>
+                                    <td>{{ $p?->kebersihan_kerapian ?? '' }}</td>
+                                </tr>
+                                @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </td>
+
+                    {{-- Grid Kehadiran --}}
+                    <td style="vertical-align: top;">
+                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Ketidak Hadiran</p>
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25px;">Kls</th>
+                                    <th style="width: 25px;">Smt</th>
+                                    <th style="width: 30px;">Sakit</th>
+                                    <th style="width: 30px;">Izin</th>
+                                    <th style="width: 30px;">Alpha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(range(1, 6) as $kelas)
+                                @foreach([1, 2] as $semester)
+                                @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
+                                <tr>
+                                    @if($semester == 1)
+                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
+                                    @endif
+                                    <td>{{ $semester }}</td>
+                                    <td>{{ $p?->hadir_sakit ?? '' }}</td>
+                                    <td>{{ $p?->hadir_izin ?? '' }}</td>
+                                    <td>{{ $p?->hadir_alpha ?? '' }}</td>
+                                </tr>
+                                @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
         {{-- ===== VII. TAMAT BELAJAR / MENINGGALKAN SEKOLAH ===== --}}
         <div class="section-block">
             <p class="section-title">VII. Tamat Belajar / Meninggalkan Sekolah</p>
             <table class="data-table">
-                @php $reg_tamat = $siswa->registrasi->where('jenis_registrasi', 'Tamat Belajar')->first(); @endphp
                 <tr class="sub-header"><td colspan="3">A. Tamat Belajar</td></tr>
-                <tr><td>1. Tahun Tamat</td><td>:</td><td>{{ $reg_tamat?->tahun_tamat ?? '—' }}</td></tr>
-                <tr><td>2. Nomor Seri Ijazah</td><td>:</td><td>{{ $reg_tamat?->no_ijazah ?? '—' }}</td></tr>
-                <tr><td>3. Melanjutkan Ke Sekolah</td><td>:</td><td>{{ $reg_tamat?->melanjutkan_ke ?? '—' }}</td></tr>
+                <tr><td>1. Tanggal Lulus</td><td>:</td><td>{{ $bukuInduk->tgl_lulus ? \Carbon\Carbon::parse($bukuInduk->tgl_lulus)->translatedFormat('d F Y') : '—' }}</td></tr>
+                <tr><td>2. Tanggal & No. Seri Ijazah</td><td>:</td><td>{{ $bukuInduk->tanggal_ijazah ? \Carbon\Carbon::parse($bukuInduk->tanggal_ijazah)->translatedFormat('d F Y') : '—' }} / {{ $bukuInduk->no_ijazah ?? '—' }}</td></tr>
+                <tr><td>3. Melanjutkan Ke Sekolah</td><td>:</td><td>{{ $bukuInduk->lanjut_ke ?? '—' }}</td></tr>
 
                 @php $reg_pindah = $siswa->registrasi->where('jenis_registrasi', 'Pindah Sekolah')->first(); @endphp
                 <tr class="sub-header"><td colspan="3">B. Pindah Sekolah</td></tr>
                 <tr><td>1. Dari Sekolah</td><td>:</td><td>{{ $reg_pindah?->dari_sekolah ?? '—' }}</td></tr>
-                <tr><td>2. Ke Sekolah</td><td>:</td><td>{{ $reg_pindah?->ke_sekolah ?? '—' }}</td></tr>
+                <tr><td>2. Ke Sekolah (Ket)</td><td>:</td><td>{{ $reg_pindah?->keterangan ?? '—' }}</td></tr>
 
                 @php $reg_keluar = $siswa->registrasi->where('jenis_registrasi', 'Keluar Sekolah')->first(); @endphp
                 <tr class="sub-header"><td colspan="3">C. Keluar Sekolah</td></tr>
-                <tr><td>1. Tanggal Keluar</td><td>:</td><td>{{ $reg_keluar?->tanggal_keluar ? \Carbon\Carbon::parse($reg_keluar->tanggal_keluar)->translatedFormat('d F Y') : '—' }}</td></tr>
-                <tr><td>2. Alasan Keluar</td><td>:</td><td>{{ $reg_keluar?->alasan_keluar ?? '—' }}</td></tr>
+                <tr><td>1. Tanggal Keluar</td><td>:</td><td>{{ $reg_keluar?->tanggal ? \Carbon\Carbon::parse($reg_keluar->tanggal)->translatedFormat('d F Y') : '—' }}</td></tr>
+                <tr><td>2. Alasan Keluar</td><td>:</td><td>{{ $reg_keluar?->keterangan ?? '—' }}</td></tr>
             </table>
         </div>
 
