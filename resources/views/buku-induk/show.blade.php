@@ -47,7 +47,7 @@
                         </span>
                         <span class="flex items-center gap-1.5 text-slate-500 font-medium">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
-                            NIS: <span class="font-bold text-slate-700">{{ $siswa->nis ?? '-' }}</span>
+                            NIS: <span class="font-bold text-slate-700">{{ $siswa->nipd ?? '-' }}</span>
                         </span>
                         <span class="flex items-center gap-1.5 text-slate-500 font-medium">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>

@@ -157,92 +157,195 @@ class BukuIndukController extends Controller
     public function update(Request $request, string $nisn)
     {
         $bukuInduk = BukuInduk::where('nisn', $nisn)->firstOrFail();
-
-        $validated = $request->validate([
-            'no_induk'                => 'nullable|string|max:50',
-            'nama_panggilan'          => 'nullable|string|max:100',
-            'kewarganegaraan'         => 'nullable|string|max:50',
-            'bahasa_sehari_hari'      => 'nullable|string|max:100',
-            'golongan_darah'          => 'nullable|string|max:5',
-            'riwayat_penyakit'        => 'nullable|string',
-            'jml_saudara_tiri'        => 'nullable|integer|min:0',
-            'jml_saudara_angkat'      => 'nullable|integer|min:0',
-            'bertempat_tinggal_dengan'=> 'nullable|string|max:100',
-            'tgl_masuk_sekolah'       => 'nullable|date',
-            'asal_masuk_sekolah'      => 'nullable|string|max:100',
-            'nama_tk_asal'            => 'nullable|string|max:200',
-            'pindah_dari'             => 'nullable|string|max:200',
-            'kelas_pindah_masuk'      => 'nullable|string|max:20',
-            'tgl_pindah_masuk'        => 'nullable|date',
-            'tgl_keluar'              => 'nullable|date',
-            'alasan_keluar'           => 'nullable|string|max:255',
-            'tgl_lulus'               => 'nullable|date',
-            'no_ijazah'               => 'nullable|string|max:100',
-            'lanjut_ke'               => 'nullable|string|max:200',
-            'beasiswa'                => 'nullable|string',
-            // Ayah
-            'nama_ayah'               => 'nullable|string|max:200',
-            'tempat_lahir_ayah'       => 'nullable|string|max:100',
-            'tanggal_lahir_ayah'      => 'nullable|date',
-            'agama_ayah'              => 'nullable|string|max:50',
-            'pekerjaan_ayah_bi'       => 'nullable|string|max:100',
-            'pendidikan_ayah_bi'      => 'nullable|string|max:100',
-            'kewarganegaraan_ayah'    => 'nullable|string|max:50',
-            'alamat_ayah'             => 'nullable|string',
-            // Ibu
-            'nama_ibu'                => 'nullable|string|max:200',
-            'tempat_lahir_ibu'        => 'nullable|string|max:100',
-            'tanggal_lahir_ibu'       => 'nullable|date',
-            'agama_ibu'               => 'nullable|string|max:50',
-            'pekerjaan_ibu_bi'        => 'nullable|string|max:100',
-            'pendidikan_ibu_bi'       => 'nullable|string|max:100',
-            'kewarganegaraan_ibu'     => 'nullable|string|max:50',
-            'alamat_ibu'              => 'nullable|string',
-            // Wali
-            'nama_wali_bi'            => 'nullable|string|max:200',
-            'hubungan_wali'           => 'nullable|string|max:100',
-            'pekerjaan_wali_bi'       => 'nullable|string|max:100',
-            'pendidikan_wali_bi'      => 'nullable|string|max:100',
-            'alamat_wali_bi'          => 'nullable|string',
-            'telp_wali_bi'            => 'nullable|string|max:20',
-            'foto_1'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'foto_2'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        if ($request->hasFile('foto_1')) {
-            if ($bukuInduk->foto_1) Storage::disk('public')->delete($bukuInduk->foto_1);
-            
-            $file = $request->file('foto_1');
-            $filename = time() . '_1_' . $file->getClientOriginalName();
-            $file->move(storage_path('app/public/siswa_photos'), $filename);
-            $validated['foto_1'] = 'siswa_photos/' . $filename;
-        }
-        
-        if ($request->hasFile('foto_2')) {
-            if ($bukuInduk->foto_2) Storage::disk('public')->delete($bukuInduk->foto_2);
-            
-            $file = $request->file('foto_2');
-            $filename = time() . '_2_' . $file->getClientOriginalName();
-            $file->move(storage_path('app/public/siswa_photos'), $filename);
-            $validated['foto_2'] = 'siswa_photos/' . $filename;
-        }
-
-        $bukuInduk->update($validated);
-
-        // Fetch name for logging (from latest Siswa record)
         $siswa = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $nisn)
             ->orderBy('created_at', 'desc')
-            ->first();
-        
-        $namaSiswa = $siswa ? $siswa->nama : "NISN: {$nisn}";
+            ->firstOrFail();
 
+        // Validasi yang disesuaikan dengan struktur tab yang baru (bersifat dinamis)
+        $validated = $request->validate([
+            'nis' => 'nullable|string',
+            'nisn' => 'nullable|string',
+            'nik' => 'nullable|string',
+            'nama' => 'nullable|string',
+            'nama_panggilan' => 'nullable|string',
+            'jenis_kelamin' => 'nullable|string',
+            'tempat_lahir' => 'nullable|string',
+            'tanggal_lahir' => 'nullable|date',
+            'agama' => 'nullable|string',
+            'kewarganegaraan' => 'nullable|string',
+            'telepon' => 'nullable|string',
+
+            'ayah' => 'nullable|array',
+            'ibu' => 'nullable|array',
+            'wali' => 'nullable|array',
+
+            'periodik' => 'nullable|array',
+            'jasmani' => 'nullable|array',
+            'beasiswa' => 'nullable|array',
+            'registrasi' => 'nullable|array',
+
+            'foto_1' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_2' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated, $siswa, $bukuInduk, $nisn) {
+            
+            // 1. Update Siswa Induk
+            $siswa->update([
+                'nipd' => $validated['nis'] ?? $siswa->nipd,
+                'nisn' => $validated['nisn'] ?? $siswa->nisn,
+                'nik' => $validated['nik'] ?? $siswa->nik,
+                'nama' => $validated['nama'] ?? $siswa->nama,
+                'nama_panggilan' => $validated['nama_panggilan'] ?? $siswa->nama_panggilan,
+                'jk' => $validated['jenis_kelamin'] ?? $siswa->jk,
+                'tempat_lahir' => $validated['tempat_lahir'] ?? $siswa->tempat_lahir,
+                'tanggal_lahir' => $validated['tanggal_lahir'] ?? $siswa->tanggal_lahir,
+                'agama' => $validated['agama'] ?? $siswa->agama,
+                'kewarganegaraan' => $validated['kewarganegaraan'] ?? $siswa->kewarganegaraan,
+                'telepon' => $validated['telepon'] ?? $siswa->telepon,
+            ]);
+
+            // 2. Update Data Orang Tua (Ayah, Ibu, Wali)
+            if (isset($validated['ayah'])) {
+                \App\Models\DataOrangTuaSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id, 'jenis' => 'Ayah'],
+                    [
+                        'nama' => $validated['ayah']['nama'] ?? null,
+                        'pendidikan_terakhir' => $validated['ayah']['pendidikan'] ?? null,
+                        'pekerjaan' => $validated['ayah']['pekerjaan'] ?? null,
+                    ]
+                );
+            }
+            if (isset($validated['ibu'])) {
+                \App\Models\DataOrangTuaSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id, 'jenis' => 'Ibu'],
+                    [
+                        'nama' => $validated['ibu']['nama'] ?? null,
+                        'pendidikan_terakhir' => $validated['ibu']['pendidikan'] ?? null,
+                        'pekerjaan' => $validated['ibu']['pekerjaan'] ?? null,
+                    ]
+                );
+            }
+            if (isset($validated['wali'])) {
+                \App\Models\DataOrangTuaSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id, 'jenis' => 'Wali'],
+                    [
+                        'nama' => $validated['wali']['nama'] ?? null,
+                        'status_hubungan_wali' => $validated['wali']['hubungan'] ?? null,
+                        'pendidikan_terakhir' => $validated['wali']['pendidikan'] ?? null,
+                        'pekerjaan' => $validated['wali']['pekerjaan'] ?? null,
+                    ]
+                );
+            }
+
+            // 3. Update Data Periodik
+            if (isset($validated['periodik'])) {
+                \App\Models\DataPeriodikSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id],
+                    [
+                        'jml_saudara_kandung' => $validated['periodik']['jml_saudara_kandung'] ?? 0,
+                        'jml_saudara_tiri' => $validated['periodik']['jml_saudara_tiri'] ?? 0,
+                        'jml_saudara_angkat' => $validated['periodik']['jml_saudara_angkat'] ?? 0,
+                        'bahasa_sehari_hari' => $validated['periodik']['bahasa_sehari_hari'] ?? null,
+                        'alamat_tinggal' => $validated['periodik']['alamat_tinggal'] ?? null,
+                        'bertempat_tinggal_pada' => $validated['periodik']['bertempat_tinggal_pada'] ?? null,
+                        'jarak_tempat_tinggal_ke_sekolah' => $validated['periodik']['jarak'] ?? null,
+                    ]
+                );
+            }
+
+            // 4. Update Keadaan Jasmani
+            if (isset($validated['jasmani'])) {
+                \App\Models\KeadaanJasmaniSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id],
+                    [
+                        'berat_badan' => $validated['jasmani']['berat_badan'] ?? null,
+                        'tinggi_badan' => $validated['jasmani']['tinggi_badan'] ?? null,
+                        'golongan_darah' => $validated['jasmani']['golongan_darah'] ?? null,
+                        'nama_riwayat_penyakit' => $validated['jasmani']['riwayat_penyakit'] ?? null,
+                        'kelainan_jasmani' => $validated['jasmani']['kelainan'] ?? null,
+                    ]
+                );
+            }
+
+            // 5. Update Beasiswa (Replace All)
+            if (isset($validated['beasiswa']) && is_array($validated['beasiswa'])) {
+                $siswa->beasiswa()->delete(); // Bersihkan yang lama
+                $beasiswaRecords = [];
+                foreach ($validated['beasiswa'] as $item) {
+                    if (!empty($item['jenis_beasiswa'])) {
+                        $beasiswaRecords[] = [
+                            'id' => \Illuminate\Support\Str::uuid(),
+                            'siswa_id' => $siswa->id,
+                            'jenis_beasiswa' => $item['jenis_beasiswa'],
+                            'sumber_beasiswa' => $item['sumber_beasiswa'] ?? null,
+                            'tahun_mulai' => $item['tahun_mulai'] ?? null,
+                            'tahun_selesai' => $item['tahun_selesai'] ?? null,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ];
+                    }
+                }
+                if (count($beasiswaRecords) > 0) {
+                    \App\Models\BeasiswaSiswa::insert($beasiswaRecords);
+                }
+            } else {
+                $siswa->beasiswa()->delete();
+            }
+
+            // 6. Update Registrasi (Replace All)
+            if (isset($validated['registrasi']) && is_array($validated['registrasi'])) {
+                $siswa->registrasi()->delete();
+                $registrasiRecords = [];
+                foreach ($validated['registrasi'] as $item) {
+                    if (!empty($item['jenis_registrasi'])) {
+                        $registrasiRecords[] = [
+                            'id' => \Illuminate\Support\Str::uuid(),
+                            'siswa_id' => $siswa->id,
+                            'jenis_registrasi' => $item['jenis_registrasi'],
+                            'tanggal' => $item['tanggal'] ?? null,
+                            'keterangan' => $item['keterangan'] ?? null,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ];
+                    }
+                }
+                if (count($registrasiRecords) > 0) {
+                    \App\Models\RegistrasiSiswa::insert($registrasiRecords);
+                }
+            } else {
+                $siswa->registrasi()->delete();
+            }
+
+            // 7. Proses Foto
+            if ($request->hasFile('foto_1')) {
+                if ($bukuInduk->foto_1) Storage::disk('public')->delete($bukuInduk->foto_1);
+                $file = $request->file('foto_1');
+                $filename = time() . '_1_' . $file->getClientOriginalName();
+                $file->move(storage_path('app/public/siswa_photos'), $filename);
+                $bukuInduk->foto_1 = 'siswa_photos/' . $filename;
+            }
+            
+            if ($request->hasFile('foto_2')) {
+                if ($bukuInduk->foto_2) Storage::disk('public')->delete($bukuInduk->foto_2);
+                $file = $request->file('foto_2');
+                $filename = time() . '_2_' . $file->getClientOriginalName();
+                $file->move(storage_path('app/public/siswa_photos'), $filename);
+                $bukuInduk->foto_2 = 'siswa_photos/' . $filename;
+            }
+            
+            $bukuInduk->save();
+        });
+
+        // 8. Log Activity
+        $namaSiswa = $siswa->nama ?? "NISN: {$nisn}";
         ActivityLogService::log('buku_induk_update', "Melengkapi data Buku Induk: {$namaSiswa}", [
             'nisn' => $nisn,
             'nama' => $namaSiswa
         ]);
 
-        return redirect()->route('buku-induk.show', $nisn)->with('success', 'Buku Induk berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Data siswa berhasil dan aman diperbarui ke seluruh tabel relasi.');
     }
 
     /**
