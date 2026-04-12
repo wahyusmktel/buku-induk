@@ -126,8 +126,21 @@
         <div class="school-header pb-4 mb-4">
             <h1>Catatan Prestasi Belajar Siswa</h1>
             <h2>{{ $settings['sekolah_nama'] ?? 'Sekolah Dasar / Menengah' }}</h2>
-            <p>Nama Siswa: <strong>{{ $siswa->nama }}</strong> | NISN: <strong>{{ $siswa->nisn ?? '-' }}</strong></p>
+            <p>Tahun Pelajaran {{ $siswa->tahunPelajaran ? $siswa->tahunPelajaran->tahun . ' / Semester ' . $siswa->tahunPelajaran->semester : ($siswa->rombel_saat_ini ?? '—') }}</p>
         </div>
+
+        <table style="width: 100%; border: none; font-size: 9.5pt; font-weight: bold; margin-bottom: 15px;">
+            <tr>
+                <td style="width: 50px; padding-bottom: 2px;">Nama</td>
+                <td style="width: 10px; padding-bottom: 2px;">:</td>
+                <td style="padding-bottom: 2px;">{{ $siswa->nama }}</td>
+            </tr>
+            <tr>
+                <td>NISN</td>
+                <td>:</td>
+                <td>{{ $siswa->nisn ?? '-' }}</td>
+            </tr>
+        </table>
 
         {{-- ===== VI. PRESTASI BELAJAR (halaman baru) ===== --}}
         <div>
@@ -142,9 +155,9 @@
                 }
             @endphp
 
-            <table class="bordered" style="font-size: 8.5pt; table-layout: fixed; width: 100%;">
+            <table class="bordered" style="font-size: 8.5pt; table-layout: auto; width: 100%;">
                 <colgroup>
-                    <col style="width: 20pt;">  {{-- No --}}
+                    <col style="width: 12pt;">  {{-- No --}}
                     <col> {{-- Mata Pelajaran --}}
                     @foreach(range(1,6) as $k)
                     <col style="width: 25pt;"> {{-- Smt I --}}
@@ -156,7 +169,7 @@
                     {{-- ROW 1: Tahun Pelajaran --}}
                     <tr>
                         <th rowspan="4" style="vertical-align: middle;">No</th>
-                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px;">Mata Pelajaran</th>
+                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px; white-space: nowrap;">Mata Pelajaran</th>
                         @foreach(range(1,6) as $k)
                         <th colspan="2" style="font-size: 7pt;">{{ $tahunPerKelas[$k] ?: '— / —' }}</th>
                         @endforeach
@@ -265,113 +278,202 @@
             </table>
         </div>
 
+        {{-- ===== EKSTRAKURIKULER ===== --}}
+        @php
+            $studentEkskulIds = $siswa->prestasiEkstrakurikulers->pluck('ekstrakurikuler_id')->unique();
+            $activeEkskuls = $ekstrakurikulers->whereIn('id', $studentEkskulIds);
+        @endphp
+        @if($activeEkskuls->count() > 0)
+        <div>
+            <p class="section-title" style="margin-top: 0; font-size: 14pt;">B. Ekstrakurikuler</p>
+            <table class="bordered" style="font-size: 8.5pt; table-layout: auto; width: 100%;">
+                <colgroup>
+                    <col style="width: 12pt;">
+                    <col>
+                    @foreach(range(1,6) as $k)
+                    <col style="width: 25pt;">
+                    <col style="width: 25pt;">
+                    @endforeach
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th rowspan="4" style="vertical-align: middle;">No</th>
+                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px; white-space: nowrap;">Kegiatan Ekstrakurikuler</th>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 7pt;">{{ $tahunPerKelas[$k] ?: '— / —' }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2">Kelas {{ $k }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 6.5pt; font-weight: normal;">Smstr</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th style="font-size: 7pt;">I</th>
+                        <th style="font-size: 7pt;">II</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $rowEks = 1; @endphp
+                    @foreach($activeEkskuls as $ekskul)
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">{{ $rowEks++ }}</td>
+                        <td class="left" style="font-size: 8.5pt;">{{ $ekskul->nama_ekstrakurikuler }}</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            @php $eks = $siswa->prestasiEkstrakurikulers->where('kelas', $kelas)->where('semester', $semester)->where('ekstrakurikuler_id', $ekskul->id)->first(); @endphp
+                            <td style="font-size: 7.5pt;">{{ $eks?->predikat ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
+
+        {{-- ===== KEPRIBADIAN ===== --}}
+        <div>
+            <p class="section-title" style="margin-top: 0; font-size: 14pt;">{{ $activeEkskuls->count() > 0 ? 'C' : 'B' }}. Kepribadian</p>
+            <table class="bordered" style="font-size: 8.5pt; table-layout: auto; width: 100%;">
+                <colgroup>
+                    <col style="width: 12pt;">
+                    <col>
+                    @foreach(range(1,6) as $k)
+                    <col style="width: 25pt;">
+                    <col style="width: 25pt;">
+                    @endforeach
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th rowspan="4" style="vertical-align: middle;">No</th>
+                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px; white-space: nowrap;">Aspek Kepribadian</th>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 7pt;">{{ $tahunPerKelas[$k] ?: '— / —' }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2">Kelas {{ $k }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 6.5pt; font-weight: normal;">Smstr</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th style="font-size: 7pt;">I</th>
+                        <th style="font-size: 7pt;">II</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">1</td>
+                        <td class="left" style="font-size: 8.5pt;">Sikap</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->sikap ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">2</td>
+                        <td class="left" style="font-size: 8.5pt;">Kerajinan</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->kerajinan ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">3</td>
+                        <td class="left" style="font-size: 8.5pt;">Kebersihan dan Kerapian</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->kebersihan_kerapian ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div style="margin-top: 15px;">
-            <table style="width: 100%; border: none; border-collapse: collapse; margin-bottom: 20px;">
-                <tr>
-                    {{-- Grid Ekstrakurikuler --}}
-                    @php
-                        $studentEkskulIds = $siswa->prestasiEkstrakurikulers->pluck('ekstrakurikuler_id')->unique();
-                        $activeEkskuls = $ekstrakurikulers->whereIn('id', $studentEkskulIds);
-                    @endphp
-                    @if($activeEkskuls->count() > 0)
-                    <td style="vertical-align: top; padding-right: 10px;">
-                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Ekstrakurikuler</p>
-                        <table class="bordered">
-                            <thead>
-                                <tr>
-                                    <th style="width: 25px;">Kls</th>
-                                    <th style="width: 25px;">Smt</th>
-                                    @foreach($activeEkskuls as $ekskul)
-                                    <th>{{ $ekskul->nama_ekstrakurikuler }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(range(1, 6) as $kelas)
-                                @foreach([1, 2] as $semester)
-                                @php $eks = $siswa->prestasiEkstrakurikulers->where('kelas', $kelas)->where('semester', $semester); @endphp
-                                <tr>
-                                    @if($semester == 1)
-                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
-                                    @endif
-                                    <td>{{ $semester }}</td>
-                                    @foreach($activeEkskuls as $ekskul)
-                                    <td>{{ $eks->where('ekstrakurikuler_id', $ekskul->id)->first()?->predikat ?? '' }}</td>
-                                    @endforeach
-                                </tr>
-                                @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </td>
-                    @endif
-
-                    {{-- Grid Kepribadian --}}
-                    <td style="vertical-align: top; padding-right: 10px;">
-                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Kepribadian</p>
-                        <table class="bordered">
-                            <thead>
-                                <tr>
-                                    <th style="width: 25px;">Kls</th>
-                                    <th style="width: 25px;">Smt</th>
-                                    <th style="width: 40px;">Sikap</th>
-                                    <th style="width: 45px;">Kerajinan</th>
-                                    <th style="width: 40px;">Kerapian</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(range(1, 6) as $kelas)
-                                @foreach([1, 2] as $semester)
-                                @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
-                                <tr>
-                                    @if($semester == 1)
-                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
-                                    @endif
-                                    <td>{{ $semester }}</td>
-                                    <td>{{ $p?->sikap ?? '' }}</td>
-                                    <td>{{ $p?->kerajinan ?? '' }}</td>
-                                    <td>{{ $p?->kebersihan_kerapian ?? '' }}</td>
-                                </tr>
-                                @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </td>
-
-                    {{-- Grid Kehadiran --}}
-                    <td style="vertical-align: top;">
-                        <p class="section-title" style="margin-top: 0; font-size: 8pt;">Tabel Ketidak Hadiran</p>
-                        <table class="bordered">
-                            <thead>
-                                <tr>
-                                    <th style="width: 25px;">Kls</th>
-                                    <th style="width: 25px;">Smt</th>
-                                    <th style="width: 30px;">Sakit</th>
-                                    <th style="width: 30px;">Izin</th>
-                                    <th style="width: 30px;">Alpha</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(range(1, 6) as $kelas)
-                                @foreach([1, 2] as $semester)
-                                @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
-                                <tr>
-                                    @if($semester == 1)
-                                    <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
-                                    @endif
-                                    <td>{{ $semester }}</td>
-                                    <td>{{ $p?->hadir_sakit ?? '' }}</td>
-                                    <td>{{ $p?->hadir_izin ?? '' }}</td>
-                                    <td>{{ $p?->hadir_alpha ?? '' }}</td>
-                                </tr>
-                                @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
+        {{-- ===== KETIDAK HADIRAN ===== --}}
+        <div>
+            <p class="section-title" style="margin-top: 0; font-size: 14pt;">{{ $activeEkskuls->count() > 0 ? 'D' : 'C' }}. Ketidak Hadiran</p>
+            <table class="bordered" style="font-size: 8.5pt; table-layout: auto; width: 100%;">
+                <colgroup>
+                    <col style="width: 12pt;">
+                    <col>
+                    @foreach(range(1,6) as $k)
+                    <col style="width: 25pt;">
+                    <col style="width: 25pt;">
+                    @endforeach
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th rowspan="4" style="vertical-align: middle;">No</th>
+                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px; white-space: nowrap;">Alasan Ketidak Hadiran</th>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 7pt;">{{ $tahunPerKelas[$k] ?: '— / —' }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2">Kelas {{ $k }}</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 6.5pt; font-weight: normal;">Smstr</th>
+                        @endforeach
+                    </tr>
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th style="font-size: 7pt;">I</th>
+                        <th style="font-size: 7pt;">II</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">1</td>
+                        <td class="left" style="font-size: 8.5pt;">Sakit</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->hadir_sakit ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">2</td>
+                        <td class="left" style="font-size: 8.5pt;">Izin</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->hadir_izin ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; font-size: 7.5pt;">3</td>
+                        <td class="left" style="font-size: 8.5pt;">Tanpa Keterangan</td>
+                        @foreach(range(1, 6) as $kelas)
+                            @foreach([1, 2] as $semester)
+                            <td style="font-size: 7.5pt;">{{ $akademikGrid[$kelas][$semester]?->hadir_alpha ?? '' }}</td>
+                            @endforeach
+                        @endforeach
+                    </tr>
+                </tbody>
             </table>
         </div>
 

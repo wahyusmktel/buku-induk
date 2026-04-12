@@ -530,6 +530,43 @@ class BukuIndukController extends Controller
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
         $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
 
+        // Pre-process gambar via GD agar DomPDF bisa render berwarna (fix PNG grayscale bug)
+        $imageKeys = ['sekolah_kop', 'kepsek_ttd', 'sekolah_stempel'];
+        $tempDir = storage_path('app/public/settings/_pdf_temp');
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        foreach ($imageKeys as $key) {
+            if (!empty($settings[$key])) {
+                $srcPath = storage_path('app/public/' . $settings[$key]);
+                if (file_exists($srcPath)) {
+                    $ext = strtolower(pathinfo($srcPath, PATHINFO_EXTENSION));
+                    $src = null;
+                    if ($ext === 'png') {
+                        $src = @imagecreatefrompng($srcPath);
+                    } elseif ($ext === 'jpg' || $ext === 'jpeg') {
+                        $src = @imagecreatefromjpeg($srcPath);
+                    }
+                    if ($src) {
+                        $w = imagesx($src);
+                        $h = imagesy($src);
+                        $canvas = imagecreatetruecolor($w, $h);
+                        $white = imagecolorallocate($canvas, 255, 255, 255);
+                        imagefill($canvas, 0, 0, $white);
+                        imagecopy($canvas, $src, 0, 0, 0, 0, $w, $h);
+
+                        $cleanPath = $tempDir . '/' . $key . '.png';
+                        imagepng($canvas, $cleanPath, 0);
+                        imagedestroy($src);
+                        imagedestroy($canvas);
+
+                        // Simpan path absolut file bersih ke settings
+                        $settings[$key . '_pdf'] = $cleanPath;
+                    }
+                }
+            }
+        }
+
         $is_pdf = true;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print-prestasi', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'ekstrakurikulers', 'is_pdf'))
