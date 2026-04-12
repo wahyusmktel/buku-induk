@@ -19,9 +19,19 @@ class SiswaController extends Controller
     {
         $status = $request->get('status', 'Aktif');
         $tingkat = $request->get('tingkat');
+        $rombel = $request->get('rombel');
+        $search = $request->get('search');
         $tahunAktif = \App\Models\TahunPelajaran::where('is_aktif', true)->first();
         
         $query = Siswa::query();
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nipd', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
         if ($status !== 'Semua') {
             $query->where('status', $status);
         }
@@ -30,9 +40,23 @@ class SiswaController extends Controller
             $query->where('tingkat_kelas', $tingkat);
         }
 
+        if ($rombel) {
+            $query->where(function($q) use ($rombel) {
+                $q->where('rombel_saat_ini', $rombel)
+                  ->orWhereHas('rombel', function($rq) use ($rombel) {
+                      $rq->where('nama', $rombel);
+                  });
+            });
+        }
+
         $siswas = $query->latest()->paginate(15)->withQueryString();
         
-        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat'));
+        // Ambil daftar rombel dari tabel Rombel untuk tahun aktif agar lebih akurat
+        $rombels = \App\Models\Rombel::where('tahun_pelajaran_id', $tahunAktif?->id)
+            ->orderBy('nama')
+            ->pluck('nama');
+            
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels'));
     }
 
     public function import(Request $request)

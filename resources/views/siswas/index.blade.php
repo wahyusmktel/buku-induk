@@ -21,27 +21,60 @@
         </div>
     </div>
     @endif
+    {{-- Filters Card --}}
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
+        <form action="{{ route('siswas.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            {{-- Search Search --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Cari Siswa</label>
+                <div class="relative">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                        class="pl-10 pr-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all w-full shadow-inner font-bold text-slate-700" 
+                        placeholder="Nama, NIS, atau NISN...">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
 
-    <div class="mb-4 flex flex-wrap gap-2 px-2">
-        @foreach(['Aktif', 'Lulus', 'Keluar/Mutasi', 'Semua'] as $st)
-            <a href="{{ route('siswas.index', ['status' => $st, 'tingkat' => $tingkat]) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $status == $st ? 'bg-[#0ea5e9] text-white border-[#0ea5e9] shadow-md shadow-sky-200' : 'bg-white text-slate-500 border-slate-200 hover:border-sky-300 hover:text-sky-600' }}">
-                {{ $st }}
-            </a>
-        @endforeach
-        <div class="h-8 w-px bg-slate-200 mx-2"></div>
-        @foreach([1, 2, 3, 4, 5, 6] as $t)
-            <a href="{{ route('siswas.index', ['status' => $status, 'tingkat' => $t]) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border {{ $tingkat == $t ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600' }}">
-                Tingkat {{ $t }}
-            </a>
-        @endforeach
-        @if($tingkat)
-            <a href="{{ route('siswas.index', ['status' => $status]) }}" 
-               class="px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100">
-                Reset Filter
-            </a>
-        @endif
+            {{-- Filter Tingkat --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tingkat Kelas</label>
+                <select name="tingkat" onchange="this.form.submit()" 
+                        class="w-full pl-4 pr-10 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner font-bold text-slate-700">
+                    <option value="">Semua Tingkat</option>
+                    @foreach([1, 2, 3, 4, 5, 6] as $t)
+                        <option value="{{ $t }}" {{ $tingkat == $t ? 'selected' : '' }}>Tingkat {{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Filter Rombel --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Rombongan Belajar</label>
+                <select name="rombel" onchange="this.form.submit()" 
+                        class="w-full pl-4 pr-10 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner font-bold text-slate-700">
+                    <option value="">Semua Rombel</option>
+                    @foreach($rombels as $r)
+                        <option value="{{ $r }}" {{ $rombel == $r ? 'selected' : '' }}>{{ $r }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all shadow-md shadow-indigo-200 font-bold flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Cari
+                </button>
+
+                @if(request()->anyFilled(['search', 'tingkat', 'rombel']))
+                    <a href="{{ route('siswas.index') }}" 
+                       class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all shadow-sm flex items-center justify-center" 
+                       title="Reset Filter">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </a>
+                @endif
+            </div>
+        </form>
     </div>
 
     <div class="mb-6 flex justify-between items-center px-2">
@@ -136,6 +169,7 @@
                         <th class="py-4 px-6">Nama Lengkap / NISN</th>
                         <th class="py-4 px-6">Jenjang / Rombel</th>
                         <th class="py-4 px-6">Status</th>
+                        <th class="py-4 px-6">Tempat, Tanggal Lahir</th>
                         <th class="py-4 px-6 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -429,10 +463,12 @@
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                             <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
-                            Filter Data
+                            Filter Data (Dropdown)
                         </h4>
-                        <p class="ml-8">Terdapat tombol filter pada bagian atas yang memungkinkan Anda hanya merender/menampilkan siswa yang berstatus <span class="font-bold text-slate-700">Aktif</span>, <span class="font-bold text-slate-700">Lulus</span>, <span class="font-bold text-slate-700">Keluar/Mutasi</span>, atau melihat kesemuanya.</p>
+                        <p class="ml-8">Gunakan menu dropdown di bagian atas untuk menyaring data berdasarkan <span class="font-bold text-slate-700">Status</span>, <span class="font-bold text-slate-700">Tingkat Kelas</span>, atau <span class="font-bold text-slate-700">Rombongan Belajar (Rombel)</span>. Halaman akan otomatis memuat data setiap kali Anda mengubah pilihan.</p>
                     </div>
+
+
 
                 </div>
             </div>
