@@ -535,6 +535,11 @@
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                                 Tambah / Update Nilai Ekskul Semester Ini
                             </button>
+                            <button type="button" x-on:click="$dispatch('open-import-ekskul-modal')"
+                                    class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-bold rounded-2xl shadow-sm transition-all cursor-pointer">
+                                <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Import dari Excel
+                            </button>
                             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-100">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 Kelas {{ $currentRombel->tingkat }} &mdash; Semester {{ strtolower($activeTahunPelajaran->semester) == 'ganjil' ? 1 : 2 }} &mdash; {{ $activeTahunPelajaran->tahun }}
@@ -1075,6 +1080,75 @@
     @endif
     @endhasanyrole
 
+    {{-- MODAL: Import Nilai Ekstrakurikuler dari Excel --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    <div x-data="{ open: false }"
+         @open-import-ekskul-modal.window="open = true"
+         x-show="open" x-transition
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden">
+
+            {{-- Header --}}
+            <div class="bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-6 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/10 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Import Nilai Ekskul</h3>
+                        <p class="text-xs text-white/70 font-bold uppercase tracking-widest">Update massal via Excel</p>
+                    </div>
+                </div>
+                <button @click="open = false" class="p-2 hover:bg-white/10 rounded-full cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="p-8 space-y-6">
+
+                {{-- Info + download template --}}
+                <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5 flex items-start gap-4">
+                    <div class="p-2 bg-violet-100 rounded-lg text-violet-600 shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-violet-900">Gunakan Template Resmi</p>
+                        <p class="text-xs text-violet-700 leading-relaxed font-medium">
+                            Pastikan format kolom sesuai template agar data berhasil diimport. Setiap baris = 1 semester. Predikat isi dengan <strong>A, B, C, atau D</strong>.
+                        </p>
+                        <a href="{{ route('ekskul.template', $siswa->nisn) }}"
+                           class="inline-flex items-center gap-1.5 text-violet-600 text-xs font-black hover:text-violet-800 transition-colors mt-2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Unduh Template Format Excel
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Upload form --}}
+                <form action="{{ route('ekskul.import', $siswa->nisn) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    @csrf
+                    <div class="space-y-2">
+                        <label class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest px-1">Pilih File Excel (.xlsx / .xls / .csv)</label>
+                        <input type="file" name="file" required accept=".xlsx,.xls,.csv"
+                               class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-slate-700 font-bold text-sm cursor-pointer hover:border-violet-300 transition-colors">
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="open = false"
+                                class="flex-1 py-3.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                class="flex-[2] py-3.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-violet-200 transition-all cursor-pointer">
+                            Unggah &amp; Proses Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endhasanyrole
+
 </div>
 @endsection
-

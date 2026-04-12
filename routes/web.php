@@ -89,6 +89,8 @@ Route::middleware(['auth'])->group(function () {
 
         // Ekstrakurikuler Prestasi (Nilai Per-Semester)
         Route::post('/buku-induk/{nisn}/ekskul', [EkskulPrestasiController::class, 'store'])->name('ekskul.store');
+        Route::get('/buku-induk/{nisn}/ekskul/template', [EkskulPrestasiController::class, 'downloadTemplate'])->name('ekskul.template');
+        Route::post('/buku-induk/{nisn}/ekskul/import', [EkskulPrestasiController::class, 'import'])->name('ekskul.import');
 
         // Export Massal ZIP
         Route::get('/exports', [ExportController::class, 'index'])->name('exports.index');
