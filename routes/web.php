@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/buku-induk', [BukuIndukController::class, 'index'])->name('buku-induk.index');
     Route::get('/buku-induk/{nisn}', [BukuIndukController::class, 'show'])->name('buku-induk.show');
     Route::get('/buku-induk/{nisn}/print', [BukuIndukController::class, 'print'])->name('buku-induk.print');
+    Route::get('/buku-induk/{nisn}/print-prestasi', [BukuIndukController::class, 'printPrestasi'])->name('buku-induk.print-prestasi');
     
     // Restricted Actions (Import & Edit)
     Route::middleware(['role:Super Admin|Operator|Tata Usaha'])->group(function () {

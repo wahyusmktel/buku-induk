@@ -507,4 +507,47 @@ class BukuIndukController extends Controller
 
         return $pdf->stream("Buku_Induk_{$nisn}_{$siswa->nama}.pdf");
     }
+
+    public function printPrestasi($nisn)
+    {
+        $siswa = Siswa::withoutGlobalScope('tahun_aktif')->where('nisn', $nisn)->firstOrFail();
+        $bukuInduk = BukuInduk::firstOrCreate(
+            ['nisn' => $nisn],
+            ['siswa_id' => $siswa->id]
+        );
+
+        $prestasis = $bukuInduk->prestasis()->with('nilais.mataPelajaran')->get();
+        $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
+
+        $akademikGrid = [];
+        foreach (range(1, 6) as $kelas) {
+            foreach ([1, 2] as $semester) {
+                $record = $prestasis->where('kelas', $kelas)->where('semester', $semester)->first();
+                $akademikGrid[$kelas][$semester] = $record;
+            }
+        }
+
+        $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+        $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
+
+        $is_pdf = true;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('buku-induk.print-prestasi', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'ekstrakurikulers', 'is_pdf'))
+            ->setOption('isPhpEnabled', true);
+        
+        $paperSize = $settings['paper_size'] ?? 'a4';
+        
+        // Memaksa orientasi LANDSCAPE
+        if ($paperSize === 'custom') {
+            $width = ($settings['paper_width'] ?? 210) * 2.83465;
+            $height = ($settings['paper_height'] ?? 297) * 2.83465;
+            $pdf->setPaper([0, 0, $width, $height], 'landscape');
+        } elseif ($paperSize === 'folio') {
+            $pdf->setPaper([0, 0, 612.0, 936.0], 'landscape');
+        } else {
+            $pdf->setPaper($paperSize, 'landscape');
+        }
+
+        return $pdf->stream("Prestasi_Belajar_{$nisn}_{$siswa->nama}.pdf");
+    }
 }
