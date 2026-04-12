@@ -11,6 +11,9 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class PrestasiTemplateExport implements FromArray, WithStyles, WithEvents
 {
@@ -123,28 +126,105 @@ class PrestasiTemplateExport implements FromArray, WithStyles, WithEvents
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1    => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        $countMapel = MataPelajaran::count();
+        $endMapel = 3 + $countMapel;
+        $startAbsen = $endMapel + 1;
+        $endAbsen = $endMapel + 3;
+        $startPribadi = $endAbsen + 1;
+        $endPribadi = $endAbsen + 3;
+        $startRank = $endPribadi + 1;
+        $endRank = $endPribadi + 2;
+
+        $colEndMapel = Coordinate::stringFromColumnIndex($endMapel);
+        $colStartAbsen = Coordinate::stringFromColumnIndex($startAbsen);
+        $colEndAbsen = Coordinate::stringFromColumnIndex($endAbsen);
+        $colStartPribadi = Coordinate::stringFromColumnIndex($startPribadi);
+        $colEndPribadi = Coordinate::stringFromColumnIndex($endPribadi);
+        $colStartRank = Coordinate::stringFromColumnIndex($startRank);
+        $colEndRank = Coordinate::stringFromColumnIndex($endRank);
+
+        $styles = [
+            // Identitas (Col A-C) - Light Blue/Slate
+            'A1:C2' => [
+                'font' => ['bold' => true, 'color' => ['rgb' => '1E293B']],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '1E293B'] // Dark slate
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'F1F5F9'] // Slate 100
                 ],
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'CBD5E1']],
                 ],
             ],
-            2    => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            // Ketidakhadiran - Light Yellow
+            "{$colStartAbsen}1:{$colEndAbsen}2" => [
+                'font' => ['bold' => true, 'color' => ['rgb' => '1E293B']],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '4F46E5'] // Indigo
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'FEF9C3'] // Yellow 100
                 ],
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'FDE047']],
+                ],
+            ],
+            // Kepribadian - Light Purple
+            "{$colStartPribadi}1:{$colEndPribadi}2" => [
+                'font' => ['bold' => true, 'color' => ['rgb' => '1E293B']],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'F3E8FF'] // Purple 100
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'E9D5FF']],
+                ],
+            ],
+            // Peringkat & Kenaikan - Light Orange
+            "{$colStartRank}1:{$colEndRank}2" => [
+                'font' => ['bold' => true, 'color' => ['rgb' => '1E293B']],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'FFEDD5'] // Orange 100
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'FED7AA']],
                 ],
             ],
         ];
+
+        // Mapel (Only if exist) - Light Green
+        if ($countMapel > 0) {
+            $styles["D1:{$colEndMapel}2"] = [
+                'font' => ['bold' => true, 'color' => ['rgb' => '1E293B']],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'DCFCE7'] // Green 100
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'BBF7D0']],
+                ],
+            ];
+        }
+
+        return $styles;
     }
 
     public function registerEvents(): array
