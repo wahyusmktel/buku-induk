@@ -34,6 +34,7 @@ use App\Http\Controllers\MataPelajaranController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\EkstrakurikulerController;
+use App\Http\Controllers\EkskulPrestasiController;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityController;
@@ -85,6 +86,9 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/buku-induk/{nisn}/prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
         Route::get('/buku-induk/{nisn}/prestasi/template', [PrestasiController::class, 'downloadTemplate'])->name('prestasi.template');
         Route::post('/buku-induk/{nisn}/prestasi/import', [PrestasiController::class, 'import'])->name('prestasi.import');
+
+        // Ekstrakurikuler Prestasi (Nilai Per-Semester)
+        Route::post('/buku-induk/{nisn}/ekskul', [EkskulPrestasiController::class, 'store'])->name('ekskul.store');
 
         // Export Massal ZIP
         Route::get('/exports', [ExportController::class, 'index'])->name('exports.index');

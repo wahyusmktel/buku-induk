@@ -517,18 +517,88 @@
                         <div>
                             <h4 class="font-bold text-slate-800">Nilai Ekstrakurikuler Bersifat Per-Semester</h4>
                             <p class="text-sm text-slate-500 mt-1 leading-relaxed">
-                                Sama halnya dengan nilai mata pelajaran akademik, Kepribadian, dan Absensi, nilai kegiatan Ekstrakurikuler diisi untuk setiap semesternya. Anda dapat menginput nilai Ekstrakurikuler (Predikat A, B, C) secara bersamaan melalui form <strong>Update Nilai Semester</strong>.
+                                Nilai kegiatan Ekstrakurikuler (Predikat A, B, C) diisi untuk setiap semesternya secara terpisah dari nilai mata pelajaran akademik.
                             </p>
                         </div>
                     </div>
+
                     @hasanyrole('Super Admin|Operator|Tata Usaha')
-                    <button type="button" x-on:click="$dispatch('open-prestasi-modal')" class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Buka Form Input Nilai Semester
-                    </button>
+                    @if(!$currentRombel || !$activeTahunPelajaran)
+                        <div class="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm font-medium">
+                            <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 14c-.77 1.333.192 3 1.732 3z"/></svg>
+                            Siswa belum di-mapping ke Rombel aktif. Silahkan lakukan mapping terlebih dahulu sebelum mengisi nilai Ekstrakurikuler.
+                        </div>
+                    @else
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            <button type="button" x-on:click="$dispatch('open-ekskul-modal')"
+                                    class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Tambah / Update Nilai Ekskul Semester Ini
+                            </button>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-100">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                Kelas {{ $currentRombel->tingkat }} &mdash; Semester {{ strtolower($activeTahunPelajaran->semester) == 'ganjil' ? 1 : 2 }} &mdash; {{ $activeTahunPelajaran->tahun }}
+                            </span>
+                        </div>
+                    @endif
                     @endhasanyrole
+
+                    {{-- Ringkasan Data Ekskul Tersimpan --}}
+                    @if($allEkskulPrestasi->isNotEmpty())
+                        <div class="mt-2 space-y-4">
+                            <p class="text-xs font-black text-slate-500 uppercase tracking-widest">Riwayat Nilai Ekstrakurikuler</p>
+                            @foreach($allEkskulPrestasi as $label => $rows)
+                                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                                    <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center gap-2">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                        <span class="text-xs font-black text-slate-600 uppercase tracking-wide">{{ $label }}</span>
+                                    </div>
+                                    <table class="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                                <th class="px-5 py-2 w-10 text-center">No</th>
+                                                <th class="px-5 py-2">Nama Ekstrakurikuler</th>
+                                                <th class="px-5 py-2 w-24 text-center">Predikat</th>
+                                                <th class="px-5 py-2">Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-50">
+                                            @foreach($rows as $i => $row)
+                                                <tr class="hover:bg-slate-50/50">
+                                                    <td class="px-5 py-3 text-center text-sm font-bold text-slate-400">{{ $i + 1 }}</td>
+                                                    <td class="px-5 py-3 text-sm font-bold text-slate-700">{{ $row->ekstrakurikuler?->nama_ekstrakurikuler ?? '&#8212;' }}</td>
+                                                    <td class="px-5 py-3 text-center">
+                                                        @php
+                                                            $badgeColor = match($row->predikat) {
+                                                                'A' => 'bg-emerald-100 text-emerald-700',
+                                                                'B' => 'bg-blue-100 text-blue-700',
+                                                                'C' => 'bg-amber-100 text-amber-700',
+                                                                'D' => 'bg-rose-100 text-rose-700',
+                                                                default => 'bg-slate-100 text-slate-600',
+                                                            };
+                                                        @endphp
+                                                        <span class="inline-block px-3 py-1 text-xs font-black rounded-lg {{ $badgeColor }}">{{ $row->predikat }}</span>
+                                                    </td>
+                                                    <td class="px-5 py-3 text-sm text-slate-500">{{ $row->keterangan ?? '&#8212;' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="flex flex-col items-center justify-center py-10 text-center">
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            <p class="text-sm font-bold text-slate-400">Belum ada data nilai Ekstrakurikuler</p>
+                            <p class="text-xs text-slate-400 mt-1">Gunakan tombol di atas untuk mulai menginput nilai</p>
+                        </div>
+                    @endif
                 </div>
             </div>
+
             
             {{-- Submit --}}
             <div class="mt-10 pt-6 border-t border-slate-100 flex gap-3">
@@ -854,5 +924,157 @@
     </div>
     @endhasanyrole
 
+    {{-- MODAL: Input Nilai Ekstrakurikuler --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    @if($currentRombel && $activeTahunPelajaran)
+    @php
+        $ekskulSmt = strtolower($activeTahunPelajaran->semester) == 'ganjil' ? 1 : 2;
+    @endphp
+    <div x-data="{
+            open: false,
+            isMax: false,
+            posX: 0,
+            posY: 0,
+            dragging: false,
+            startX: 0,
+            startY: 0,
+            startDrag(e) {
+                if(this.isMax) return;
+                this.dragging = true;
+                this.startX = e.clientX - this.posX;
+                this.startY = e.clientY - this.posY;
+            },
+            doDrag(e) {
+                if(!this.dragging) return;
+                this.posX = e.clientX - this.startX;
+                this.posY = e.clientY - this.startY;
+            },
+            stopDrag() {
+                this.dragging = false;
+            }
+         }"
+         @open-ekskul-modal.window="open = true"
+         @mousemove.window="doDrag"
+         @mouseup.window="stopDrag"
+         x-show="open" x-transition
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+
+        <div :class="{
+                'w-full h-full max-w-none max-h-none rounded-none m-0': isMax,
+                'w-full max-w-3xl max-h-[90vh] rounded-3xl': !isMax,
+                'transition-all duration-300': !dragging
+             }"
+             :style="(!isMax && posX !== undefined) ? `transform: translate(${posX}px, ${posY}px)` : ''"
+             class="bg-white shadow-2xl overflow-hidden flex flex-col border border-white/20">
+
+            {{-- Header --}}
+            <div @mousedown="startDrag($event)" class="bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-5 text-white flex items-center justify-between shrink-0 cursor-move select-none">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Input / Update Nilai Ekstrakurikuler</h3>
+                        <p class="text-violet-200 text-xs font-medium mt-0.5">
+                            Kelas {{ $currentRombel->tingkat }} &mdash; Semester {{ $ekskulSmt }} &mdash; {{ $activeTahunPelajaran->tahun }}
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button type="button" @click="isMax = !isMax; if(!isMax) { posX = 0; posY = 0; }" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg x-show="!isMax" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        <svg x-show="isMax" class="w-4 h-4" x-cloak fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10V6h4m-4 0l5 5m11 5V6h-4m4 0l-5 5"/></svg>
+                    </button>
+                    <button type="button" @click="open = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Form --}}
+            <form action="{{ route('ekskul.store', $siswa->nisn) }}" method="POST" class="flex flex-col flex-1 overflow-hidden" id="formInputEkskul">
+                @csrf
+                <input type="hidden" name="kelas" value="{{ $currentRombel->tingkat }}">
+                <input type="hidden" name="semester" value="{{ $ekskulSmt }}">
+
+                <div class="p-8 flex-1 overflow-y-auto">
+
+                    {{-- Info Badge --}}
+                    <div class="flex items-center gap-3 p-4 mb-6 bg-violet-50 border border-violet-100 rounded-2xl text-sm text-violet-800 font-medium">
+                        <svg class="w-5 h-5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Nilai yang belum diisi tidak akan disimpan. Kosongkan predikat untuk menghapus nilai ekskul tersebut.
+                    </div>
+
+                    {{-- Tabel Daftar Ekskul --}}
+                    @if($ekstrakurikulers->isEmpty())
+                        <div class="text-center py-10 text-slate-400">
+                            <svg class="w-10 h-10 mx-auto mb-3 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <p class="font-bold text-sm">Belum ada data Ekstrakurikuler</p>
+                            <p class="text-xs mt-1">Tambahkan daftar kegiatan di menu Master Data terlebih dahulu.</p>
+                        </div>
+                    @else
+                        <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50">
+                                    <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                        <th class="px-6 py-3 w-12 text-center border-r border-slate-100">No</th>
+                                        <th class="px-6 py-3 border-r border-slate-100">Nama Ekstrakurikuler</th>
+                                        <th class="px-6 py-3 w-36 border-r border-slate-100 text-center">Predikat</th>
+                                        <th class="px-6 py-3">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    @foreach($ekstrakurikulers as $index => $ekskul)
+                                    @php
+                                        $savedEkskul = $aktifEkskuls[$ekskul->id] ?? null;
+                                    @endphp
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">{{ $index + 1 }}</td>
+                                        <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">
+                                            {{ $ekskul->nama_ekstrakurikuler }}
+                                            @if($ekskul->deskripsi)
+                                                <p class="text-xs text-slate-400 font-normal mt-0.5">{{ $ekskul->deskripsi }}</p>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-2 border-r border-slate-100">
+                                            <select name="ekskul[{{ $ekskul->id }}]"
+                                                    class="w-full px-3 py-2 rounded-xl border border-slate-200 font-black text-slate-700 text-sm text-center focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all">
+                                                <option value="">&#8212;</option>
+                                                <option value="A" {{ $savedEkskul?->predikat == 'A' ? 'selected' : '' }}>A</option>
+                                                <option value="B" {{ $savedEkskul?->predikat == 'B' ? 'selected' : '' }}>B</option>
+                                                <option value="C" {{ $savedEkskul?->predikat == 'C' ? 'selected' : '' }}>C</option>
+                                                <option value="D" {{ $savedEkskul?->predikat == 'D' ? 'selected' : '' }}>D</option>
+                                            </select>
+                                        </td>
+                                        <td class="px-6 py-2">
+                                            <input type="text" name="keterangan[{{ $ekskul->id }}]"
+                                                   value="{{ $savedEkskul?->keterangan ?? '' }}"
+                                                   placeholder="Keterangan opsional..."
+                                                   class="w-full px-3 py-2 rounded-xl border border-slate-200 font-medium text-slate-700 text-sm focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all">
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-end shrink-0 gap-3">
+                    <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" form="formInputEkskul" class="px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-violet-200 transition-all cursor-pointer flex items-center gap-2">
+                        Simpan Nilai Ekskul
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+    @endhasanyrole
+
 </div>
 @endsection
+

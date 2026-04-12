@@ -170,7 +170,27 @@ class BukuIndukController extends Controller
                 ->first();
         }
 
-        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang', 'kelengkapan', 'ekstrakurikulers', 'activeTahunPelajaran', 'currentRombel', 'activePrestasi'));
+        // Data ekskul aktif untuk pre-populate modal ekskul
+        $aktifEkskuls = collect();
+        if ($currentRombel && $activeTahunPelajaran && $siswaActive) {
+            $aktifEkskuls = \App\Models\PrestasiEkstrakurikuler::where('siswa_id', $siswaActive->id)
+                ->where('kelas', $currentRombel->tingkat)
+                ->where('semester', $activeSmtInt)
+                ->get()
+                ->keyBy('ekstrakurikuler_id');
+        }
+
+        // Semua data ekskul per semester (untuk ringkasan di tab)
+        $allEkskulPrestasi = collect();
+        if ($siswaActive) {
+            $allEkskulPrestasi = \App\Models\PrestasiEkstrakurikuler::where('siswa_id', $siswaActive->id)
+                ->with('ekstrakurikuler')
+                ->orderBy('kelas')->orderBy('semester')
+                ->get()
+                ->groupBy(fn($e) => "Kelas {$e->kelas} Smt {$e->semester}");
+        }
+
+        return view('buku-induk.edit', compact('bukuInduk', 'siswa', 'mataPelajarans', 'jenjang', 'kelengkapan', 'ekstrakurikulers', 'activeTahunPelajaran', 'currentRombel', 'activePrestasi', 'aktifEkskuls', 'allEkskulPrestasi', 'siswaActive'));
     }
 
     /**
