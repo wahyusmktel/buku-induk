@@ -265,15 +265,15 @@
                 }
             @endphp
 
-            <table class="bordered" style="font-size: 7.5pt; table-layout: fixed;">
+            <table class="bordered" style="font-size: 7pt; table-layout: fixed; width: 100%;">
                 <colgroup>
-                    <col style="width: 12pt;">  {{-- No --}}
-                    <col style="width: 160pt;"> {{-- Mata Pelajaran --}}
+                    <col style="width: 15pt;">  {{-- No --}}
+                    <col style="width: 210pt;"> {{-- Mata Pelajaran --}}
                     @foreach(range(1,6) as $k)
-                    <col style="width: 19pt;"> {{-- Smt I --}}
-                    <col style="width: 19pt;"> {{-- Smt II --}}
+                    <col style="width: 17pt;"> {{-- Smt I --}}
+                    <col style="width: 17pt;"> {{-- Smt II --}}
                     @endforeach
-                    <col style="width: 23pt;"> {{-- Nilai Ijazah --}}
+                    <col style="width: 25pt;"> {{-- Nilai Ijazah --}}
                 </colgroup>
                 <thead>
                     {{-- ROW 1: Tahun Pelajaran --}}
@@ -313,44 +313,43 @@
                     @endphp
 
                     @foreach($mataPelajarans as $mapel)
-                    @php
-                        $isMulokHeader = stripos($mapel->nama, 'Muatan Lokal') === 0
-                                         && trim(str_ireplace('Muatan Lokal', '', $mapel->nama)) === '';
-                        $isMulokSub   = $mulokStarted && !$isMulokHeader;
-                        if ($isMulokHeader) {
-                            $mulokStarted  = true;
-                            $mulokSubIndex = 0;
-                            $rowNum++;
-                        } elseif (!$mulokStarted) {
-                            $rowNum++;
-                        }
-                    @endphp
-                    <tr>
-                        <td style="text-align: center; font-size: 7pt;">{{ $isMulokSub ? '' : $rowNum }}</td>
-                        <td class="left" style="font-size: 7.5pt; {{ $isMulokHeader ? 'font-weight:bold;' : '' }} {{ $isMulokSub ? 'padding-left: 8px;' : '' }}">
-                            @if($isMulokSub)
-                                {{ chr(97 + $mulokSubIndex) }}. {{ $mapel->nama }}
-                                @php $mulokSubIndex++ @endphp
-                            @else
-                                {{ $mapel->nama }}
-                            @endif
-                        </td>
-                        @foreach(range(1,6) as $k)
-                        @foreach([1,2] as $smt)
+                        @if(empty(trim($mapel->nama))) @continue @endif
                         @php
-                            $p   = $akademikGrid[$k][$smt] ?? null;
-                            $val = (!$isMulokHeader && $p)
-                                    ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai
-                                    : null;
+                            $isMulokHeader = stripos($mapel->nama, 'Muatan Lokal') === 0
+                                             && trim(str_ireplace('Muatan Lokal', '', $mapel->nama)) === '';
+                            $isMulokSub   = $mulokStarted && !$isMulokHeader;
+                            if ($isMulokHeader) {
+                                $mulokStarted  = true;
+                                $mulokSubIndex = 0;
+                                $rowNum++;
+                            } elseif (!$mulokStarted) {
+                                $rowNum++;
+                            }
                         @endphp
-                        <td>{{ $val !== null ? number_format($val, 0) : '' }}</td>
-                        @endforeach
-                        @endforeach
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <td style="text-align: center; font-size: 6.5pt; width: 12pt;">{{ $isMulokSub ? '' : $rowNum }}</td>
+                            <td class="left" style="font-size: 7.5pt; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; {{ $isMulokHeader ? 'font-weight:bold;' : '' }} {{ $isMulokSub ? 'padding-left: 10px;' : '' }}">
+                                @if($isMulokSub)
+                                    {{ chr(97 + $mulokSubIndex) }}. {{ $mapel->nama }}
+                                    @php $mulokSubIndex++ @endphp
+                                @else
+                                    {{ $mapel->nama }}
+                                @endif
+                            </td>
+                            @foreach(range(1,6) as $k)
+                                @foreach([1,2] as $smt)
+                                    @php
+                                        $p   = $akademikGrid[$k][$smt] ?? null;
+                                        $val = (!$isMulokHeader && $p)
+                                                ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai
+                                                : null;
+                                    @endphp
+                                    <td style="font-size: 6.5pt; width: 16pt;">{{ $val !== null ? number_format($val, 0) : '' }}</td>
+                                @endforeach
+                            @endforeach
+                            <td style="width: 25pt;"></td>
+                        </tr>
                     @endforeach
-
-                    {{-- No filler rows needed --}}
 
                     {{-- Summary rows --}}
                     @php
@@ -362,28 +361,28 @@
                         ];
                     @endphp
                     @foreach($summaryRows as $sr)
-                    <tr style="background-color: #f3f4f6;">
-                        <td></td>
-                        <td class="left" style="font-weight: bold; font-size: 7.5pt;">{{ $sr['label'] }}</td>
-                        @foreach(range(1,6) as $k)
-                        @foreach([1,2] as $smt)
-                        @php
-                            $p = $akademikGrid[$k][$smt] ?? null;
-                            $v = null;
-                            if ($p) {
-                                if (isset($sr['smt_only']) && $smt != $sr['smt_only']) {
-                                    $v = null;
-                                } else {
-                                    $raw = $p->{$sr['field']} ?? null;
-                                    $v = ($sr['fmt'] && $raw !== null) ? number_format($raw, 0) : $raw;
-                                }
-                            }
-                        @endphp
-                        <td style="font-size: 7pt;">{{ $v ?? '' }}</td>
-                        @endforeach
-                        @endforeach
-                        <td></td>
-                    </tr>
+                        <tr style="background-color: #f3f4f6;">
+                            <td></td>
+                            <td class="left" style="font-weight: bold; font-size: 7.5pt; white-space: nowrap;">{{ $sr['label'] }}</td>
+                            @foreach(range(1,6) as $k)
+                                @foreach([1,2] as $smt)
+                                    @php
+                                        $p = $akademikGrid[$k][$smt] ?? null;
+                                        $v = null;
+                                        if ($p) {
+                                            if (isset($sr['smt_only']) && $smt != $sr['smt_only']) {
+                                                $v = null;
+                                            } else {
+                                                $raw = $p->{$sr['field']} ?? null;
+                                                $v = ($sr['fmt'] && $raw !== null) ? number_format($raw, 0) : $raw;
+                                            }
+                                        }
+                                    @endphp
+                                    <td style="font-size: 6.5pt;">{{ $v ?? '' }}</td>
+                                @endforeach
+                            @endforeach
+                            <td></td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
