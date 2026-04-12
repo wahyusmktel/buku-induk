@@ -254,50 +254,136 @@
         {{-- ===== VI. PRESTASI BELAJAR (halaman baru) ===== --}}
         <div class="page-break-before">
             <p class="section-title" style="margin-top: 0;">VI. Prestasi Belajar</p>
-            <table class="bordered">
+            <p style="font-weight: bold; font-size: 9pt; margin: 0 0 5px 0;">A. Penilaian Hasil Belajar</p>
+
+            @php
+                // Build tahun_pelajaran label per kelas (ambil dari Semester 1 jika ada, fallback Semester 2)
+                $tahunPerKelas = [];
+                for ($k = 1; $k <= 6; $k++) {
+                    $rec = $akademikGrid[$k][1] ?? $akademikGrid[$k][2] ?? null;
+                    $tahunPerKelas[$k] = $rec?->tahun_pelajaran ?? '';
+                }
+            @endphp
+
+            <table class="bordered" style="font-size: 7.5pt; table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 12pt;">  {{-- No --}}
+                    <col style="width: 160pt;"> {{-- Mata Pelajaran --}}
+                    @foreach(range(1,6) as $k)
+                    <col style="width: 19pt;"> {{-- Smt I --}}
+                    <col style="width: 19pt;"> {{-- Smt II --}}
+                    @endforeach
+                    <col style="width: 23pt;"> {{-- Nilai Ijazah --}}
+                </colgroup>
                 <thead>
+                    {{-- ROW 1: Tahun Pelajaran --}}
                     <tr>
-                        <th rowspan="2" style="width: 22px;">Kls</th>
-                        <th rowspan="2" style="width: 22px;">Smt</th>
-                        <th rowspan="2" style="width: 75px;">Thn Pelajaran</th>
-                        <th colspan="{{ $mataPelajarans->count() }}">Nilai Mata Pelajaran</th>
-                        <th rowspan="2" style="width: 28px;">Jml</th>
-                        <th rowspan="2" style="width: 28px;">Rata²</th>
-                        <th rowspan="2" style="width: 28px;">Rank</th>
-                        <th rowspan="2" style="width: 38px;">Naik?</th>
+                        <th rowspan="4" style="vertical-align: middle;">No</th>
+                        <th rowspan="4" style="vertical-align: middle; text-align: left; padding-left: 4px;">Mata Pelajaran</th>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 6.5pt;">{{ $tahunPerKelas[$k] ?: '— / —' }}</th>
+                        @endforeach
+                        <th rowspan="4" style="vertical-align: middle; font-size: 6.5pt;">Nilai Ijazah</th>
                     </tr>
+                    {{-- ROW 2: Kelas --}}
                     <tr>
-                        @foreach($mataPelajarans as $mapel)
-                        <th style="font-size: 6pt; font-weight: normal; overflow: hidden; word-wrap: break-word;" title="{{ $mapel->nama }}">
-                            {{ substr($mapel->nama, 0, 7) }}{{ strlen($mapel->nama) > 7 ? '.' : '' }}
-                        </th>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2">Kelas {{ $k }}</th>
+                        @endforeach
+                    </tr>
+                    {{-- ROW 3: Smstr --}}
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th colspan="2" style="font-size: 6pt; font-weight: normal;">Smstr</th>
+                        @endforeach
+                    </tr>
+                    {{-- ROW 4: I / II --}}
+                    <tr>
+                        @foreach(range(1,6) as $k)
+                        <th style="font-size: 6.5pt;">I</th>
+                        <th style="font-size: 6.5pt;">II</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(range(1, 6) as $kelas)
-                    @foreach([1, 2] as $semester)
-                    @php $p = $akademikGrid[$kelas][$semester] ?? null; @endphp
+                    @php
+                        $rowNum = 0;
+                        $mulokStarted = false;
+                        $mulokSubIndex = 0; // a, b, c...
+                    @endphp
+
+                    @foreach($mataPelajarans as $mapel)
+                    @php
+                        $isMulokHeader = stripos($mapel->nama, 'Muatan Lokal') === 0
+                                         && trim(str_ireplace('Muatan Lokal', '', $mapel->nama)) === '';
+                        $isMulokSub   = $mulokStarted && !$isMulokHeader;
+                        if ($isMulokHeader) {
+                            $mulokStarted  = true;
+                            $mulokSubIndex = 0;
+                            $rowNum++;
+                        } elseif (!$mulokStarted) {
+                            $rowNum++;
+                        }
+                    @endphp
                     <tr>
-                        @if($semester == 1)
-                        <td rowspan="2" style="vertical-align:middle; font-weight:bold;">{{ $kelas }}</td>
-                        @endif
-                        <td>{{ $semester }}</td>
-                        <td class="left" style="font-size:6.5pt; white-space: nowrap;">{{ $p?->tahun_pelajaran ?? '' }}</td>
-                        
-                        @foreach($mataPelajarans as $mapel)
+                        <td style="text-align: center; font-size: 7pt;">{{ $isMulokSub ? '' : $rowNum }}</td>
+                        <td class="left" style="font-size: 7.5pt; {{ $isMulokHeader ? 'font-weight:bold;' : '' }} {{ $isMulokSub ? 'padding-left: 8px;' : '' }}">
+                            @if($isMulokSub)
+                                {{ chr(97 + $mulokSubIndex) }}. {{ $mapel->nama }}
+                                @php $mulokSubIndex++ @endphp
+                            @else
+                                {{ $mapel->nama }}
+                            @endif
+                        </td>
+                        @foreach(range(1,6) as $k)
+                        @foreach([1,2] as $smt)
                         @php
-                            $nilaiVal = $p ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai : null;
+                            $p   = $akademikGrid[$k][$smt] ?? null;
+                            $val = (!$isMulokHeader && $p)
+                                    ? $p->nilais->where('mata_pelajaran_id', $mapel->id)->first()?->nilai
+                                    : null;
                         @endphp
-                        <td style="font-size: 8pt;">{{ $nilaiVal ? number_format($nilaiVal, 0) : '' }}</td>
+                        <td>{{ $val !== null ? number_format($val, 0) : '' }}</td>
                         @endforeach
-                        
-                        <td><strong>{{ $p?->jumlah_nilai ? number_format($p->jumlah_nilai, 0) : '' }}</strong></td>
-                        <td style="font-size: 7.5pt;">{{ $p?->rata_rata ?? '' }}</td>
-                        <td>{{ $p?->peringkat ?? '' }}</td>
-                        <td style="font-size:7pt;">{{ ($p && $semester == 2) ? ($p->keterangan_kenaikan ?? '') : '' }}</td>
+                        @endforeach
+                        <td></td>
                     </tr>
                     @endforeach
+
+                    {{-- No filler rows needed --}}
+
+                    {{-- Summary rows --}}
+                    @php
+                        $summaryRows = [
+                            ['label' => 'Jumlah Nilai',       'field' => 'jumlah_nilai',       'fmt' => true],
+                            ['label' => 'Nilai Rata-Rata',    'field' => 'rata_rata',           'fmt' => false],
+                            ['label' => 'Peringkat Kelas ke', 'field' => 'peringkat',           'fmt' => false],
+                            ['label' => 'Naik/Tidak Naik',   'field' => 'keterangan_kenaikan', 'fmt' => false, 'smt_only' => 2],
+                        ];
+                    @endphp
+                    @foreach($summaryRows as $sr)
+                    <tr style="background-color: #f3f4f6;">
+                        <td></td>
+                        <td class="left" style="font-weight: bold; font-size: 7.5pt;">{{ $sr['label'] }}</td>
+                        @foreach(range(1,6) as $k)
+                        @foreach([1,2] as $smt)
+                        @php
+                            $p = $akademikGrid[$k][$smt] ?? null;
+                            $v = null;
+                            if ($p) {
+                                if (isset($sr['smt_only']) && $smt != $sr['smt_only']) {
+                                    $v = null;
+                                } else {
+                                    $raw = $p->{$sr['field']} ?? null;
+                                    $v = ($sr['fmt'] && $raw !== null) ? number_format($raw, 0) : $raw;
+                                }
+                            }
+                        @endphp
+                        <td style="font-size: 7pt;">{{ $v ?? '' }}</td>
+                        @endforeach
+                        @endforeach
+                        <td></td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>

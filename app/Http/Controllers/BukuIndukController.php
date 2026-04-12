@@ -437,12 +437,14 @@ class BukuIndukController extends Controller
         }
 
         $akademikGrid = [];
-        foreach ($availableGrades as $kelas) {
+        // Always build for all 6 kelas so the transposed table renders all columns
+        foreach (range(1, 6) as $kelas) {
             foreach ([1, 2] as $semester) {
                 $record = $prestasis->where('kelas', $kelas)->where('semester', $semester)->first();
                 $akademikGrid[$kelas][$semester] = $record;
             }
         }
+
         $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
         $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
 
