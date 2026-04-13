@@ -35,12 +35,18 @@
     </div>
     @endif
     @if(!$tahunAktif)
-    <div class="bg-amber-50 border-2 border-amber-200 border-dashed rounded-3xl p-8 text-center shadow-sm">
-        <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+    <div class="mb-8 bg-rose-50 border-2 border-rose-200 border-dashed rounded-3xl p-8 text-center shadow-sm">
+        <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 14c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
-        <h3 class="text-xl font-black text-amber-800 tracking-tight">Sesi Akademik Belum Aktif</h3>
-        <p class="text-amber-600 font-medium max-w-lg mx-auto mt-2">Daftar Rombel akan muncul otomatis setelah Anda mengaktifkan Tahun Pelajaran dan mengimport data siswa.</p>
+        <h3 class="text-xl font-black text-rose-800 tracking-tight">Perhatian: Sesi Akademik Belum Aktif!</h3>
+        <p class="text-rose-600 font-medium max-w-lg mx-auto mt-2">Anda wajib menambahkan atau mengaktifkan Tahun Pelajaran terlebih dahulu sebelum dapat mengelola Data Rombongan Belajar.</p>
+        <div class="mt-6">
+            <a href="{{ route('tahun-pelajaran.index') }}" class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-rose-200 hover:-translate-y-0.5">
+                Konfigurasi Tahun Pelajaran
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </a>
+        </div>
     </div>
     @else
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
@@ -206,6 +212,7 @@
         </div>
     </div>
 
+    @if($tahunAktif)
     <!-- Add Rombel Modal -->
     <div x-show="addModal" 
          x-transition:enter="transition ease-out duration-300"
@@ -313,5 +320,6 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection
