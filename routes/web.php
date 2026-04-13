@@ -103,6 +103,8 @@ Route::middleware(['auth'])->group(function () {
         // Rombel Management
         Route::get('/rombels', [RombelController::class, 'index'])->name('rombels.index');
         Route::post('/rombels', [RombelController::class, 'store'])->name('rombels.store');
+        Route::get('/api/rombels/preview/{tahunId}', [RombelController::class, 'getPreview'])->name('api.rombels.preview');
+        Route::post('/rombels/copy', [RombelController::class, 'copyFromSemester'])->name('rombels.copy-from-semester');
         Route::get('/rombels/{id}', [RombelController::class, 'show'])->name('rombels.show');
         Route::get('/api/rombels/{id}/unassigned-siswas', [RombelController::class, 'getUnassignedSiswas']);
         Route::post('/rombels/{id}/assign-siswas', [RombelController::class, 'assignSiswas'])->name('rombels.assign');
@@ -111,6 +113,7 @@ Route::middleware(['auth'])->group(function () {
     // Tahun Pelajaran Management
     Route::middleware(['role:Super Admin|Operator'])->group(function () {
         Route::get('/tahun-pelajaran', [TahunPelajaranController::class, 'index'])->name('tahun-pelajaran.index');
+        Route::get('/api/tahun-pelajaran', [TahunPelajaranController::class, 'getApiList'])->name('api.tahun-pelajaran.list');
         Route::post('/tahun-pelajaran', [TahunPelajaranController::class, 'store'])->name('tahun-pelajaran.store');
         Route::post('/tahun-pelajaran/{id}/copy-data', [TahunPelajaranController::class, 'copyData'])->name('tahun-pelajaran.copy-data');
         Route::patch('/tahun-pelajaran/{id}/activate', [TahunPelajaranController::class, 'activate'])->name('tahun-pelajaran.activate');

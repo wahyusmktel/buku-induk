@@ -131,4 +131,10 @@ class TahunPelajaranController extends Controller
 
         return redirect()->back()->with('success', 'Tahun Pelajaran berhasil dihapus.');
     }
+
+    public function getApiList()
+    {
+        $tahunPelajarans = TahunPelajaran::orderByDesc('tahun')->orderByDesc('semester')->get();
+        return response()->json($tahunPelajarans);
+    }
 }

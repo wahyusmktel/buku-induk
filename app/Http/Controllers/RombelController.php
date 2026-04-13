@@ -7,6 +7,8 @@ use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\DB;
+use App\Services\ActivityLogService;
 
 class RombelController extends Controller
 {
@@ -115,5 +117,61 @@ class RombelController extends Controller
             ->update(['rombel_id' => $rombel->id]);
 
         return redirect()->back()->with('success', count($request->siswa_ids) . ' siswa berhasil dipetakan ke Rombel ' . $rombel->nama);
+    }
+
+    public function getPreview($tahunId)
+    {
+        $rombels = Rombel::where('tahun_pelajaran_id', $tahunId)->get();
+        return response()->json($rombels);
+    }
+
+    public function copyFromSemester(Request $request)
+    {
+        $request->validate([
+            'source_tahun_id' => 'required|exists:tahun_pelajarans,id',
+        ]);
+
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+        if (!$tahunAktif) {
+            return redirect()->back()->with('error', 'Tidak ada tahun pelajaran aktif.');
+        }
+
+        $sourceTahun = TahunPelajaran::findOrFail($request->source_tahun_id);
+        $sourceRombels = Rombel::where('tahun_pelajaran_id', $sourceTahun->id)->get();
+
+        if ($sourceRombels->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ditemukan rombel pada semester sumber.');
+        }
+
+        $count = 0;
+        DB::transaction(function () use ($sourceRombels, $tahunAktif, &$count) {
+            foreach ($sourceRombels as $rombel) {
+                // Prevent duplicates by checking name and target year
+                $exists = Rombel::where('nama', $rombel->nama)
+                    ->where('tahun_pelajaran_id', $tahunAktif->id)
+                    ->exists();
+
+                if (!$exists) {
+                    Rombel::create([
+                        'nama' => $rombel->nama,
+                        'tingkat' => $rombel->tingkat,
+                        'tahun_pelajaran_id' => $tahunAktif->id,
+                        'jenis_rombel' => $rombel->jenis_rombel,
+                        'kompetensi_keahlian' => $rombel->kompetensi_keahlian,
+                        'kurikulum' => $rombel->kurikulum,
+                        'guru_id' => null, // Do not copy home room teacher as it might change
+                    ]);
+                    $count++;
+                }
+            }
+        });
+
+        ActivityLogService::log('rombel_copy', "Menyalin {$count} rombel dari {$sourceTahun->tahun} - {$sourceTahun->semester} ke tahun aktif.", [
+            'source_id' => $sourceTahun->id,
+            'target_id' => $tahunAktif->id,
+            'count' => $count
+        ]);
+
+        return redirect()->back()->with('success', "Berhasil menyalin {$count} rombel dari semester sebelumnya.");
     }
 }
