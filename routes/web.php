@@ -74,9 +74,13 @@ Route::middleware(['auth'])->group(function () {
     
     // Restricted Actions (Import & Edit)
     Route::middleware(['role:Super Admin|Operator|Tata Usaha'])->group(function () {
-        Route::post('/siswas/import', [SiswaController::class, 'import'])->name('siswas.import');
+        Route::get('/api/siswas/preview/{tahunId}', [SiswaController::class, 'getPreviewByYear'])->name('api.siswas.preview');
+        Route::post('/siswas/promote-semester', [SiswaController::class, 'promoteSemester'])->name('siswas.promote-semester');
+        
+        Route::get('/siswas', [SiswaController::class, 'index'])->name('siswas.index');
         Route::get('/siswas/{siswa}/edit', [SiswaController::class, 'edit'])->name('siswas.edit');
         Route::put('/siswas/{siswa}', [SiswaController::class, 'update'])->name('siswas.update');
+        Route::post('/siswas/import', [SiswaController::class, 'import'])->name('siswas.import');
 
         // Buku Induk Edit
         Route::get('/buku-induk/{nisn}/edit', [BukuIndukController::class, 'edit'])->name('buku-induk.edit');

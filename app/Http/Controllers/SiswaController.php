@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Siswa;
+use App\Models\Rombel;
+use App\Models\TahunPelajaran;
 use App\Imports\SiswaImport;
 use App\Imports\MasterBukuIndukImport;
 use Illuminate\Http\Request;
@@ -10,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use App\Services\ActivityLogService;
 
 
@@ -51,12 +54,20 @@ class SiswaController extends Controller
 
         $siswas = $query->latest()->paginate(15)->withQueryString();
         
+        // Cek apakah bisa melakukan Naikan Semester
+        $canPromote = false;
+        if ($tahunAktif) {
+            $hasPreviousYear = TahunPelajaran::where('id', '!=', $tahunAktif->id)->exists();
+            $isCurrentEmpty = $siswas->total() === 0;
+            $canPromote = $hasPreviousYear && $isCurrentEmpty;
+        }
+
         // Ambil daftar rombel dari tabel Rombel untuk tahun aktif agar lebih akurat
-        $rombels = \App\Models\Rombel::where('tahun_pelajaran_id', $tahunAktif?->id)
+        $rombels = Rombel::where('tahun_pelajaran_id', $tahunAktif?->id)
             ->orderBy('nama')
             ->pluck('nama');
             
-        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels'));
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels', 'canPromote'));
     }
 
     public function import(Request $request)
@@ -432,5 +443,96 @@ class SiswaController extends Controller
             Log::error('Master Import Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal memproses file Master Import: ' . $e->getMessage());
         }
+    }
+
+    public function getPreviewByYear($tahunId)
+    {
+        $siswas = Siswa::withoutGlobalScope('tahun_aktif')
+            ->with('rombel:id,nama')
+            ->where('tahun_pelajaran_id', $tahunId)
+            ->where('status', 'Aktif')
+            ->orderBy('nama')
+            ->get();
+            
+        $data = $siswas->map(function($s) {
+            return [
+                'id' => $s->id,
+                'nama' => $s->nama,
+                'nisn' => $s->nisn,
+                'rombel_saat_ini' => $s->rombel ? $s->rombel->nama : ($s->rombel_saat_ini ?: '-')
+            ];
+        });
+            
+        return response()->json($data);
+    }
+
+    public function promoteSemester(Request $request)
+    {
+        $request->validate([
+            'source_tahun_id' => 'required|exists:tahun_pelajarans,id',
+        ]);
+
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+        if (!$tahunAktif) {
+            return redirect()->back()->with('error', 'Tidak ada tahun pelajaran aktif.');
+        }
+
+        $sourceTahun = TahunPelajaran::findOrFail($request->source_tahun_id);
+        $sourceSiswas = Siswa::withoutGlobalScope('tahun_aktif')
+            ->where('tahun_pelajaran_id', $sourceTahun->id)
+            ->where('status', 'Aktif')
+            ->get();
+
+        if ($sourceSiswas->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ditemukan siswa aktif pada semester sumber.');
+        }
+
+        $count = 0;
+        DB::transaction(function () use ($sourceSiswas, $tahunAktif, &$count) {
+            // Pre-fetch rombels in target year for matching
+            $targetRombels = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)->get()->keyBy('nama');
+
+            foreach ($sourceSiswas as $oldSiswa) {
+                // Prevent duplicates by checking NISN/NIK and target year
+                $existsQuery = Siswa::withoutGlobalScope('tahun_aktif')
+                    ->where('tahun_pelajaran_id', $tahunAktif->id);
+                
+                if ($oldSiswa->nisn) {
+                    $existsQuery->where('nisn', $oldSiswa->nisn);
+                } elseif ($oldSiswa->nik) {
+                    $existsQuery->where('nik', $oldSiswa->nik);
+                } else {
+                    // If no unique ID, match by name and birth date
+                    $existsQuery->where('nama', $oldSiswa->nama)
+                        ->where('tanggal_lahir', $oldSiswa->tanggal_lahir);
+                }
+
+                if ($existsQuery->exists()) {
+                    continue;
+                }
+
+                $newSiswa = $oldSiswa->replicate();
+                $newSiswa->tahun_pelajaran_id = $tahunAktif->id;
+                
+                // Match Rombel by Name if possible
+                $matchRombel = $targetRombels->get($oldSiswa->rombel_saat_ini);
+                if ($matchRombel) {
+                    $newSiswa->rombel_id = $matchRombel->id;
+                } else {
+                    $newSiswa->rombel_id = null;
+                }
+
+                $newSiswa->save();
+                $count++;
+            }
+        });
+
+        ActivityLogService::log('siswa_promote_semester', "Menyalin {$count} siswa dari {$sourceTahun->tahun} - {$sourceTahun->semester} ke tahun aktif.", [
+            'source_id' => $sourceTahun->id,
+            'target_id' => $tahunAktif->id,
+            'count' => $count
+        ]);
+
+        return redirect()->back()->with('success', "Berhasil menyalin {$count} data siswa dari semester sebelumnya.");
     }
 }

@@ -91,11 +91,14 @@
         
         @hasanyrole('Super Admin|Operator|Tata Usaha')
         <div class="flex gap-3">
-            <a href="{{ route('siswas.promote.index') }}" 
+            @if($canPromote)
+            <button 
+               @click="$dispatch('open-promote-siswa-modal')"
                class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all shadow-indigo-600/20 hover:shadow-md cursor-pointer">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                Naik Kelas
-            </a>
+                Naikan Semester
+            </button>
+            @endif
             <div class="h-10 w-px bg-slate-200 mx-1"></div>
             <button 
                 @click="guideModal = true"
@@ -481,4 +484,182 @@
         </div>
     </div>
 </div>
+    {{-- MODAL: Naikan Semester (Siswa) --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    <div x-data="{ 
+            open: false,
+            isMax: false,
+            posX: 0,
+            posY: 0,
+            dragging: false,
+            startX: 0,
+            startY: 0,
+            loading: false,
+            years: [],
+            selectedYearId: '',
+            siswas: [],
+            init() {
+                fetch('{{ route('api.tahun-pelajaran.list') }}')
+                    .then(res => res.json())
+                    .then(data => {
+                        this.years = data.filter(y => y.id !== '{{ $tahunAktif->id ?? '' }}');
+                    });
+            },
+            fetchPreview() {
+                if (!this.selectedYearId) {
+                    this.siswas = [];
+                    return;
+                }
+                this.loading = true;
+                fetch(`/api/siswas/preview/${this.selectedYearId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.siswas = data;
+                        this.loading = false;
+                    });
+            },
+            confirmPromote() {
+                const yearText = this.years.find(y => y.id === this.selectedYearId);
+                const yearName = yearText ? `${yearText.tahun} - ${yearText.semester}` : '';
+                
+                Swal.fire({
+                    title: 'Pindahkan Semester?',
+                    text: `Akan menyalin ${this.siswas.length} data siswa dari semester (${yearName}) ke dalam semester aktif saat ini?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#f43f5e',
+                    confirmButtonText: 'Ya, Salin Data!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.$refs.promoteForm.submit();
+                    }
+                });
+            },
+            startDrag(e) {
+                if(this.isMax) return;
+                this.dragging = true;
+                this.startX = e.clientX - this.posX;
+                this.startY = e.clientY - this.posY;
+            },
+            doDrag(e) {
+                if(!this.dragging) return;
+                this.posX = e.clientX - this.startX;
+                this.posY = e.clientY - this.startY;
+            },
+            stopDrag() {
+                this.dragging = false;
+            }
+         }" 
+         @open-promote-siswa-modal.window="open = true"
+         @mousemove.window="doDrag" 
+         @mouseup.window="stopDrag"
+         x-show="open" x-transition 
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div :class="{
+                'w-full h-full max-w-none max-h-none rounded-none m-0': isMax,
+                'w-full max-w-5xl max-h-[90vh] rounded-3xl': !isMax,
+                'transition-all duration-300': !dragging 
+             }" 
+             :style="(!isMax && posX !== undefined) ? `transform: translate(${posX}px, ${posY}px)` : ''"
+             class="bg-white shadow-2xl overflow-hidden flex flex-col border border-white/20">
+
+            <div @mousedown="startDrag($event)" class="bg-gradient-to-r from-indigo-600 to-indigo-800 px-8 py-5 text-white flex items-center justify-between shrink-0 cursor-move select-none">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Naikan Semester</h3>
+                        <p class="text-indigo-100 text-xs font-medium mt-0.5">Salin data siswa dari semester/tahun sebelumnya.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button type="button" @click="isMax = !isMax; if(!isMax) { posX = 0; posY = 0; }" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg x-show="!isMax" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        <svg x-show="isMax" class="w-4 h-4" x-cloak fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10V6h4m-4 0l5 5m11 5V6h-4m4 0l-5 5"/></svg>
+                    </button>
+                    <button type="button" @click="open = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-8 flex-1 overflow-y-auto space-y-8">
+                <form x-ref="promoteForm" action="{{ route('siswas.promote-semester') }}" method="POST">
+                    @csrf
+                    <div class="max-w-xl">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Semester Sumber</label>
+                        <select name="source_tahun_id" x-model="selectedYearId" @change="fetchPreview()" 
+                                class="w-full px-4 py-3 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner">
+                            <option value="">-- Pilih Semester / Tahun Pelajaran --</option>
+                            <template x-for="year in years" :key="year.id">
+                                <option :value="year.id" x-text="year.tahun + ' - ' + year.semester"></option>
+                            </template>
+                        </select>
+                    </div>
+                </form>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            Preview Data Siswa
+                        </h4>
+                        <span x-show="siswas.length > 0" class="px-3 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-lg border border-indigo-100 uppercase" x-text="siswas.length + ' Siswa ditemukan'"></span>
+                    </div>
+
+                    <div class="border-2 border-dashed border-slate-200 rounded-3xl overflow-hidden min-h-[200px] flex flex-col">
+                        <div x-show="loading" class="flex-1 flex flex-col items-center justify-center py-12" x-cloak>
+                            <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p class="text-sm font-bold text-slate-400">Mengambil data...</p>
+                        </div>
+
+                        <div x-show="!loading && siswas.length === 0" class="flex-1 flex flex-col items-center justify-center py-12 text-slate-300" x-cloak>
+                            <svg class="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <p class="text-sm font-bold text-slate-400">Silahkan pilih semester sumber untuk melihat preview</p>
+                        </div>
+
+                        <table x-show="!loading && siswas.length > 0" class="w-full text-left border-collapse" x-cloak>
+                            <thead class="bg-slate-50">
+                                <tr class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-6 py-4 w-16 text-center">No</th>
+                                    <th class="px-6 py-4">Nama Siswa</th>
+                                    <th class="px-6 py-4">NISN</th>
+                                    <th class="px-6 py-4 text-right">Rombel Terakhir</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 bg-white">
+                                <template x-for="(s, index) in siswas" :key="index">
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-6 py-4 text-center text-sm font-bold text-slate-400" x-text="index + 1"></td>
+                                        <td class="px-6 py-4 text-sm font-bold text-slate-700" x-text="s.nama"></td>
+                                        <td class="px-6 py-4 text-xs text-slate-500 font-medium" x-text="s.nisn || '-'"></td>
+                                        <td class="px-6 py-4 text-right">
+                                            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-md" x-text="s.rombel_saat_ini || '-'"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-end shrink-0 gap-3">
+                <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
+                <button type="button" @click="confirmPromote()" :disabled="!selectedYearId || loading || siswas.length === 0"
+                        :class="(!selectedYearId || loading || siswas.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 hover:-translate-y-0.5 shadow-indigo-200'"
+                        class="px-8 py-3 bg-indigo-600 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer flex items-center gap-2">
+                    Salin Data Siswa
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endhasanyrole
 @endsection
+
