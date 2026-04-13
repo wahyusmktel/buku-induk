@@ -109,6 +109,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/rombels', [RombelController::class, 'store'])->name('rombels.store');
         Route::get('/api/rombels/preview/{tahunId}', [RombelController::class, 'getPreview'])->name('api.rombels.preview');
         Route::post('/rombels/copy', [RombelController::class, 'copyFromSemester'])->name('rombels.copy-from-semester');
+        Route::get('/api/rombels/preview-members/{tahunId}', [RombelController::class, 'getPreviewMembers'])->name('api.rombels.preview-members');
+        Route::post('/rombels/copy-members', [RombelController::class, 'copyMembers'])->name('rombels.copy-members');
         Route::get('/rombels/{id}', [RombelController::class, 'show'])->name('rombels.show');
         Route::get('/api/rombels/{id}/unassigned-siswas', [RombelController::class, 'getUnassignedSiswas']);
         Route::post('/rombels/{id}/assign-siswas', [RombelController::class, 'assignSiswas'])->name('rombels.assign');

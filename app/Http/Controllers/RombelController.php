@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Rombel;
 use App\Models\TahunPelajaran;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
 
 use App\Models\Setting;
@@ -29,15 +30,28 @@ class RombelController extends Controller
             // Ambil nama-nama rombel yang sudah ada di semester aktif
             $currentRombelNames = $rombels->pluck('nama')->toArray();
 
-            // Tombol salin muncul jika masih ada rombel di semester lain yang belum ada di semester aktif
+            // Tombol salin rombel (metadata)
             $canCopy = Rombel::where('tahun_pelajaran_id', '!=', $tahunAktif->id)
                 ->whereNotIn('nama', $currentRombelNames)
                 ->exists();
+
+            // Tombol salin anggota rombel
+            // Muncul jika di tahun aktif belum ada siswa yang masuk ke rombel mana pun
+            $hasMembersInCurrentYear = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)
+                ->whereNotNull('rombel_id')
+                ->exists();
+            
+            $hasPreviousYearWithStudents = Siswa::withoutGlobalScope('tahun_aktif')
+                ->where('tahun_pelajaran_id', '!=', $tahunAktif->id)
+                ->exists();
+
+            $canCopyMembers = !$hasMembersInCurrentYear && $hasPreviousYearWithStudents;
         } else {
             $rombels = collect();
+            $canCopyMembers = false;
         }
 
-        return view('rombels.index', compact('rombels', 'tahunAktif', 'jenjang', 'canCopy'));
+        return view('rombels.index', compact('rombels', 'tahunAktif', 'jenjang', 'canCopy', 'canCopyMembers'));
     }
 
     public function store(Request $request)
@@ -195,5 +209,93 @@ class RombelController extends Controller
         ]);
 
         return redirect()->back()->with('success', "Berhasil menyalin {$count} rombel dari semester sebelumnya.");
+    }
+
+    public function getPreviewMembers($tahunId)
+    {
+        $rombels = Rombel::where('tahun_pelajaran_id', $tahunId)
+            ->withCount(['siswas' => function($q) {
+                $q->withoutGlobalScope('tahun_aktif')->where('status', 'Aktif');
+            }])
+            ->get();
+            
+        return response()->json($rombels);
+    }
+
+    public function copyMembers(Request $request)
+    {
+        $request->validate([
+            'source_tahun_id' => 'required|exists:tahun_pelajarans,id',
+        ]);
+
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+        if (!$tahunAktif) {
+            return redirect()->back()->with('error', 'Tidak ada tahun pelajaran aktif.');
+        }
+
+        $sourceTahun = TahunPelajaran::findOrFail($request->source_tahun_id);
+        
+        // Ambil semua rombel di tahun aktif untuk pemetaan (berdasarkan nama)
+        $targetRombels = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)->get()->keyBy('nama');
+        
+        // Ambil semua rombel di tahun sumber yang memiliki siswa aktif
+        $sourceRombels = Rombel::where('tahun_pelajaran_id', $sourceTahun->id)
+            ->with(['siswas' => function($q) {
+                $q->withoutGlobalScope('tahun_aktif')->where('status', 'Aktif');
+            }])
+            ->get();
+
+        $studentCount = 0;
+        $rombelCount = 0;
+
+        DB::transaction(function () use ($sourceRombels, $targetRombels, $tahunAktif, &$studentCount, &$rombelCount) {
+            foreach ($sourceRombels as $sourceRombel) {
+                $targetRombel = $targetRombels->get($sourceRombel->nama);
+                
+                if ($targetRombel && $sourceRombel->siswas->isNotEmpty()) {
+                    $rombelCount++;
+                    foreach ($sourceRombel->siswas as $oldSiswa) {
+                        // Cari apakah siswa ini sudah ada di tahun aktif (misal dipromosikan lewat menu Siswa)
+                        $newSiswa = Siswa::withoutGlobalScope('tahun_aktif')
+                            ->where('tahun_pelajaran_id', $tahunAktif->id)
+                            ->where(function($q) use ($oldSiswa) {
+                                if ($oldSiswa->nisn) {
+                                    $q->where('nisn', $oldSiswa->nisn);
+                                } elseif ($oldSiswa->nik) {
+                                    $q->where('nik', $oldSiswa->nik);
+                                } else {
+                                    $q->where('nama', $oldSiswa->nama)
+                                      ->where('tanggal_lahir', $oldSiswa->tanggal_lahir);
+                                }
+                            })->first();
+
+                        if ($newSiswa) {
+                            // Update rombel_id ke rombel baru yang namanya sama
+                            $newSiswa->update([
+                                'rombel_id' => $targetRombel->id,
+                                'rombel_saat_ini' => $targetRombel->nama
+                            ]);
+                        } else {
+                            // Replicate siswa ke tahun aktif jika belum ada
+                            $newSiswa = $oldSiswa->replicate();
+                            $newSiswa->tahun_pelajaran_id = $tahunAktif->id;
+                            $newSiswa->rombel_id = $targetRombel->id;
+                            $newSiswa->rombel_saat_ini = $targetRombel->nama;
+                            $newSiswa->save();
+                        }
+                        $studentCount++;
+                    }
+                }
+            }
+        });
+
+        ActivityLogService::log('rombel_members_copy', "Menyalin {$studentCount} anggota siswa ke {$rombelCount} rombel dari {$sourceTahun->tahun}.", [
+            'source_id' => $sourceTahun->id,
+            'target_id' => $tahunAktif->id,
+            'student_count' => $studentCount,
+            'rombel_count' => $rombelCount
+        ]);
+
+        return redirect()->back()->with('success', "Berhasil menyalin {$studentCount} anggota siswa ke {$rombelCount} rombel.");
     }
 }
