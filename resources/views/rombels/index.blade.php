@@ -494,7 +494,9 @@
                                     <th class="px-6 py-4">Nama Rombel</th>
                                     <th class="px-6 py-4">Tingkat</th>
                                     <th class="px-6 py-4">Kurikulum</th>
+                                    @if($jenjang == 'SMA/SMK')
                                     <th class="px-6 py-4">Kompetensi</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50 bg-white">
@@ -509,7 +511,9 @@
                                             <span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-md" x-text="'Kelas ' + r.tingkat"></span>
                                         </td>
                                         <td class="px-6 py-4 text-xs text-slate-500 font-medium" x-text="r.kurikulum"></td>
+                                        @if($jenjang == 'SMA/SMK')
                                         <td class="px-6 py-4 text-xs text-slate-500 font-medium" x-text="r.kompetensi_keahlian || '-'"></td>
+                                        @endif
                                     </tr>
                                 </template>
                             </tbody>

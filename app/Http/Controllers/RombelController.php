@@ -121,7 +121,19 @@ class RombelController extends Controller
 
     public function getPreview($tahunId)
     {
-        $rombels = Rombel::where('tahun_pelajaran_id', $tahunId)->get();
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+        $existingRombelNames = [];
+
+        if ($tahunAktif) {
+            $existingRombelNames = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)
+                ->pluck('nama')
+                ->toArray();
+        }
+
+        $rombels = Rombel::where('tahun_pelajaran_id', $tahunId)
+            ->whereNotIn('nama', $existingRombelNames)
+            ->get();
+            
         return response()->json($rombels);
     }
 
