@@ -18,20 +18,26 @@ class RombelController extends Controller
         $jenjangSetting = Setting::where('key', 'jenjang_pendidikan')->first();
         $jenjang = $jenjangSetting ? $jenjangSetting->value : 'SD';
         
-        if (!$tahunAktif) {
-            $rombels = collect();
-        } else {
-            // Kita hilangkan mandatory whereHas('siswas') agar rombel kosong tetap tampil dan bisa ditambahkan siswa nantinya
-            // Atau tetap dipertahankan? Karena sebelumnya difilter whereHas siswa...
-            // Karena sekarang kita bisa tambah rombel kosong, sebaiknya whereHas dihapus agar rombel baru muncul di list.
+        $canCopy = false;
+        if ($tahunAktif) {
             $rombels = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)
                 ->withCount(['siswas' => function($q) {
                     $q->where('status', 'Aktif');
                 }])
                 ->get();
+
+            // Ambil nama-nama rombel yang sudah ada di semester aktif
+            $currentRombelNames = $rombels->pluck('nama')->toArray();
+
+            // Tombol salin muncul jika masih ada rombel di semester lain yang belum ada di semester aktif
+            $canCopy = Rombel::where('tahun_pelajaran_id', '!=', $tahunAktif->id)
+                ->whereNotIn('nama', $currentRombelNames)
+                ->exists();
+        } else {
+            $rombels = collect();
         }
 
-        return view('rombels.index', compact('rombels', 'tahunAktif', 'jenjang'));
+        return view('rombels.index', compact('rombels', 'tahunAktif', 'jenjang', 'canCopy'));
     }
 
     public function store(Request $request)

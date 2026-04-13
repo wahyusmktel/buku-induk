@@ -56,12 +56,14 @@
         </div>
         <div class="flex items-center gap-2">
             @hasanyrole('Super Admin|Operator')
+            @if($canCopy)
             <button 
                 @click="$dispatch('open-copy-rombel-modal')"
                 class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-sky-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-slate-100 cursor-pointer">
                 <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V7M8 7h12m0 0v8a2 2 0 01-2 2h-2.5M12 7V4h3"/></svg>
                 Salin Rombel
             </button>
+            @endif
             @endhasanyrole
             <button 
                 @click="addModal = true"
