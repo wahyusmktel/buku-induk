@@ -129,6 +129,8 @@ class RombelController extends Controller
     {
         $request->validate([
             'source_tahun_id' => 'required|exists:tahun_pelajarans,id',
+            'selected_rombel_ids' => 'required|array',
+            'selected_rombel_ids.*' => 'exists:rombels,id',
         ]);
 
         $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
@@ -137,10 +139,12 @@ class RombelController extends Controller
         }
 
         $sourceTahun = TahunPelajaran::findOrFail($request->source_tahun_id);
-        $sourceRombels = Rombel::where('tahun_pelajaran_id', $sourceTahun->id)->get();
+        $sourceRombels = Rombel::where('tahun_pelajaran_id', $sourceTahun->id)
+            ->whereIn('id', $request->selected_rombel_ids)
+            ->get();
 
         if ($sourceRombels->isEmpty()) {
-            return redirect()->back()->with('error', 'Tidak ditemukan rombel pada semester sumber.');
+            return redirect()->back()->with('error', 'Tidak ada rombel yang dipilih atau ditemukan.');
         }
 
         $count = 0;

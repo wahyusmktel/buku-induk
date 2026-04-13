@@ -344,6 +344,15 @@
             years: [],
             selectedYearId: '',
             rombels: [],
+            selectedRombelIds: [],
+            checkAll: false,
+            toggleAll() {
+                if (this.checkAll) {
+                    this.selectedRombelIds = this.rombels.map(r => r.id);
+                } else {
+                    this.selectedRombelIds = [];
+                }
+            },
             init() {
                 fetch('{{ route('api.tahun-pelajaran.list') }}')
                     .then(res => res.json())
@@ -361,6 +370,8 @@
                     .then(res => res.json())
                     .then(data => {
                         this.rombels = data;
+                        this.selectedRombelIds = data.map(r => r.id); // Default select all
+                        this.checkAll = true;
                         this.loading = false;
                     });
             },
@@ -370,7 +381,7 @@
                 
                 Swal.fire({
                     title: 'Apakah anda yakin?',
-                    text: `Akan menyalin semua rombel tahun pelajaran (${yearName}) ke dalam tahun pelajaran aktif? Catatan: hanya daftar rombelnya saja yang disalin, tidak termasuk anggota rombel.`,
+                    text: `Akan menyalin rombel tahun pelajaran (${yearName}) ke dalam tahun pelajaran aktif? Catatan: hanya daftar rombelnya saja yang disalin, tidak termasuk anggota rombel.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#4f46e5',
@@ -447,6 +458,10 @@
                             </template>
                         </select>
                     </div>
+
+                    <template x-for="id in selectedRombelIds" :key="id">
+                        <input type="hidden" name="selected_rombel_ids[]" :value="id">
+                    </template>
                 </form>
 
                 <div class="space-y-4">
@@ -472,6 +487,9 @@
                         <table x-show="!loading && rombels.length > 0" class="w-full text-left border-collapse" x-cloak>
                             <thead class="bg-slate-50">
                                 <tr class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-4 py-4 w-10 text-center">
+                                        <input type="checkbox" x-model="checkAll" @change="toggleAll()" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                    </th>
                                     <th class="px-6 py-4 w-16 text-center">No</th>
                                     <th class="px-6 py-4">Nama Rombel</th>
                                     <th class="px-6 py-4">Tingkat</th>
@@ -482,6 +500,9 @@
                             <tbody class="divide-y divide-slate-50 bg-white">
                                 <template x-for="(r, index) in rombels" :key="index">
                                     <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="px-4 py-4 text-center">
+                                            <input type="checkbox" :value="r.id" x-model="selectedRombelIds" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                        </td>
                                         <td class="px-6 py-4 text-center text-sm font-bold text-slate-400" x-text="index + 1"></td>
                                         <td class="px-6 py-4 text-sm font-bold text-slate-700" x-text="r.nama"></td>
                                         <td class="px-6 py-4">
@@ -499,10 +520,10 @@
 
             <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-end shrink-0 gap-3">
                 <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
-                <button type="button" @click="confirmCopy()" :disabled="!selectedYearId || loading || rombels.length === 0"
-                        :class="(!selectedYearId || loading || rombels.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 hover:-translate-y-0.5 shadow-indigo-200'"
+                <button type="button" @click="confirmCopy()" :disabled="!selectedYearId || loading || rombels.length === 0 || selectedRombelIds.length === 0"
+                        :class="(!selectedYearId || loading || rombels.length === 0 || selectedRombelIds.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 hover:-translate-y-0.5 shadow-indigo-200'"
                         class="px-8 py-3 bg-indigo-600 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer flex items-center gap-2">
-                    Salin Semua Rombel
+                    Salin Rombel Terpilih
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V7M8 7h12m0 0v8a2 2 0 01-2 2h-2.5M12 7V4h3"/></svg>
                 </button>
             </div>
