@@ -80,27 +80,97 @@
     <div>
         @hasrole('Super Admin')
         <!-- Aksi Cepat: Toggle Tahun Pelajaran -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-5 border-b border-slate-100 bg-slate-50/50">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group/panel hover:shadow-md transition-shadow duration-300">
+            <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-violet-50">
                 <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span class="flex items-center justify-center w-6 h-6 bg-indigo-500 rounded-lg text-white">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </span>
                     Aksi Cepat
                 </h3>
             </div>
             <div class="p-5">
-                <p class="text-xs text-slate-500 font-semibold mb-3">Ganti Tahun Pelajaran Aktif:</p>
-                <form action="{{ $tahunAktif ? route('tahun-pelajaran.activate', $tahunAktif->id) : '#' }}" method="POST" id="quick-activate-form">
+                <p class="text-xs text-slate-500 font-semibold mb-1 uppercase tracking-wide">Tahun Pelajaran Aktif</p>
+                @if($tahunAktif)
+                    <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span class="text-sm font-bold text-emerald-700">{{ $tahunAktif->tahun }} - Semester {{ $tahunAktif->semester }}</span>
+                    </div>
+                @else
+                    <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                        <span class="text-sm font-bold text-amber-700">Belum ada tahun pelajaran aktif</span>
+                    </div>
+                @endif
+
+                <label for="tahun-select" class="text-xs text-slate-500 font-semibold block mb-2">Beralih ke:</label>
+                <form action="#" method="POST" id="quick-activate-form">
                     @csrf
                     @method('PATCH')
-                    <select name="tahun_id" onchange="if(this.value){ document.getElementById('quick-activate-form').action = '/tahun-pelajaran/' + this.value + '/activate'; document.getElementById('quick-activate-form').submit(); }" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer">
-                        <option value="" disabled {{ !$tahunAktif ? 'selected' : '' }}>Pilih Tahun Pelajaran</option>
-                        @foreach($tahunPelajarans as $tp)
-                            <option value="{{ $tp->id }}" class="text-slate-800" {{ $tahunAktif && $tahunAktif->id == $tp->id ? 'selected' : '' }}>{{ $tp->tahun }} - Semester {{ $tp->semester }}</option>
-                        @endforeach
-                    </select>
+                    <div class="relative">
+                        <select name="tahun_id" id="tahun-select" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer shadow-sm hover:border-indigo-300 transition-colors">
+                            <option value="" disabled selected>Pilih Tahun Pelajaran</option>
+                            @foreach($tahunPelajarans as $tp)
+                                <option value="{{ $tp->id }}" {{ $tahunAktif && $tahunAktif->id == $tp->id ? 'disabled class="opacity-50"' : '' }}>{{ $tp->tahun }} - Semester {{ $tp->semester }}</option>
+                            @endforeach
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-activate-tp" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        Aktifkan
+                    </button>
                 </form>
             </div>
         </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('tahun-select');
+            const btn = document.getElementById('btn-activate-tp');
+            const form = document.getElementById('quick-activate-form');
+
+            select.addEventListener('change', function() {
+                btn.disabled = !this.value;
+            });
+
+            btn.addEventListener('click', function() {
+                const selectedId = select.value;
+                const selectedText = select.options[select.selectedIndex].text;
+
+                if (!selectedId) return;
+
+                Swal.fire({
+                    title: 'Konfirmasi Perubahan',
+                    html: '<div class="text-left">' +
+                        '<p class="text-slate-600 mb-3">Apakah Anda yakin ingin beralih ke tahun pelajaran:</p>' +
+                        '<div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-center">' +
+                        '<span class="text-base font-bold text-indigo-700">' + selectedText + '</span>' +
+                        '</div>' +
+                        '<p class="text-xs text-slate-400 mt-3">Data yang ditampilkan akan disesuaikan dengan tahun pelajaran yang dipilih.</p>' +
+                        '</div>',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4f46e5',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Aktifkan',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    focusCancel: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.action = '/tahun-pelajaran/' + selectedId + '/activate';
+                        form.submit();
+                    } else {
+                        select.value = '';
+                        btn.disabled = true;
+                    }
+                });
+            });
+        });
+        </script>
         @endhasrole
     </div>
 </div>
