@@ -56,10 +56,42 @@ class SiswaController extends Controller
         
         // Cek apakah bisa melakukan Naikan Semester
         $canPromote = false;
+        $canPromoteGrade = false;
+        $previousGenapId = null;
         if ($tahunAktif) {
-            $hasPreviousYear = TahunPelajaran::where('id', '!=', $tahunAktif->id)->exists();
             $isCurrentEmpty = $siswas->total() === 0;
-            $canPromote = $hasPreviousYear && $isCurrentEmpty;
+
+            // --- Deteksi Naikan Kelas ---
+            // Muncul jika: tahun aktif = Ganjil, ada semester Genap di tahun sebelumnya, dan data siswa kosong
+            if ($tahunAktif->semester === 'Ganjil' && $isCurrentEmpty) {
+                // Cari tahun pelajaran Genap di tahun sebelumnya
+                // Tahun format "2025/2026" -> tahun sebelumnya "2024/2025"
+                $tahunParts = explode('/', $tahunAktif->tahun);
+                if (count($tahunParts) === 2) {
+                    $prevTahun = ($tahunParts[0] - 1) . '/' . ($tahunParts[1] - 1);
+                    $previousGenap = TahunPelajaran::where('tahun', $prevTahun)
+                        ->where('semester', 'Genap')
+                        ->first();
+                    
+                    if ($previousGenap) {
+                        $hasSiswasInPrev = Siswa::withoutGlobalScope('tahun_aktif')
+                            ->where('tahun_pelajaran_id', $previousGenap->id)
+                            ->where('status', 'Aktif')
+                            ->exists();
+                        if ($hasSiswasInPrev) {
+                            $canPromoteGrade = true;
+                            $previousGenapId = $previousGenap->id;
+                        }
+                    }
+                }
+            }
+            
+            // --- Deteksi Naikan Semester (existing) ---
+            // Hanya muncul jika bukan naik kelas
+            if (!$canPromoteGrade && $isCurrentEmpty) {
+                $hasPreviousYear = TahunPelajaran::where('id', '!=', $tahunAktif->id)->exists();
+                $canPromote = $hasPreviousYear;
+            }
         }
 
         // Ambil daftar rombel dari tabel Rombel untuk tahun aktif agar lebih akurat
@@ -67,7 +99,7 @@ class SiswaController extends Controller
             ->orderBy('nama')
             ->pluck('nama');
             
-        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels', 'canPromote'));
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels', 'canPromote', 'canPromoteGrade', 'previousGenapId'));
     }
 
     public function import(Request $request)
@@ -534,5 +566,145 @@ class SiswaController extends Controller
         ]);
 
         return redirect()->back()->with('success', "Berhasil menyalin {$count} data siswa dari semester sebelumnya.");
+    }
+
+    /**
+     * API: Preview data siswa untuk naik kelas.
+     * Menampilkan tingkat saat ini dan tingkat baru.
+     */
+    public function getGradePromotePreview($tahunId)
+    {
+        $jenjang = \App\Models\Setting::getValue('jenjang_pendidikan', 'SD');
+        $tingkatAkhir = match($jenjang) {
+            'SMP' => 3,
+            'SMA/SMK' => 3,
+            default => 6, // SD
+        };
+
+        $siswas = Siswa::withoutGlobalScope('tahun_aktif')
+            ->with('rombel:id,nama')
+            ->where('tahun_pelajaran_id', $tahunId)
+            ->where('status', 'Aktif')
+            ->orderBy('tingkat_kelas')
+            ->orderBy('nama')
+            ->get();
+
+        $data = $siswas->map(function($s) use ($tingkatAkhir) {
+            $tingkatBaru = ($s->tingkat_kelas && $s->tingkat_kelas >= $tingkatAkhir) ? null : ($s->tingkat_kelas ? $s->tingkat_kelas + 1 : null);
+            $willGraduate = $s->tingkat_kelas && $s->tingkat_kelas >= $tingkatAkhir;
+            return [
+                'id' => $s->id,
+                'nama' => $s->nama,
+                'nisn' => $s->nisn,
+                'tingkat_kelas' => $s->tingkat_kelas,
+                'tingkat_baru' => $tingkatBaru,
+                'will_graduate' => $willGraduate,
+                'rombel_saat_ini' => $s->rombel ? $s->rombel->nama : ($s->rombel_saat_ini ?: '-'),
+            ];
+        });
+
+        $summary = [
+            'total' => $data->count(),
+            'naik' => $data->where('will_graduate', false)->count(),
+            'lulus' => $data->where('will_graduate', true)->count(),
+        ];
+
+        return response()->json([
+            'siswas' => $data->values(),
+            'summary' => $summary,
+        ]);
+    }
+
+    /**
+     * POST: Proses naik kelas.
+     * Menyalin data siswa dari semester Genap tahun sebelumnya ke semester Ganjil tahun baru.
+     * Siswa naik satu tingkat, siswa tingkat akhir menjadi Lulus.
+     */
+    public function promoteGrade(Request $request)
+    {
+        $request->validate([
+            'source_tahun_id' => 'required|exists:tahun_pelajarans,id',
+        ]);
+
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+        if (!$tahunAktif) {
+            return redirect()->back()->with('error', 'Tidak ada tahun pelajaran aktif.');
+        }
+
+        $sourceTahun = TahunPelajaran::findOrFail($request->source_tahun_id);
+        $sourceSiswas = Siswa::withoutGlobalScope('tahun_aktif')
+            ->where('tahun_pelajaran_id', $sourceTahun->id)
+            ->where('status', 'Aktif')
+            ->get();
+
+        if ($sourceSiswas->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ditemukan siswa aktif pada semester sumber.');
+        }
+
+        $jenjang = \App\Models\Setting::getValue('jenjang_pendidikan', 'SD');
+        $tingkatAkhir = match($jenjang) {
+            'SMP' => 3,
+            'SMA/SMK' => 3,
+            default => 6, // SD
+        };
+
+        $countNaik = 0;
+        $countLulus = 0;
+
+        DB::transaction(function () use ($sourceSiswas, $tahunAktif, $sourceTahun, $tingkatAkhir, &$countNaik, &$countLulus) {
+            $targetRombels = Rombel::where('tahun_pelajaran_id', $tahunAktif->id)->get()->keyBy('nama');
+
+            foreach ($sourceSiswas as $oldSiswa) {
+                // Prevent duplicates
+                $existsQuery = Siswa::withoutGlobalScope('tahun_aktif')
+                    ->where('tahun_pelajaran_id', $tahunAktif->id);
+
+                if ($oldSiswa->nisn) {
+                    $existsQuery->where('nisn', $oldSiswa->nisn);
+                } elseif ($oldSiswa->nik) {
+                    $existsQuery->where('nik', $oldSiswa->nik);
+                } else {
+                    $existsQuery->where('nama', $oldSiswa->nama)
+                        ->where('tanggal_lahir', $oldSiswa->tanggal_lahir);
+                }
+
+                if ($existsQuery->exists()) {
+                    continue;
+                }
+
+                $isGraduating = $oldSiswa->tingkat_kelas && $oldSiswa->tingkat_kelas >= $tingkatAkhir;
+
+                if ($isGraduating) {
+                    // Siswa lulus — tandai di tahun sumber, TIDAK replicate ke tahun baru
+                    $oldSiswa->update(['status' => 'Lulus']);
+                    $countLulus++;
+                } else {
+                    // Siswa naik kelas — replicate ke tahun baru dengan tingkat + 1
+                    $newSiswa = $oldSiswa->replicate();
+                    $newSiswa->tahun_pelajaran_id = $tahunAktif->id;
+                    $newSiswa->tingkat_kelas = $oldSiswa->tingkat_kelas ? $oldSiswa->tingkat_kelas + 1 : null;
+
+                    // Match Rombel by name if possible
+                    $matchRombel = $targetRombels->get($oldSiswa->rombel_saat_ini);
+                    if ($matchRombel) {
+                        $newSiswa->rombel_id = $matchRombel->id;
+                    } else {
+                        $newSiswa->rombel_id = null;
+                    }
+
+                    $newSiswa->save();
+                    $countNaik++;
+                }
+            }
+        });
+
+        ActivityLogService::log('siswa_promote_grade', "Naik kelas: {$countNaik} siswa naik kelas, {$countLulus} siswa lulus dari {$sourceTahun->tahun} - {$sourceTahun->semester}.", [
+            'source_id' => $sourceTahun->id,
+            'target_id' => $tahunAktif->id,
+            'count_naik' => $countNaik,
+            'count_lulus' => $countLulus,
+        ]);
+
+        return redirect()->back()->with('success', "Naik Kelas berhasil: {$countNaik} siswa naik kelas, {$countLulus} siswa dinyatakan lulus.");
     }
 }

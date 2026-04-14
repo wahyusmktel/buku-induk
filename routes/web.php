@@ -76,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:Super Admin|Operator|Tata Usaha'])->group(function () {
         Route::get('/api/siswas/preview/{tahunId}', [SiswaController::class, 'getPreviewByYear'])->name('api.siswas.preview');
         Route::post('/siswas/promote-semester', [SiswaController::class, 'promoteSemester'])->name('siswas.promote-semester');
+        Route::get('/api/siswas/grade-preview/{tahunId}', [SiswaController::class, 'getGradePromotePreview'])->name('api.siswas.grade-preview');
+        Route::post('/siswas/promote-grade', [SiswaController::class, 'promoteGrade'])->name('siswas.promote-grade');
         
         Route::get('/siswas', [SiswaController::class, 'index'])->name('siswas.index');
         Route::get('/siswas/{siswa}/edit', [SiswaController::class, 'edit'])->name('siswas.edit');

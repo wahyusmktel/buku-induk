@@ -95,7 +95,7 @@
             <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
         </div>
         <h3 class="text-lg font-bold text-slate-700">Belum Ada Data Rombel</h3>
-        <p class="text-slate-500 mt-1">Silakan lakukan import data siswa untuk membuat data rombel secara otomatis.</p>
+        <p class="text-slate-500 mt-1">Buat rombel secara manual melalui tombol <span class="font-semibold text-slate-700">"Tambah Rombel / Kelas"</span>, atau salin dari semester sebelumnya melalui fitur <span class="font-semibold text-slate-700">"Salin Rombel"</span>.</p>
     </div>
     @else
     <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
@@ -716,8 +716,10 @@
 
             <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-end shrink-0 gap-3">
                 <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
-                <button type="button" @click="confirmCopy()" :disabled="!selectedYearId || loading || rombels.length === 0"
-                        :class="(!selectedYearId || loading || rombels.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-700 hover:-translate-y-0.5 shadow-emerald-200'"
+                <button type="button" @click="confirmCopy()" 
+                        x-show="!loading && rombels.length > 0"
+                        :disabled="!selectedYearId"
+                        :class="!selectedYearId ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-700 hover:-translate-y-0.5 shadow-emerald-200'"
                         class="px-8 py-3 bg-emerald-600 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer flex items-center gap-2">
                     Salin Anggota Rombel
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>

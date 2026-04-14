@@ -99,6 +99,14 @@
                 Naikan Semester
             </button>
             @endif
+            @if($canPromoteGrade)
+            <button 
+               @click="$dispatch('open-promote-grade-modal')"
+               class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all shadow-amber-500/20 hover:shadow-md cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                Naikan Kelas
+            </button>
+            @endif
             <div class="h-10 w-px bg-slate-200 mx-1"></div>
             <button 
                 @click="guideModal = true"
@@ -438,7 +446,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-extrabold tracking-tight">Panduan Penggunaan</h3>
-                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi & Cara Mengelola Data Pokok Siswa</p>
+                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Import, Naikan Semester, Naikan Kelas & Filter Data Siswa</p>
                     </div>
                 </div>
             </div>
@@ -520,11 +528,11 @@
             },
             confirmPromote() {
                 const yearText = this.years.find(y => y.id === this.selectedYearId);
-                const yearName = yearText ? `${yearText.tahun} - ${yearText.semester}` : '';
+                const yearName = yearText ? yearText.tahun + ' - ' + yearText.semester : '';
                 
                 Swal.fire({
                     title: 'Pindahkan Semester?',
-                    text: `Akan menyalin ${this.siswas.length} data siswa dari semester (${yearName}) ke dalam semester aktif saat ini?`,
+                    text: 'Akan menyalin ' + this.siswas.length + ' data siswa dari semester (' + yearName + ') ke dalam semester aktif saat ini?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#4f46e5',
@@ -660,6 +668,226 @@
             </div>
         </div>
     </div>
+    @endhasanyrole
+
+    {{-- MODAL: Naikan Kelas (Grade Promotion) --}}
+    @hasanyrole('Super Admin|Operator|Tata Usaha')
+    @if($canPromoteGrade && $previousGenapId)
+    <div x-data="{ 
+            open: false,
+            isMax: false,
+            posX: 0,
+            posY: 0,
+            dragging: false,
+            startX: 0,
+            startY: 0,
+            loading: false,
+            siswas: [],
+            summary: { total: 0, naik: 0, lulus: 0 },
+            sourceId: '{{ $previousGenapId }}',
+            init() {
+                // auto-fetch on open
+            },
+            fetchPreview() {
+                this.loading = true;
+                fetch(`/api/siswas/grade-preview/${this.sourceId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.siswas = data.siswas;
+                        this.summary = data.summary;
+                        this.loading = false;
+                    });
+            },
+            confirmPromote() {
+                var naik = this.summary.naik;
+                var lulus = this.summary.lulus;
+                var htmlContent = '<div class=&quot;text-left text-sm space-y-2&quot;>' +
+                    '<p><strong>' + naik + '</strong> siswa akan <span style=&quot;color:#059669;font-weight:bold&quot;>naik kelas</span></p>' +
+                    '<p><strong>' + lulus + '</strong> siswa akan dinyatakan <span style=&quot;color:#e11d48;font-weight:bold&quot;>LULUS</span></p>' +
+                    '<p style=&quot;font-size:0.75rem;color:#94a3b8;margin-top:0.75rem&quot;>Siswa lulus tidak akan muncul lagi di daftar siswa.</p>' +
+                    '</div>';
+                Swal.fire({
+                    title: 'Proses Naik Kelas?',
+                    html: htmlContent,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f59e0b',
+                    cancelButtonColor: '#f43f5e',
+                    confirmButtonText: 'Ya, Proses Naik Kelas!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.$refs.gradeForm.submit();
+                    }
+                });
+            },
+            startDrag(e) {
+                if(this.isMax) return;
+                this.dragging = true;
+                this.startX = e.clientX - this.posX;
+                this.startY = e.clientY - this.posY;
+            },
+            doDrag(e) {
+                if(!this.dragging) return;
+                this.posX = e.clientX - this.startX;
+                this.posY = e.clientY - this.startY;
+            },
+            stopDrag() {
+                this.dragging = false;
+            }
+         }" 
+         @open-promote-grade-modal.window="open = true; fetchPreview()"
+         @mousemove.window="doDrag" 
+         @mouseup.window="stopDrag"
+         x-show="open" x-transition 
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        
+        <div :class="{
+                'w-full h-full max-w-none max-h-none rounded-none m-0': isMax,
+                'w-full max-w-5xl max-h-[90vh] rounded-3xl': !isMax,
+                'transition-all duration-300': !dragging 
+             }" 
+             :style="(!isMax && posX !== undefined) ? `transform: translate(${posX}px, ${posY}px)` : ''"
+             class="bg-white shadow-2xl overflow-hidden flex flex-col border border-white/20">
+
+            {{-- Header --}}
+            <div @mousedown="startDrag($event)" class="bg-gradient-to-r from-amber-500 to-orange-600 px-8 py-5 text-white flex items-center justify-between shrink-0 cursor-move select-none">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Naikan Kelas</h3>
+                        <p class="text-amber-100 text-xs font-medium mt-0.5">Promosi siswa ke tingkat berikutnya & kelulusan tingkat akhir.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button type="button" @click="isMax = !isMax; if(!isMax) { posX = 0; posY = 0; }" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg x-show="!isMax" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        <svg x-show="isMax" class="w-4 h-4" x-cloak fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10V6h4m-4 0l5 5m11 5V6h-4m4 0l-5 5"/></svg>
+                    </button>
+                    <button type="button" @click="open = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Body --}}
+            <div class="p-8 flex-1 overflow-y-auto space-y-6">
+                <form x-ref="gradeForm" action="{{ route('siswas.promote-grade') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="source_tahun_id" :value="sourceId">
+                </form>
+
+                {{-- Summary Cards --}}
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-center">
+                        <p class="text-3xl font-black text-slate-700" x-text="summary.total">0</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Total Siswa</p>
+                    </div>
+                    <div class="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 text-center">
+                        <p class="text-3xl font-black text-emerald-600" x-text="summary.naik">0</p>
+                        <p class="text-xs font-bold text-emerald-500 uppercase tracking-wider mt-1">Naik Kelas</p>
+                    </div>
+                    <div class="bg-rose-50 rounded-2xl p-4 border border-rose-100 text-center">
+                        <p class="text-3xl font-black text-rose-600" x-text="summary.lulus">0</p>
+                        <p class="text-xs font-bold text-rose-500 uppercase tracking-wider mt-1">Lulus</p>
+                    </div>
+                </div>
+
+                {{-- Preview Table --}}
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            Preview Data Naik Kelas
+                        </h4>
+                    </div>
+
+                    <div class="border-2 border-dashed border-slate-200 rounded-3xl overflow-hidden min-h-[200px] flex flex-col">
+                        <div x-show="loading" class="flex-1 flex flex-col items-center justify-center py-12" x-cloak>
+                            <div class="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p class="text-sm font-bold text-slate-400">Mengambil data...</p>
+                        </div>
+
+                        <div x-show="!loading && siswas.length === 0" class="flex-1 flex flex-col items-center justify-center py-12 text-slate-300" x-cloak>
+                            <svg class="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            <p class="text-sm font-bold text-slate-400">Tidak ada data siswa untuk ditampilkan</p>
+                        </div>
+
+                        <table x-show="!loading && siswas.length > 0" class="w-full text-left border-collapse" x-cloak>
+                            <thead class="bg-slate-50">
+                                <tr class="text-[0.65rem] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                    <th class="px-6 py-4 w-16 text-center">No</th>
+                                    <th class="px-6 py-4">Nama Siswa</th>
+                                    <th class="px-6 py-4">NISN</th>
+                                    <th class="px-6 py-4 text-center">Tingkat Saat Ini</th>
+                                    <th class="px-6 py-4 text-center">Tingkat Baru</th>
+                                    <th class="px-6 py-4 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 bg-white">
+                                <template x-for="(s, index) in siswas" :key="index">
+                                    <tr class="hover:bg-slate-50/50 transition-colors" :class="s.will_graduate ? 'bg-rose-50/30' : ''">
+                                        <td class="px-6 py-4 text-center text-sm font-bold text-slate-400" x-text="index + 1"></td>
+                                        <td class="px-6 py-4 text-sm font-bold text-slate-700" x-text="s.nama"></td>
+                                        <td class="px-6 py-4 text-xs text-slate-500 font-medium" x-text="s.nisn || '-'"></td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 text-sm font-black" x-text="s.tingkat_kelas || '-'"></span>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <template x-if="!s.will_graduate">
+                                                <div class="flex items-center justify-center gap-1.5">
+                                                    <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-black" x-text="s.tingkat_baru || '-'"></span>
+                                                </div>
+                                            </template>
+                                            <template x-if="s.will_graduate">
+                                                <span class="text-xs text-rose-400 font-bold">—</span>
+                                            </template>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <template x-if="!s.will_graduate">
+                                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-100">Naik Kelas</span>
+                                            </template>
+                                            <template x-if="s.will_graduate">
+                                                <span class="px-2.5 py-1 bg-rose-50 text-rose-700 text-[10px] font-black rounded-full border border-rose-200 animate-pulse">🎓 LULUS</span>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer --}}
+            <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-4 text-xs">
+                    <span class="flex items-center gap-1.5 text-emerald-600 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span x-text="summary.naik + ' Naik Kelas'"></span>
+                    </span>
+                    <span class="flex items-center gap-1.5 text-rose-600 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        <span x-text="summary.lulus + ' Lulus'"></span>
+                    </span>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" @click="open = false" class="px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-2xl transition-colors cursor-pointer">Batal</button>
+                    <button type="button" @click="confirmPromote()" :disabled="loading || siswas.length === 0"
+                            :class="(loading || siswas.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-600 hover:-translate-y-0.5 shadow-amber-200'"
+                            class="px-8 py-3 bg-amber-500 text-white text-sm font-bold rounded-2xl shadow-lg transition-all cursor-pointer flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                        Proses Naik Kelas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
     @endhasanyrole
 @endsection
 

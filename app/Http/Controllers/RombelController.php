@@ -36,7 +36,10 @@ class RombelController extends Controller
                 ->exists();
 
             // Tombol salin anggota rombel
-            // Muncul jika di tahun aktif belum ada siswa yang masuk ke rombel mana pun
+            // Muncul jika: tahun aktif sudah memiliki rombel (ada tujuan salin),
+            // belum ada siswa yang masuk ke rombel mana pun, dan ada siswa di tahun sebelumnya.
+            $hasRombelsInCurrentYear = $rombels->isNotEmpty();
+
             $hasMembersInCurrentYear = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)
                 ->whereNotNull('rombel_id')
                 ->exists();
@@ -45,7 +48,7 @@ class RombelController extends Controller
                 ->where('tahun_pelajaran_id', '!=', $tahunAktif->id)
                 ->exists();
 
-            $canCopyMembers = !$hasMembersInCurrentYear && $hasPreviousYearWithStudents;
+            $canCopyMembers = $hasRombelsInCurrentYear && !$hasMembersInCurrentYear && $hasPreviousYearWithStudents;
         } else {
             $rombels = collect();
             $canCopyMembers = false;
