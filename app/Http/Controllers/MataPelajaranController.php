@@ -8,10 +8,29 @@ use App\Services\ActivityLogService;
 
 class MataPelajaranController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $mapels = MataPelajaran::orderBy('urutan')->get();
-        return view('mata-pelajaran.index', compact('mapels'));
+        $search = $request->get('q', '');
+        $perPage = (int) $request->get('per_page', 10);
+
+        // Clamp per_page
+        $allowedPerPage = [10, 20, 30, 40, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+
+        $query = MataPelajaran::query();
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('kelompok', 'like', "%{$search}%");
+            });
+        }
+
+        $mapels = $query->orderBy('urutan')->paginate($perPage)->withQueryString();
+
+        return view('mata-pelajaran.index', compact('mapels', 'search', 'perPage'));
     }
 
     public function store(Request $request)
