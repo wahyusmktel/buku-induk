@@ -151,10 +151,117 @@
                             </div>
                         </td>
                         <td class="py-4 px-6 text-right">
-                            <a href="{{ route('rombels.show', $rombel->id) }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-sky-50 text-sky-600 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-slate-200 hover:border-sky-200 shadow-sm">
-                                Lihat Anggota
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </a>
+                            <div class="flex items-center justify-end gap-2">
+                                <button type="button" @click="$dispatch('open-edit-modal-{{ $rombel->id }}')" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-amber-50 text-amber-600 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-slate-200 hover:border-amber-200 shadow-sm">
+                                    Edit
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                                <a href="{{ route('rombels.show', $rombel->id) }}" class="inline-flex items-center justify-center gap-2 bg-white hover:bg-sky-50 text-sky-600 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-slate-200 hover:border-sky-200 shadow-sm">
+                                    Lihat Anggota
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+
+                            <!-- Edit Modal for {{ $rombel->nama }} -->
+                            <div x-data="{ open: false }" 
+                                 @open-edit-modal-{{ $rombel->id }}.window="open = true"
+                                 x-show="open" 
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm text-left" x-cloak>
+                                
+                                <div @click.away="open = false" 
+                                     class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20 flex flex-col max-h-[90vh]">
+                                    
+                                    <div class="bg-amber-500 px-6 py-5 text-white flex items-center justify-between shrink-0">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-bold tracking-tight">Edit Rombel</h3>
+                                                <p class="text-amber-100 text-xs font-medium">Ubah data rombongan belajar</p>
+                                            </div>
+                                        </div>
+                                        <button @click="open = false" type="button" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="p-6 overflow-y-auto w-full">
+                                        <form action="{{ route('rombels.update', $rombel->id) }}" method="POST" id="formEditRombel-{{ $rombel->id }}" class="space-y-5">
+                                            @csrf
+                                            @method('PUT')
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                <!-- Jenis Rombel -->
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Jenis Rombel <span class="text-red-500">*</span></label>
+                                                    <select name="jenis_rombel" required class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-inner">
+                                                        <option value="Kelas" {{ (old('jenis_rombel', $rombel->jenis_rombel) == 'Kelas') ? 'selected' : '' }}>Kelas</option>
+                                                        <option value="Pilihan" {{ (old('jenis_rombel', $rombel->jenis_rombel) == 'Pilihan') ? 'selected' : '' }}>Pilihan</option>
+                                                    </select>
+                                                    @error('jenis_rombel') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                                </div>
+
+                                                <!-- Tingkat Pendidikan -->
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tingkat Pendidikan <span class="text-red-500">*</span></label>
+                                                    <select name="tingkat" required class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-inner">
+                                                        <option value="">Pilih Tingkat</option>
+                                                        <template x-for="t in tingkatOptions" :key="t">
+                                                            <option :value="t" x-text="'Tingkat ' + t" :selected="t == '{{ old('tingkat', $rombel->tingkat) }}'"></option>
+                                                        </template>
+                                                    </select>
+                                                    @error('tingkat') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                                </div>
+                                            </div>
+
+                                            <!-- Program Keahlian (Show if SMA/SMK) -->
+                                            <div x-show="jenjang === 'SMA/SMK'" x-cloak>
+                                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Program / Kompetensi Keahlian</label>
+                                                <input type="text" name="kompetensi_keahlian" value="{{ old('kompetensi_keahlian', $rombel->kompetensi_keahlian) }}" placeholder="Contoh: Rekayasa Perangkat Lunak"
+                                                       class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-inner">
+                                            </div>
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                <!-- Nama Rombel -->
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Rombel / Kelas <span class="text-red-500">*</span></label>
+                                                    <input type="text" name="nama" value="{{ old('nama', $rombel->nama) }}" required placeholder="Contoh: 1-A"
+                                                           class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-white focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-sm">
+                                                    @error('nama') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                                </div>
+
+                                                <!-- Kurikulum -->
+                                                <div>
+                                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kurikulum</label>
+                                                    <select name="kurikulum" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-inner">
+                                                        <option value="Kurikulum SD Merdeka" {{ (old('kurikulum', $rombel->kurikulum) == 'Kurikulum SD Merdeka') ? 'selected' : '' }}>Kurikulum SD Merdeka</option>
+                                                        <option value="Kurikulum SMP Merdeka" {{ (old('kurikulum', $rombel->kurikulum) == 'Kurikulum SMP Merdeka') ? 'selected' : '' }}>Kurikulum SMP Merdeka</option>
+                                                        <option value="Kurikulum SMA/SMK Merdeka" {{ (old('kurikulum', $rombel->kurikulum) == 'Kurikulum SMA/SMK Merdeka') ? 'selected' : '' }}>Kurikulum SMA/SMK Merdeka</option>
+                                                        <option value="Kurikulum 2013" {{ (old('kurikulum', $rombel->kurikulum) == 'Kurikulum 2013') ? 'selected' : '' }}>Kurikulum 2013</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </form>
+                                    </div>
+
+                                    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3 shrink-0">
+                                        <button type="button" @click="open = false" class="px-5 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-xl transition-colors cursor-pointer">
+                                            Batal
+                                        </button>
+                                        <button type="submit" form="formEditRombel-{{ $rombel->id }}" class="px-6 py-2 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-lg shadow-amber-200 transition-all hover:-translate-y-0.5 cursor-pointer">
+                                            Simpan Perubahan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
