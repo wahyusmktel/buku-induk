@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
         // Setup initial roles first before assigning
         $this->call([
             RoleAndPermissionSeeder::class,
+            EkstrakurikulerSeeder::class,
+            MataPelajaranSeeder::class,
         ]);
 
         $admin = User::firstOrCreate(
