@@ -36,6 +36,54 @@
     </div>
     @endforeach
 
+    {{-- ══ FILTER & SEARCH AREA ══ --}}
+    <form method="GET" action="{{ route('mata-pelajaran.index') }}" class="mb-6 flex flex-wrap gap-3 items-center px-2">
+        {{-- Search input --}}
+        <div class="relative flex-1" style="min-width:280px;">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="q" value="{{ $search }}"
+                   placeholder="Cari nama mata pelajaran atau kelompok…"
+                   class="w-full pl-9 pr-3 py-2.5 text-sm border-2 border-slate-100 rounded-xl
+                          focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10
+                          text-slate-700 font-bold bg-white transition-all">
+        </div>
+
+        {{-- Per-page dropdown --}}
+        <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-xs text-slate-500 font-bold whitespace-nowrap">Tampilkan</span>
+            <div class="relative">
+                <select name="per_page" onchange="this.form.submit()"
+                        class="appearance-none pl-3 pr-8 py-2.5 text-xs font-black border-2 border-slate-100 rounded-xl
+                               bg-white text-slate-600 cursor-pointer transition-all
+                               hover:border-sky-400 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10">
+                    @foreach([10, 20, 30, 40, 50, 100] as $pp)
+                        <option value="{{ $pp }}" {{ $perPage == $pp ? 'selected' : '' }}>{{ $pp }}</option>
+                    @endforeach
+                </select>
+                <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+        </div>
+
+        <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer">
+            Cari
+        </button>
+
+        @if($search || $perPage != 10)
+        <a href="{{ route('mata-pelajaran.index') }}"
+           class="px-4 py-2.5 text-xs font-bold text-slate-400 border-2 border-slate-100 rounded-xl
+                  hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50 transition-all whitespace-nowrap">
+            ✕ Reset
+        </a>
+        @endif
+    </form>
+
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">
@@ -49,10 +97,10 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse($mapels as $mapel)
+                    @forelse($mapels as $index => $mapel)
                     <tr class="hover:bg-slate-50 transition-colors group">
                         <td class="py-4 px-6 text-center font-bold text-slate-400">
-                            {{ $mapel->urutan }}
+                            {{ $mapels->firstItem() + $index }}
                         </td>
                         <td class="py-4 px-6">
                             <p class="font-bold text-slate-800 text-base leading-tight">{{ $mapel->nama }}</p>
@@ -105,14 +153,28 @@
                                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                                 </div>
-                                <p class="font-bold text-lg text-slate-600">Belum Ada Mata Pelajaran</p>
-                                <p class="text-sm">Silakan tambahkan setup Mata Pelajaran untuk Buku Induk.</p>
+                                <p class="font-bold text-lg text-slate-600">Mata Pelajaran Tidak Ditemukan</p>
+                                <p class="text-sm">Silakan sesuaikan kata kunci pencarian Anda.</p>
                             </div>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- Footer: row count + pagination --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3
+                    px-6 py-4 bg-slate-50/50 border-t border-slate-100">
+            <p class="text-xs text-slate-500 font-medium">
+                Menampilkan <strong class="text-slate-700">{{ $mapels->firstItem() ?? 0 }}</strong>–<strong class="text-slate-700">{{ $mapels->lastItem() ?? 0 }}</strong>
+                dari <strong class="text-slate-700">{{ $mapels->total() }}</strong> mata pelajaran
+            </p>
+            @if($mapels->hasPages())
+            <div class="paginate-sm">
+                {{ $mapels->links() }}
+            </div>
+            @endif
         </div>
     </div>
 

@@ -56,15 +56,54 @@
         </div>
     </div>
 
-    @if($ekstrakurikulers->isEmpty())
-    <div class="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-sm">
-        <div class="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>
+    {{-- ══ FILTER & SEARCH AREA ══ --}}
+    <form method="GET" action="{{ route('ekstrakurikuler.index') }}" class="mb-6 flex flex-wrap gap-3 items-center px-2">
+        {{-- Search input --}}
+        <div class="relative flex-1" style="min-width:280px;">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="q" value="{{ $search }}"
+                   placeholder="Cari nama ekstrakurikuler atau deskripsi…"
+                   class="w-full pl-9 pr-3 py-2.5 text-sm border-2 border-slate-100 rounded-xl
+                          focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10
+                          text-slate-700 font-bold bg-white transition-all">
         </div>
-        <h3 class="text-lg font-bold text-slate-700">Belum Ada Ekstrakurikuler</h3>
-        <p class="text-slate-500 mt-1">Silakan tambah ekstrakurikuler untuk dapat dipilih oleh siswa.</p>
-    </div>
-    @else
+
+        {{-- Per-page dropdown --}}
+        <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-xs text-slate-500 font-bold whitespace-nowrap">Tampilkan</span>
+            <div class="relative">
+                <select name="per_page" onchange="this.form.submit()"
+                        class="appearance-none pl-3 pr-8 py-2.5 text-xs font-black border-2 border-slate-100 rounded-xl
+                               bg-white text-slate-600 cursor-pointer transition-all
+                               hover:border-indigo-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10">
+                    @foreach([10, 20, 30, 40, 50, 100] as $pp)
+                        <option value="{{ $pp }}" {{ $perPage == $pp ? 'selected' : '' }}>{{ $pp }}</option>
+                    @endforeach
+                </select>
+                <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
+        </div>
+
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-sm">
+            Cari
+        </button>
+
+        @if($search || $perPage != 10)
+        <a href="{{ route('ekstrakurikuler.index') }}"
+           class="px-4 py-2.5 text-xs font-bold text-slate-400 border-2 border-slate-100 rounded-xl
+                  hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50 transition-all whitespace-nowrap">
+            ✕ Reset
+        </a>
+        @endif
+    </form>
+
     <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -79,9 +118,11 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @foreach($ekstrakurikulers as $index => $item)
+                    @forelse($ekstrakurikulers as $index => $item)
                     <tr class="hover:bg-slate-50 transition-colors group">
-                        <td class="py-4 px-6 text-center font-bold text-slate-400">{{ $index + 1 }}</td>
+                        <td class="py-4 px-6 text-center font-bold text-slate-400">
+                            {{ $ekstrakurikulers->firstItem() + $index }}
+                        </td>
                         <td class="py-4 px-6">
                             <h3 class="font-bold text-slate-800 text-sm">{{ $item->nama_ekstrakurikuler }}</h3>
                         </td>
@@ -104,12 +145,37 @@
                         </td>
                         @endhasanyrole
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="4" class="py-16 text-center">
+                            <div class="flex flex-col items-center justify-center text-slate-400">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a2 2 0 01-.894.212h-.045a2 2 0 01-.894-.212l-.318-.158a6 6 0 00-3.86-.517l-2.387.477a2 2 0 00-1.022.547V18a2 2 0 002 2h11a2 2 0 002-2v-2.572zM12 11V3.5l3 3m-3-3l-3 3"/></svg>
+                                </div>
+                                <p class="font-bold text-lg text-slate-600">Ekstrakurikuler Tidak Ditemukan</p>
+                                <p class="text-sm">Silakan sesuaikan kata kunci pencarian Anda.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
+        {{-- Footer: row count + pagination --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3
+                    px-6 py-4 bg-slate-50/50 border-t border-slate-100">
+            <p class="text-xs text-slate-500 font-medium">
+                Menampilkan <strong class="text-slate-700">{{ $ekstrakurikulers->firstItem() ?? 0 }}</strong>–<strong class="text-slate-700">{{ $ekstrakurikulers->lastItem() ?? 0 }}</strong>
+                dari <strong class="text-slate-700">{{ $ekstrakurikulers->total() }}</strong> ekstrakurikuler
+            </p>
+            @if($ekstrakurikulers->hasPages())
+            <div class="paginate-sm">
+                {{ $ekstrakurikulers->links() }}
+            </div>
+            @endif
+        </div>
     </div>
-    @endif
 
     {{-- MODAL TAMBAH --}}
     <div x-show="addModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>

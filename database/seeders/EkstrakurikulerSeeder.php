@@ -15,7 +15,7 @@ class EkstrakurikulerSeeder extends Seeder
         $ekskuls = [
             [
                 'nama_ekstrakurikuler' => 'Pramuka',
-                'deskripsi' => 'Ekstrakurikuler wajib yang melatih disiplin, kemandirian, dan kepemimpinan.',
+                'deskripsi' => 'Pendidikan kepanduan untuk melatih kemandirian, kedisiplinan, dan jiwa kepemimpinan siswa.',
             ],
             [
                 'nama_ekstrakurikuler' => 'Tapak Suci',
@@ -24,6 +24,14 @@ class EkstrakurikulerSeeder extends Seeder
             [
                 'nama_ekstrakurikuler' => 'Hizbul Wathan',
                 'deskripsi' => 'Kepanduan khas Muhammadiyah yang menanamkan jiwa patriotisme dan religius.',
+            ],
+            [
+                'nama_ekstrakurikuler' => 'PMI / PMR',
+                'deskripsi' => 'Palang Merah Remaja yang melatih keterampilan pertolongan pertama dan jiwa kemanusiaan.',
+            ],
+            [
+                'nama_ekstrakurikuler' => 'Futsal',
+                'deskripsi' => 'Kegiatan olahraga sepak bola dalam ruangan untuk melatih fisik, kerjasama tim, dan sportivitas.',
             ],
         ];
 

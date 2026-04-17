@@ -91,6 +91,42 @@ class RombelController extends Controller
         return redirect()->route('rombels.index')->with('success', 'Rombongan Belajar berhasil ditambahkan!');
     }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'jenis_rombel' => 'required|in:Kelas,Pilihan',
+            'tingkat' => 'nullable|integer|min:1|max:12',
+            'kompetensi_keahlian' => 'nullable|string|max:255',
+            'kurikulum' => 'nullable|string|max:255',
+            'guru_id' => 'nullable|string',
+        ]);
+
+        $rombel = Rombel::findOrFail($id);
+        $tahunAktif = TahunPelajaran::where('is_aktif', true)->first();
+
+        if ($tahunAktif) {
+            // Check if another rombel with the same name already exists in this year
+            if (Rombel::where('nama', $request->nama)
+                ->where('tahun_pelajaran_id', $tahunAktif->id)
+                ->where('id', '!=', $rombel->id)
+                ->exists()) {
+                return redirect()->back()->with('error', 'Nama rombel/kelas sudah ada di tahun pelajaran ini.')->withInput();
+            }
+        }
+
+        $rombel->update([
+            'nama' => $request->nama,
+            'jenis_rombel' => $request->jenis_rombel,
+            'tingkat' => $request->tingkat,
+            'kompetensi_keahlian' => $request->kompetensi_keahlian,
+            'kurikulum' => $request->kurikulum,
+            'guru_id' => $request->guru_id,
+        ]);
+
+        return redirect()->route('rombels.index')->with('success', 'Data Rombongan Belajar berhasil diperbarui!');
+    }
+
     public function show($id)
     {
         $rombel = Rombel::with(['siswas' => function($q) {

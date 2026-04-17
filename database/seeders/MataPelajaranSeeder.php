@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\MataPelajaran;
 
 class MataPelajaranSeeder extends Seeder
 {
@@ -29,7 +30,7 @@ class MataPelajaranSeeder extends Seeder
         ];
 
         foreach ($mapels as $mapel) {
-            \App\Models\MataPelajaran::updateOrCreate(
+            MataPelajaran::updateOrCreate(
                 ['nama' => $mapel['nama']],
                 [
                     'kelompok' => $mapel['kelompok'],
