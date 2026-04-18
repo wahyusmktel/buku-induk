@@ -63,6 +63,133 @@
     </div>
 </div>
 
+{{-- Warning Badges --}}
+@if($rombelTanpaAnggota > 0 || $bukuIndukKurang > 0)
+<div class="flex flex-wrap gap-3 mb-6">
+    @if($rombelTanpaAnggota > 0)
+    <div class="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl text-sm font-semibold text-amber-700">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        Ada {{ $rombelTanpaAnggota }} rombel tanpa anggota
+    </div>
+    @endif
+    @if($bukuIndukKurang > 0)
+    <div class="flex items-center gap-2 px-4 py-2 bg-sky-50 border border-sky-200 rounded-xl text-sm font-semibold text-sky-700">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {{ $bukuIndukKurang }} buku induk belum lengkap foto
+    </div>
+    @endif
+</div>
+@endif
+
+{{-- Distribusi Siswa per Tingkat --}}
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
+    <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+        Distribusi Siswa Per Tingkat (Tahun Aktif)
+    </h3>
+    @if($siswaPerTingkat->isEmpty())
+        <p class="text-sm text-slate-400 text-center py-4">Tidak ada data siswa aktif.</p>
+    @else
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-slate-100">
+                    <th class="text-left py-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Tingkat</th>
+                    <th class="text-center py-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Total</th>
+                    <th class="text-center py-2 px-3 text-xs font-bold text-sky-500 uppercase tracking-wider">L</th>
+                    <th class="text-center py-2 px-3 text-xs font-bold text-rose-500 uppercase tracking-wider">P</th>
+                    <th class="text-left py-2 px-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Proporsi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                @foreach($siswaPerTingkat as $row)
+                @php $pct = $totalSiswaAktif > 0 ? round($row->total / $totalSiswaAktif * 100) : 0; @endphp
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="py-2.5 px-3 font-bold text-slate-700">Kelas {{ $row->tingkat_kelas }}</td>
+                    <td class="py-2.5 px-3 text-center font-black text-indigo-700">{{ $row->total }}</td>
+                    <td class="py-2.5 px-3 text-center text-sky-600 font-semibold">{{ $row->laki }}</td>
+                    <td class="py-2.5 px-3 text-center text-rose-500 font-semibold">{{ $row->perempuan }}</td>
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 rounded-full" style="width: {{ $pct }}%"></div>
+                            </div>
+                            <span class="text-xs font-bold text-slate-500 w-8 text-right">{{ $pct }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+</div>
+
+{{-- Tren Siswa per Tahun Pelajaran (Chart.js) --}}
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
+    <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block"></span>
+        Tren Jumlah Siswa per Tahun Pelajaran
+    </h3>
+    @if($trendPerTahun->isEmpty())
+        <p class="text-sm text-slate-400 text-center py-4">Belum ada data tahun pelajaran.</p>
+    @else
+    <canvas id="chartTren" height="100"></canvas>
+    @endif
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('chartTren');
+    if (!canvas) return;
+    const trendData = @json($trendPerTahun);
+    const labels = trendData.map(t => t.tahun + ' - ' + t.semester);
+    const aktifData = trendData.map(t => t.siswa_aktif);
+    const lulusData = trendData.map(t => t.siswa_lulus);
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Siswa Aktif',
+                    data: aktifData,
+                    borderColor: '#6366f1',
+                    backgroundColor: '#6366f120',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointRadius: 4,
+                },
+                {
+                    label: 'Alumni/Lulus',
+                    data: lulusData,
+                    borderColor: '#10b981',
+                    backgroundColor: '#10b98120',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+});
+</script>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2">
         <!-- Quick Informative Card -->

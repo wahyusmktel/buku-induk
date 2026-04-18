@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.php$\")",
+      "Bash(grep -r \"namespace App\\\\\\\\Models\" app/Models/*.php)",
+      "Bash(php artisan *)",
+      "Bash(where php *)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat artisan *)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat -l app/Http/Controllers/LaporanController.php)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat -l app/Http/Controllers/CetakController.php)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat -l app/Http/Controllers/SearchController.php)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat -l app/Exports/AlumniExport.php)",
+      "Bash(C:/Users/TJ/.config/herd/bin/php.bat -l resources/views/cetak/surat-aktif.blade.php)",
+      "Bash(ls resources/views/cetak/)",
+      "Bash(ls resources/views/laporan/)",
+      "Bash(php -l app/Http/Controllers/DashboardController.php)",
+      "Bash(php -l app/Http/Controllers/LaporanController.php)",
+      "Bash(php -l app/Http/Controllers/CetakController.php)",
+      "Bash(php -l app/Exports/AbsensiTemplateExport.php)",
+      "Bash(cmd /c \"php -l c:/Projects/buku-induk/app/Http/Controllers/DashboardController.php && php -l c:/Projects/buku-induk/app/Http/Controllers/LaporanController.php && php -l c:/Projects/buku-induk/app/Http/Controllers/CetakController.php && php -l c:/Projects/buku-induk/app/Exports/AbsensiTemplateExport.php\")",
+      "Bash(cmd /c \"php -l \\\\\"c:/Projects/buku-induk/app/Http/Controllers/DashboardController.php\\\\\"\")",
+      "Bash(php.exe -l app/Http/Controllers/DashboardController.php)",
+      "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/DashboardController.php)",
+      "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/LaporanController.php)",
+      "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/CetakController.php)",
+      "Bash(/c/xampp/php/php.exe -l app/Exports/AbsensiTemplateExport.php)"
+    ]
+  }
+}

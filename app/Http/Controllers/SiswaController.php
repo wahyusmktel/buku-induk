@@ -52,7 +52,7 @@ class SiswaController extends Controller
             });
         }
 
-        $siswas = $query->latest()->paginate(15)->withQueryString();
+        $siswas = $query->with('rombel')->latest()->paginate(15)->withQueryString();
         
         // Cek apakah bisa melakukan Naikan Semester atau Naikan Kelas
         $canPromote = false;
@@ -277,6 +277,7 @@ class SiswaController extends Controller
 
     public function show(Siswa $siswa)
     {
+        $siswa->load(['rombel', 'tahunPelajaran', 'dataPeriodik', 'keadaanJasmani', 'dataOrangTua', 'beasiswa']);
         return view('siswas.show', compact('siswa'));
     }
 

@@ -104,7 +104,7 @@ class BukuIndukController extends Controller
         // Fetch the canonical siswa record (latest) with relations for kelengkapan
         $siswa = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('nisn', $nisn)
-            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua'])
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua', 'beasiswa', 'registrasi'])
             ->orderBy('created_at', 'desc')
             ->firstOrFail();
 

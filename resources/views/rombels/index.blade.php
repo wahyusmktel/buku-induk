@@ -138,10 +138,10 @@
                             <p class="text-xs text-slate-500 mt-0.5">{{ $rombel->kurikulum ?: 'Kurikulum tidak diatur' }}</p>
                         </td>
                         <td class="py-4 px-6">
-                            @if($rombel->guru_id)
-                                <p class="text-sm font-semibold text-slate-700">Guru Terpilih</p>
+                            @if($rombel->nama_wali_kelas)
+                                <p class="text-sm font-semibold text-slate-700">{{ $rombel->nama_wali_kelas }}</p>
                             @else
-                                <span class="inline-flex text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-lg">Belum Diatur</span>
+                                <span class="inline-flex text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-lg">Belum Diisi</span>
                             @endif
                         </td>
                         <td class="py-4 px-6 text-center">
@@ -247,6 +247,14 @@
                                                         <option value="Kurikulum 2013" {{ (old('kurikulum', $rombel->kurikulum) == 'Kurikulum 2013') ? 'selected' : '' }}>Kurikulum 2013</option>
                                                     </select>
                                                 </div>
+                                            </div>
+
+                                            <!-- Nama Wali Kelas -->
+                                            <div>
+                                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Wali Kelas (Opsional)</label>
+                                                <input type="text" name="nama_wali_kelas" value="{{ old('nama_wali_kelas', $rombel->nama_wali_kelas) }}" placeholder="Contoh: Budi Santoso, S.Pd."
+                                                       class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-white focus:border-amber-500 focus:ring-3 focus:ring-amber-500/20 transition-all shadow-sm">
+                                                @error('nama_wali_kelas') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                             </div>
 
                                         </form>
@@ -421,16 +429,12 @@
                         </div>
                     </div>
 
-                    <!-- Wali Kelas -->
+                    <!-- Nama Wali Kelas -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Wali Kelas (Opsional)</label>
-                        <select name="guru_id" class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-100 text-slate-400 focus:border-sky-500 cursor-not-allowed shadow-inner" readonly>
-                            <option value="">Belum tersedia (Modul Guru akan datang)</option>
-                        </select>
-                        <p class="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Fitur pemilihan guru akan aktif setelah Modul Data Guru dirilis.
-                        </p>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Wali Kelas (Opsional)</label>
+                        <input type="text" name="nama_wali_kelas" value="{{ old('nama_wali_kelas') }}" placeholder="Contoh: Budi Santoso, S.Pd."
+                               class="w-full px-4 py-2.5 text-sm rounded-xl border-slate-200 bg-white focus:border-sky-500 focus:ring-3 focus:ring-sky-500/20 transition-all shadow-sm">
+                        @error('nama_wali_kelas') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                 </form>

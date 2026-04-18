@@ -97,12 +97,53 @@
             <div>
                 <h3 class="text-xl font-black text-slate-800 tracking-tight">Anggota Rombongan Belajar</h3>
                 <p class="text-sm font-medium text-slate-500 mt-1">Total anggota terdaftar: <span class="font-bold text-sky-600">{{ $rombel->siswas->count() }} Siswa</span></p>
+                <p class="text-sm font-medium text-slate-500 mt-0.5">Wali Kelas: <span class="font-bold text-slate-700">{{ $rombel->nama_wali_kelas ?? 'Belum diisi' }}</span></p>
             </div>
             <div class="flex items-center gap-3">
                 <button @click="mapModal = true; fetchStudents()" class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-sky-500/20 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Tambah Anggota Kelas
                 </button>
+
+                {{-- Cetak Leger dropdown --}}
+                <div class="relative" x-data="{ legerOpen: false }">
+                    <button @click="legerOpen = !legerOpen" @click.outside="legerOpen = false"
+                            class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-emerald-500/20 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        Cetak Leger
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="legerOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="legerOpen" x-cloak x-transition
+                         class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-30">
+                        <p class="px-4 pt-1 pb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Semester</p>
+                        <a href="{{ route('cetak.leger', $rombel->id) }}?semester=1&preview=1"
+                           target="_blank"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Preview Semester 1
+                        </a>
+                        <a href="{{ route('cetak.leger', $rombel->id) }}?semester=1"
+                           target="_blank"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            PDF Semester 1
+                        </a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <a href="{{ route('cetak.leger', $rombel->id) }}?semester=2&preview=1"
+                           target="_blank"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Preview Semester 2
+                        </a>
+                        <a href="{{ route('cetak.leger', $rombel->id) }}?semester=2"
+                           target="_blank"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            PDF Semester 2
+                        </a>
+                    </div>
+                </div>
+
                 <a href="{{ route('rombels.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-sky-600 px-5 py-2.5 rounded-xl shadow-sm transition-all focus:ring-4 focus:ring-slate-100 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     Kembali
@@ -154,6 +195,12 @@
                                     Profil
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                 </a>
+                                @if($siswa->nisn)
+                                <a href="{{ route('buku-induk.show', $siswa->nisn) }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all border border-indigo-100">
+                                    Buku Induk
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                </a>
+                                @endif
                                 <form id="remove-form-{{ $siswa->id }}" action="{{ route('rombels.remove-siswa', [$rombel->id, $siswa->id]) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('DELETE')

@@ -63,7 +63,12 @@
                 </div>
             </div>
             {{-- Actions --}}
-            <div class="flex gap-3 flex-shrink-0">
+            <div class="flex gap-3 flex-shrink-0 flex-wrap">
+                <a href="{{ route('siswas.show', $siswa->id) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-sky-50 hover:border-sky-200 hover:text-sky-700 transition-all shadow-sm">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Data Pokok Siswa
+                </a>
                 <a href="javascript:void(0)" onclick="confirmPrint('main')"
                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
                     <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
@@ -337,55 +342,306 @@
     </div>
 
     {{-- ─── TAB: BEASISWA ─── --}}
-    <div x-show="tab === 'beasiswa'" x-transition>
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 relative bg-slate-50/50">
-                <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Riwayat Beasiswa</p>
+    <div x-show="tab === 'beasiswa'" x-transition x-data="{ showBeasiswaModal: false }">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-black text-slate-800">Riwayat Beasiswa</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Catatan beasiswa yang pernah diterima siswa (PIP, KIP, Daerah, Swasta, dll.)</p>
+                </div>
+                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                <button type="button" @click="showBeasiswaModal = true"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-200 transition-all hover:-translate-y-0.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Tambah
+                </button>
+                @endhasanyrole
+            </div>
+
+            <div class="p-8">
                 @if($siswa->beasiswa && $siswa->beasiswa->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($siswa->beasiswa as $bs)
-                        <div class="flex flex-col gap-1 border-l-4 border-emerald-400 pl-4 py-2 bg-white rounded-r-xl">
-                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase tracking-widest rounded-lg w-fit">{{ $bs->jenis_beasiswa ?? '-' }}</span>
-                            <div class="flex gap-4 mt-1 text-sm">
-                                <span class="text-slate-500 font-medium">Sumber: <strong class="text-slate-700">{{ $bs->sumber_beasiswa ?? '-' }}</strong></span>
-                                <span class="text-slate-500 font-medium">Tahun: <strong class="text-slate-700">{{ $bs->tahun_mulai ?? '-' }} — {{ $bs->tahun_selesai ?? '-' }}</strong></span>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50">
+                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                <th class="px-6 py-3 w-12 text-center border-r border-slate-100">No</th>
+                                <th class="px-6 py-3 border-r border-slate-100">Jenis Beasiswa</th>
+                                <th class="px-6 py-3 w-28 border-r border-slate-100">Tahun</th>
+                                <th class="px-6 py-3">Keterangan</th>
+                                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                                <th class="px-6 py-3 w-20 text-center">Aksi</th>
+                                @endhasanyrole
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            @foreach($siswa->beasiswa as $i => $bsw)
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">{{ $i + 1 }}</td>
+                                <td class="px-6 py-3 border-r border-slate-100">
+                                    <span class="inline-flex items-center px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg">{{ $bsw->jenis_beasiswa }}</span>
+                                </td>
+                                <td class="px-6 py-3 font-bold text-slate-700 text-sm border-r border-slate-100">{{ $bsw->tahun ?? '—' }}</td>
+                                <td class="px-6 py-3 text-sm text-slate-600">{{ $bsw->keterangan ?? '—' }}</td>
+                                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                                <td class="px-6 py-3 text-center">
+                                    <form method="POST" action="{{ url('/siswas/' . $siswa->id . '/beasiswa/' . $bsw->id) }}" class="inline"
+                                          onsubmit="return false;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                                onclick="confirmDeleteBeasiswa(this)"
+                                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                                @endhasanyrole
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @else
-                    <div class="text-center py-6">
-                        <p class="text-sm font-bold text-slate-400">Belum ada riwayat beasiswa dicatat.</p>
+                <div class="flex flex-col items-center justify-center py-12 text-center">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-400 rounded-full flex items-center justify-center mb-4 border border-emerald-100">
+                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
+                    <p class="text-sm font-bold text-slate-500">Belum ada riwayat beasiswa dicatat.</p>
+                    @hasanyrole('Super Admin|Operator|Tata Usaha')
+                    <button type="button" @click="showBeasiswaModal = true"
+                            class="mt-3 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline transition-colors">
+                        + Tambah data beasiswa
+                    </button>
+                    @endhasanyrole
+                </div>
                 @endif
+            </div>
+        </div>
+
+        {{-- Modal Tambah Beasiswa --}}
+        <div x-show="showBeasiswaModal" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             @keydown.escape.window="showBeasiswaModal = false">
+            <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" @click="showBeasiswaModal = false"></div>
+            <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 z-10"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-black text-slate-800">Tambah Beasiswa</h3>
+                    <button type="button" @click="showBeasiswaModal = false"
+                            class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-100">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url('/siswas/' . $siswa->id . '/beasiswa') }}" class="space-y-5">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                            Jenis Beasiswa <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="jenis_beasiswa" required maxlength="255"
+                               placeholder="Contoh: PIP, KIP, Daerah, Swasta, Lainnya"
+                               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                            Tahun <span class="text-rose-500">*</span>
+                        </label>
+                        <input type="text" name="tahun" required maxlength="10"
+                               placeholder="Contoh: 2024 atau 2023/2024"
+                               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">Keterangan</label>
+                        <textarea name="keterangan" rows="3"
+                                  placeholder="Keterangan tambahan (opsional)..."
+                                  class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition resize-none"></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="showBeasiswaModal = false"
+                                class="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-200 transition-all hover:-translate-y-0.5">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    {{-- ─── TAB: RIWAYAT SEKOLAH ─── --}}
-    <div x-show="tab === 'riwayat'" x-transition>
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-8 relative bg-slate-50/50">
-                <p class="absolute -top-3 left-6 px-2 bg-white text-[10px] font-black text-slate-400 uppercase tracking-widest rounded-full border border-slate-200">Registrasi & Catatan Siswa</p>
+    {{-- ─── TAB: RIWAYAT SEKOLAH (REGISTRASI & MUTASI) ─── --}}
+    <div x-show="tab === 'riwayat'" x-transition x-data="{ showRegistrasiModal: false }">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-black text-slate-800">Riwayat Registrasi &amp; Mutasi</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Catatan pendaftaran, mutasi masuk/keluar, dan kelulusan siswa</p>
+                </div>
+                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                <button type="button" @click="showRegistrasiModal = true"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Tambah
+                </button>
+                @endhasanyrole
+            </div>
+
+            <div class="p-8">
                 @if($siswa->registrasi && $siswa->registrasi->count() > 0)
-                    <div class="space-y-4">
-                        @foreach($siswa->registrasi as $reg)
-                        <div class="flex flex-col gap-1 border-l-4 border-indigo-400 pl-4 py-2 bg-white rounded-r-xl">
-                            <div class="flex items-center gap-3">
-                                <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-widest rounded-lg">{{ $reg->jenis_registrasi ?? '-' }}</span>
-                                @if($reg->tanggal)
-                                <span class="text-[10px] text-slate-400 font-bold"><svg class="w-3 h-3 inline pb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> {{ \Carbon\Carbon::parse($reg->tanggal)->format('d F Y') }}</span>
-                                @endif
-                            </div>
-                            <span class="text-sm font-bold text-slate-700 mt-1">{{ $reg->keterangan ?? '-' }}</span>
-                        </div>
-                        @endforeach
-                    </div>
+                <div class="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50">
+                            <tr class="border-b border-slate-200 text-slate-500 text-[0.7rem] uppercase font-black tracking-widest">
+                                <th class="px-5 py-3 w-12 text-center border-r border-slate-100">No</th>
+                                <th class="px-5 py-3 border-r border-slate-100">Jenis</th>
+                                <th class="px-5 py-3 w-36 border-r border-slate-100">Tanggal</th>
+                                <th class="px-5 py-3 border-r border-slate-100">Tujuan Sekolah</th>
+                                <th class="px-5 py-3 w-32 border-r border-slate-100">Tujuan Kelas</th>
+                                <th class="px-5 py-3">Alasan / Catatan</th>
+                                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                                <th class="px-5 py-3 w-20 text-center">Aksi</th>
+                                @endhasanyrole
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            @foreach($siswa->registrasi as $i => $reg)
+                            @php
+                                $regColor = match($reg->jenis_registrasi) {
+                                    'Daftar Baru'   => 'bg-sky-100 text-sky-700',
+                                    'Mutasi Masuk'  => 'bg-emerald-100 text-emerald-700',
+                                    'Pindah Keluar' => 'bg-amber-100 text-amber-700',
+                                    'Lulus'         => 'bg-purple-100 text-purple-700',
+                                    default         => 'bg-slate-100 text-slate-600',
+                                };
+                            @endphp
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-5 py-3 text-center text-sm font-bold text-slate-400 border-r border-slate-100">{{ $i + 1 }}</td>
+                                <td class="px-5 py-3 border-r border-slate-100">
+                                    <span class="inline-flex items-center px-2.5 py-1 text-xs font-black rounded-lg {{ $regColor }}">{{ $reg->jenis_registrasi }}</span>
+                                </td>
+                                <td class="px-5 py-3 text-sm font-bold text-slate-700 border-r border-slate-100">
+                                    {{ $reg->tanggal ? \Carbon\Carbon::parse($reg->tanggal)->format('d/m/Y') : '—' }}
+                                </td>
+                                <td class="px-5 py-3 text-sm text-slate-600 border-r border-slate-100">{{ $reg->tujuan_sekolah ?? '—' }}</td>
+                                <td class="px-5 py-3 text-sm text-slate-600 border-r border-slate-100">{{ $reg->tujuan_kelas ?? '—' }}</td>
+                                <td class="px-5 py-3 text-sm text-slate-600">{{ $reg->alasan_catatan ?? '—' }}</td>
+                                @hasanyrole('Super Admin|Operator|Tata Usaha')
+                                <td class="px-5 py-3 text-center">
+                                    <form method="POST" action="{{ url('/siswas/' . $siswa->id . '/registrasi/' . $reg->id) }}" class="inline"
+                                          onsubmit="return false;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                                onclick="confirmDeleteRegistrasi(this)"
+                                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </td>
+                                @endhasanyrole
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 @else
-                    <div class="text-center py-6">
-                        <p class="text-sm font-bold text-slate-400">Belum ada catatan registrasi keluar, pindah, atau tamat dicatat.</p>
+                <div class="flex flex-col items-center justify-center py-12 text-center">
+                    <div class="w-14 h-14 bg-indigo-50 text-indigo-400 rounded-full flex items-center justify-center mb-4 border border-indigo-100">
+                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
+                    <p class="text-sm font-bold text-slate-500">Belum ada catatan registrasi, mutasi, atau kelulusan dicatat.</p>
+                    @hasanyrole('Super Admin|Operator|Tata Usaha')
+                    <button type="button" @click="showRegistrasiModal = true"
+                            class="mt-3 text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline transition-colors">
+                        + Tambah data registrasi
+                    </button>
+                    @endhasanyrole
+                </div>
                 @endif
+            </div>
+        </div>
+
+        {{-- Modal Tambah Registrasi --}}
+        <div x-show="showRegistrasiModal" x-cloak
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             @keydown.escape.window="showRegistrasiModal = false">
+            <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" @click="showRegistrasiModal = false"></div>
+            <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 z-10"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-black text-slate-800">Tambah Registrasi / Mutasi</h3>
+                    <button type="button" @click="showRegistrasiModal = false"
+                            class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-slate-100">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url('/siswas/' . $siswa->id . '/registrasi') }}" class="space-y-5">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                                Jenis Registrasi <span class="text-rose-500">*</span>
+                            </label>
+                            <select name="jenis_registrasi" required
+                                    class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                                <option value="" disabled selected>-- Pilih Jenis --</option>
+                                <option value="Daftar Baru">Daftar Baru</option>
+                                <option value="Mutasi Masuk">Mutasi Masuk</option>
+                                <option value="Pindah Keluar">Pindah Keluar</option>
+                                <option value="Lulus">Lulus</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">
+                                Tanggal <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="date" name="tanggal" required
+                                   class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">Tujuan Sekolah</label>
+                            <input type="text" name="tujuan_sekolah" maxlength="255"
+                                   placeholder="Nama sekolah tujuan"
+                                   class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">Tujuan Kelas</label>
+                            <input type="text" name="tujuan_kelas" maxlength="50"
+                                   placeholder="Contoh: Kelas 5A"
+                                   class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-1.5">Alasan / Catatan</label>
+                            <textarea name="alasan_catatan" rows="3"
+                                      placeholder="Alasan perpindahan, keterangan kelulusan, atau catatan lain..."
+                                      class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition resize-none"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" @click="showRegistrasiModal = false"
+                                class="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition-colors">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -731,6 +987,44 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+function confirmDeleteBeasiswa(btn) {
+    var form = btn.closest('form');
+    Swal.fire({
+        title: 'Hapus Data Beasiswa?',
+        text: 'Data beasiswa yang dihapus tidak dapat dikembalikan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            form.onsubmit = null;
+            form.submit();
+        }
+    });
+}
+
+function confirmDeleteRegistrasi(btn) {
+    var form = btn.closest('form');
+    Swal.fire({
+        title: 'Hapus Data Registrasi?',
+        text: 'Data registrasi yang dihapus tidak dapat dikembalikan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            form.onsubmit = null;
+            form.submit();
+        }
+    });
+}
+
 function confirmPrint(type = 'main') {
     let kelengkapan = {{ $kelengkapan }};
     let printUrl = type === 'main' 

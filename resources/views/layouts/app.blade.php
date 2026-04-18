@@ -131,38 +131,73 @@
                 </a>
 
                 {{-- Arsip Siswa dropdown --}}
-                <div x-data="{ open: {{ request()->routeIs('alumni.*') ? 'true' : 'false' }} }">
-                    <button @click="open = !open" 
+                <div x-data="{ open: {{ (request()->routeIs('alumni.*') || request()->routeIs('trash.*')) ? 'true' : 'false' }} }">
+                    <button @click="open = !open"
                             class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
-                                   {{ request()->routeIs('alumni.*') 
-                                      ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                                   {{ (request()->routeIs('alumni.*') || request()->routeIs('trash.*'))
+                                      ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm'
                                       : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 transition-colors {{ request()->routeIs('alumni.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-5 h-5 transition-colors {{ (request()->routeIs('alumni.*') || request()->routeIs('trash.*')) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
                             </svg>
                             Arsip Siswa
                         </div>
                         <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
-                    <div x-show="open" 
-                         x-transition:enter="transition ease-out duration-200" 
-                         x-transition:enter-start="opacity-0 -translate-y-2" 
-                         x-transition:enter-end="opacity-100 translate-y-0" 
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
                          class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
                         <a href="{{ route('alumni.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('alumni.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
                             Alumni
                         </a>
+                        @hasanyrole('Super Admin|Operator|Tata Usaha')
+                        <a href="{{ route('trash.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('trash.*') ? 'text-rose-700 font-bold bg-rose-50/50' : 'text-slate-500 hover:text-rose-600 hover:bg-slate-50' }}">
+                            Sampah / Terhapus
+                        </a>
+                        @endhasanyrole
                     </div>
                 </div>
 
-                <a href="{{ route('exports.index') }}" 
+                {{-- Laporan & Statistik dropdown --}}
+                <div x-data="{ open: {{ request()->routeIs('laporan.*') ? 'true' : 'false' }} }">
+                    <button @click="open = !open"
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
+                                   {{ request()->routeIs('laporan.*')
+                                      ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm'
+                                      : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 transition-colors {{ request()->routeIs('laporan.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            Laporan & Statistik
+                        </div>
+                        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
+                        <a href="{{ route('laporan.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('laporan.index') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Statistik Siswa
+                        </a>
+                        <a href="{{ route('laporan.prestasi') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('laporan.prestasi') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Prestasi Belajar
+                        </a>
+                        <a href="{{ route('laporan.alumni') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('laporan.alumni') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Data Alumni
+                        </a>
+                    </div>
+                </div>
+
+                <a href="{{ route('exports.index') }}"
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
-                          {{ request()->routeIs('exports.*') 
-                             ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                          {{ request()->routeIs('exports.*')
+                             ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm'
                              : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
                     <svg class="w-5 h-5 transition-colors {{ request()->routeIs('exports.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    Eksport & Laporan
+                    Eksport Massal
                 </a>
                 
                 <a href="{{ route('activities.index') }}" 
@@ -266,6 +301,54 @@
 
                 <!-- Header Actions (Right) -->
                 <div class="flex items-center gap-3 sm:gap-5">
+                    <!-- Global Search -->
+                    <div class="relative hidden md:block" x-data="{
+                        q: '',
+                        results: [],
+                        open: false,
+                        loading: false,
+                        timeout: null,
+                        search() {
+                            clearTimeout(this.timeout);
+                            if (this.q.length < 2) { this.results = []; this.open = false; return; }
+                            this.loading = true;
+                            this.timeout = setTimeout(() => {
+                                fetch('/api/search?q=' + encodeURIComponent(this.q))
+                                    .then(r => r.json())
+                                    .then(data => { this.results = data; this.open = data.length > 0; this.loading = false; })
+                                    .catch(() => { this.loading = false; });
+                            }, 300);
+                        }
+                    }" @click.away="open = false">
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="text" x-model="q" @input="search()" @focus="if(results.length) open = true"
+                                   placeholder="Cari siswa…"
+                                   class="w-56 pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 focus:outline-none transition-all">
+                            <div x-show="loading" class="absolute right-3 top-1/2 -translate-y-1/2">
+                                <div class="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        </div>
+                        <!-- Dropdown Results -->
+                        <div x-show="open" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                             class="absolute top-full left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden" x-cloak>
+                            <template x-for="item in results" :key="item.id">
+                                <div class="border-b border-slate-50 last:border-0">
+                                    <div class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs flex-shrink-0" x-text="item.nama.substring(0,2).toUpperCase()"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-bold text-slate-800 text-sm truncate" x-text="item.nama"></p>
+                                            <p class="text-xs text-slate-400 font-mono" x-text="(item.nisn || 'No NISN') + (item.kelas ? ' · Kelas ' + item.kelas : '')"></p>
+                                        </div>
+                                        <div class="flex gap-1 flex-shrink-0">
+                                            <a :href="item.url_profil" class="px-2 py-1 text-[10px] font-bold bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors">Profil</a>
+                                            <a x-show="item.url_buku_induk" :href="item.url_buku_induk" class="px-2 py-1 text-[10px] font-bold bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">Buku Induk</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                     <!-- Notifications -->
                     <button class="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors hidden sm:block cursor-pointer">
                         <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>

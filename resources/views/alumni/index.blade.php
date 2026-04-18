@@ -157,6 +157,12 @@
                             style="white-space:nowrap">Tahun Pelajaran</th>
                         <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-violet-100"
                             style="white-space:nowrap">Kelas Terakhir</th>
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-violet-100"
+                            style="white-space:nowrap">No. Ijazah</th>
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-violet-100"
+                            style="white-space:nowrap">Tgl. Lulus</th>
+                        <th class="py-3.5 px-4 text-left text-[0.62rem] font-bold uppercase tracking-widest text-violet-100"
+                            style="white-space:nowrap">Lanjut Ke</th>
                         <th class="py-3.5 px-4 text-center text-[0.62rem] font-bold uppercase tracking-widest text-violet-100"
                             style="white-space:nowrap">Buku Induk</th>
                     </tr>
@@ -216,6 +222,24 @@
                         <td class="py-3 px-4">
                             <span class="text-sm font-medium text-slate-600">
                                 {{ $siswa->rombel_saat_ini ?? '—' }}
+                            </span>
+                        </td>
+
+                        <td class="py-3 px-4">
+                            <span class="font-mono text-xs text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                                {{ $bi->no_ijazah ?? '—' }}
+                            </span>
+                        </td>
+
+                        <td class="py-3 px-4">
+                            <span class="text-xs text-slate-600 font-medium">
+                                {{ $bi && $bi->tgl_lulus ? $bi->tgl_lulus->format('d/m/Y') : '—' }}
+                            </span>
+                        </td>
+
+                        <td class="py-3 px-4">
+                            <span class="text-xs text-slate-600 font-medium">
+                                {{ $bi->lanjut_ke ?? '—' }}
                             </span>
                         </td>
 

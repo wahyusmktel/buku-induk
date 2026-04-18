@@ -39,10 +39,22 @@ use App\Http\Controllers\EkskulPrestasiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\SiswaPromotionController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\CetakController;
+use App\Http\Controllers\BeasiswaController;
+use App\Http\Controllers\RegistrasiController;
+use App\Http\Controllers\TrashController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
+    // Laporan & Statistik
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/prestasi', [LaporanController::class, 'prestasi'])->name('laporan.prestasi');
+    Route::get('/laporan/alumni', [LaporanController::class, 'alumni'])->name('laporan.alumni');
+    Route::post('/laporan/alumni/export', [LaporanController::class, 'exportAlumni'])->name('laporan.alumni.export');
+
     // Audit Log / Riwayat Aktivitas
     Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
     Route::get('/activities/export', [ActivityController::class, 'export'])->name('activities.export');
@@ -51,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/siswas/promote', [SiswaPromotionController::class, 'index'])->name('siswas.promote.index');
     Route::post('/siswas/promote', [SiswaPromotionController::class, 'store'])->name('siswas.promote.store');
     Route::get('/api/rombels/{tahunId}', [SiswaPromotionController::class, 'getRombelsByYear']);
+    Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
 
     // Master Import
     Route::post('/siswas/master-import', [SiswaController::class, 'masterImport'])->name('siswas.master-import');
@@ -121,6 +134,25 @@ Route::middleware(['auth'])->group(function () {
 
         // Arsip Siswa
         Route::get('/alumni', [\App\Http\Controllers\AlumniController::class, 'index'])->name('alumni.index');
+
+        // Cetak Dokumen (Surat & Leger)
+        Route::get('/cetak/surat-aktif/{siswa}', [CetakController::class, 'suratKeteranganAktif'])->name('cetak.surat-aktif');
+        Route::get('/cetak/surat-lulus/{nisn}', [CetakController::class, 'suratLulus'])->name('cetak.surat-lulus');
+        Route::get('/cetak/leger/{rombelId}', [CetakController::class, 'leger'])->name('cetak.leger');
+        Route::get('/cetak/template-absensi/{rombelId}', [CetakController::class, 'templateAbsensi'])->name('cetak.template-absensi');
+
+        // Beasiswa Siswa
+        Route::post('/siswas/{siswaId}/beasiswa', [BeasiswaController::class, 'store'])->name('beasiswa.store');
+        Route::delete('/siswas/{siswaId}/beasiswa/{beasiswa}', [BeasiswaController::class, 'destroy'])->name('beasiswa.destroy');
+
+        // Registrasi Siswa
+        Route::post('/siswas/{siswaId}/registrasi', [RegistrasiController::class, 'store'])->name('registrasi.store');
+        Route::delete('/siswas/{siswaId}/registrasi/{registrasi}', [RegistrasiController::class, 'destroy'])->name('registrasi.destroy');
+
+        // Sampah / Trash (Soft Deleted Siswas)
+        Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
+        Route::post('/trash/{id}/restore', [TrashController::class, 'restore'])->name('trash.restore');
+        Route::delete('/trash/{id}', [TrashController::class, 'forceDelete'])->name('trash.force-delete');
     });
 
     // Tahun Pelajaran Management

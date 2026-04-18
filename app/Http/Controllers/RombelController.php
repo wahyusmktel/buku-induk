@@ -69,6 +69,7 @@ class RombelController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'nama_wali_kelas' => 'nullable|string|max:255',
             'jenis_rombel' => 'required|in:Kelas,Pilihan',
             'tingkat' => 'nullable|integer|min:1|max:12',
             'kompetensi_keahlian' => 'nullable|string|max:255',
@@ -88,6 +89,7 @@ class RombelController extends Controller
 
         Rombel::create([
             'nama' => $request->nama,
+            'nama_wali_kelas' => $request->nama_wali_kelas,
             'jenis_rombel' => $request->jenis_rombel,
             'tingkat' => $request->tingkat,
             'kompetensi_keahlian' => $request->kompetensi_keahlian,
@@ -103,6 +105,7 @@ class RombelController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'nama_wali_kelas' => 'nullable|string|max:255',
             'jenis_rombel' => 'required|in:Kelas,Pilihan',
             'tingkat' => 'nullable|integer|min:1|max:12',
             'kompetensi_keahlian' => 'nullable|string|max:255',
@@ -125,6 +128,7 @@ class RombelController extends Controller
 
         $rombel->update([
             'nama' => $request->nama,
+            'nama_wali_kelas' => $request->nama_wali_kelas,
             'jenis_rombel' => $request->jenis_rombel,
             'tingkat' => $request->tingkat,
             'kompetensi_keahlian' => $request->kompetensi_keahlian,
