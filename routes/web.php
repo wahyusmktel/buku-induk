@@ -117,6 +117,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/rombels/{id}', [RombelController::class, 'update'])->name('rombels.update');
         Route::get('/api/rombels/{id}/unassigned-siswas', [RombelController::class, 'getUnassignedSiswas']);
         Route::post('/rombels/{id}/assign-siswas', [RombelController::class, 'assignSiswas'])->name('rombels.assign');
+        Route::delete('/rombels/{rombel}/remove-siswa/{siswa}', [RombelController::class, 'removeSiswa'])->name('rombels.remove-siswa');
+
+        // Arsip Siswa
+        Route::get('/alumni', [\App\Http\Controllers\AlumniController::class, 'index'])->name('alumni.index');
     });
 
     // Tahun Pelajaran Management

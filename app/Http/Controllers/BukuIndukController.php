@@ -42,7 +42,7 @@ class BukuIndukController extends Controller
                 ->orderBy('tingkat_kelas')
                 ->pluck('tingkat_kelas');
 
-            $rombelQuery = \App\Models\Rombel::orderBy('nama');
+            $rombelQuery = \App\Models\Rombel::where('tahun_pelajaran_id', $tahunAktif->id)->orderBy('nama');
             $rombelList  = $rombelQuery->get();
         }
 

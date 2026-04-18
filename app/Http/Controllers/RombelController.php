@@ -35,6 +35,14 @@ class RombelController extends Controller
                 ->whereNotIn('nama', $currentRombelNames)
                 ->exists();
 
+            // Sembunyikan tombol Salin Rombel jika seluruh siswa tahun ini sudah masuk kedalam rombel
+            $hasActiveStudent = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)->where('status', 'Aktif')->exists();
+            $hasUnassignedSiswas = Siswa::where('tahun_pelajaran_id', $tahunAktif->id)->whereNull('rombel_id')->where('status', 'Aktif')->exists();
+            
+            if ($hasActiveStudent && !$hasUnassignedSiswas) {
+                $canCopy = false;
+            }
+
             // Tombol salin anggota rombel
             // Muncul jika: tahun aktif sudah memiliki rombel (ada tujuan salin),
             // belum ada siswa yang masuk ke rombel mana pun, dan ada siswa di tahun sebelumnya.
@@ -179,6 +187,22 @@ class RombelController extends Controller
             ]);
 
         return redirect()->back()->with('success', count($request->siswa_ids) . ' siswa berhasil dipetakan ke Rombel ' . $rombel->nama);
+    }
+
+    public function removeSiswa($rombelId, $siswaId)
+    {
+        $rombel = Rombel::findOrFail($rombelId);
+        $siswa = \App\Models\Siswa::findOrFail($siswaId);
+
+        if ($siswa->rombel_id == $rombel->id) {
+            $siswa->update([
+                'rombel_id' => null,
+                'rombel_saat_ini' => null,
+            ]);
+            return redirect()->back()->with('success', 'Siswa ' . $siswa->nama . ' berhasil dikeluarkan dari rombel.');
+        }
+
+        return redirect()->back()->with('error', 'Siswa tidak ditemukan dalam rombel ini.');
     }
 
     public function getPreview($tahunId)

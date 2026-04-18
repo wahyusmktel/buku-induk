@@ -130,6 +130,32 @@
                     @endif
                 </a>
 
+                {{-- Arsip Siswa dropdown --}}
+                <div x-data="{ open: {{ request()->routeIs('alumni.*') ? 'true' : 'false' }} }">
+                    <button @click="open = !open" 
+                            class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
+                                   {{ request()->routeIs('alumni.*') 
+                                      ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                                      : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 transition-colors {{ request()->routeIs('alumni.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                            </svg>
+                            Arsip Siswa
+                        </div>
+                        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" 
+                         x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 -translate-y-2" 
+                         x-transition:enter-end="opacity-100 translate-y-0" 
+                         class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
+                        <a href="{{ route('alumni.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('alumni.*') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                            Alumni
+                        </a>
+                    </div>
+                </div>
+
                 <a href="{{ route('exports.index') }}" 
                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
                           {{ request()->routeIs('exports.*') 
