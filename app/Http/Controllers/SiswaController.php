@@ -54,43 +54,48 @@ class SiswaController extends Controller
 
         $siswas = $query->latest()->paginate(15)->withQueryString();
         
-        // Cek apakah bisa melakukan Naikan Semester
+        // Cek apakah bisa melakukan Naikan Semester atau Naikan Kelas
         $canPromote = false;
         $canPromoteGrade = false;
         $previousGenapId = null;
+        $semesterSumber = null;
+
         if ($tahunAktif) {
             $isCurrentEmpty = $siswas->total() === 0;
 
-            // --- Deteksi Naikan Kelas ---
-            // Muncul jika: tahun aktif = Ganjil, ada semester Genap di tahun sebelumnya, dan data siswa kosong
-            if ($tahunAktif->semester === 'Ganjil' && $isCurrentEmpty) {
-                // Cari tahun pelajaran Genap di tahun sebelumnya
-                // Tahun format "2025/2026" -> tahun sebelumnya "2024/2025"
-                $tahunParts = explode('/', $tahunAktif->tahun);
-                if (count($tahunParts) === 2) {
-                    $prevTahun = ($tahunParts[0] - 1) . '/' . ($tahunParts[1] - 1);
-                    $previousGenap = TahunPelajaran::where('tahun', $prevTahun)
-                        ->where('semester', 'Genap')
-                        ->first();
-                    
-                    if ($previousGenap) {
-                        $hasSiswasInPrev = Siswa::withoutGlobalScope('tahun_aktif')
-                            ->where('tahun_pelajaran_id', $previousGenap->id)
+            if ($isCurrentEmpty) {
+                // --- Deteksi Naikan Semester: transisi antar semester dalam tahun yang SAMA ---
+                $otherSemester = $tahunAktif->semester === 'Ganjil' ? 'Genap' : 'Ganjil';
+                $sameYearOther = TahunPelajaran::where('tahun', $tahunAktif->tahun)
+                    ->where('semester', $otherSemester)
+                    ->where('id', '!=', $tahunAktif->id)
+                    ->first();
+
+                if ($sameYearOther && Siswa::withoutGlobalScope('tahun_aktif')
+                    ->where('tahun_pelajaran_id', $sameYearOther->id)
+                    ->where('status', 'Aktif')
+                    ->exists()) {
+                    $canPromote = true;
+                    $previousGenapId = $sameYearOther->id;
+                    $semesterSumber = $sameYearOther;
+                }
+
+                // --- Deteksi Naikan Kelas: transisi ke tahun pelajaran BARU (tahun berbeda) ---
+                if (!$canPromote) {
+                    $prevWithStudents = TahunPelajaran::where('tahun', '!=', $tahunAktif->tahun)
+                        ->orderByDesc('tahun')
+                        ->orderByDesc('semester')
+                        ->get()
+                        ->first(fn($tp) => Siswa::withoutGlobalScope('tahun_aktif')
+                            ->where('tahun_pelajaran_id', $tp->id)
                             ->where('status', 'Aktif')
-                            ->exists();
-                        if ($hasSiswasInPrev) {
-                            $canPromoteGrade = true;
-                            $previousGenapId = $previousGenap->id;
-                        }
+                            ->exists());
+
+                    if ($prevWithStudents) {
+                        $canPromoteGrade = true;
+                        $previousGenapId = $prevWithStudents->id;
                     }
                 }
-            }
-            
-            // --- Deteksi Naikan Semester (existing) ---
-            // Hanya muncul jika bukan naik kelas
-            if (!$canPromoteGrade && $isCurrentEmpty) {
-                $hasPreviousYear = TahunPelajaran::where('id', '!=', $tahunAktif->id)->exists();
-                $canPromote = $hasPreviousYear;
             }
         }
 
@@ -98,8 +103,8 @@ class SiswaController extends Controller
         $rombels = Rombel::where('tahun_pelajaran_id', $tahunAktif?->id)
             ->orderBy('nama')
             ->pluck('nama');
-            
-        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels', 'canPromote', 'canPromoteGrade', 'previousGenapId'));
+
+        return view('siswas.index', compact('siswas', 'tahunAktif', 'status', 'tingkat', 'rombel', 'rombels', 'canPromote', 'canPromoteGrade', 'previousGenapId', 'semesterSumber'));
     }
 
     public function import(Request $request)
@@ -550,8 +555,10 @@ class SiswaController extends Controller
                 $matchRombel = $targetRombels->get($oldSiswa->rombel_saat_ini);
                 if ($matchRombel) {
                     $newSiswa->rombel_id = $matchRombel->id;
+                    $newSiswa->rombel_saat_ini = $matchRombel->nama;
                 } else {
                     $newSiswa->rombel_id = null;
+                    $newSiswa->rombel_saat_ini = null;
                 }
 
                 $newSiswa->save();
@@ -688,8 +695,10 @@ class SiswaController extends Controller
                     $matchRombel = $targetRombels->get($oldSiswa->rombel_saat_ini);
                     if ($matchRombel) {
                         $newSiswa->rombel_id = $matchRombel->id;
+                        $newSiswa->rombel_saat_ini = $matchRombel->nama;
                     } else {
                         $newSiswa->rombel_id = null;
+                        $newSiswa->rombel_saat_ini = null;
                     }
 
                     $newSiswa->save();

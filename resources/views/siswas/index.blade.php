@@ -494,6 +494,7 @@
 </div>
     {{-- MODAL: Naikan Semester (Siswa) --}}
     @hasanyrole('Super Admin|Operator|Tata Usaha')
+    @if($canPromote && $previousGenapId && $semesterSumber)
     <div x-data="{ 
             open: false,
             isMax: false,
@@ -503,16 +504,9 @@
             startX: 0,
             startY: 0,
             loading: false,
-            years: [],
-            selectedYearId: '',
+            selectedYearId: '{{ $previousGenapId ?? '' }}',
             siswas: [],
-            init() {
-                fetch('{{ route('api.tahun-pelajaran.list') }}')
-                    .then(res => res.json())
-                    .then(data => {
-                        this.years = data.filter(y => y.id !== '{{ $tahunAktif->id ?? '' }}');
-                    });
-            },
+            init() { },
             fetchPreview() {
                 if (!this.selectedYearId) {
                     this.siswas = [];
@@ -527,8 +521,7 @@
                     });
             },
             confirmPromote() {
-                const yearText = this.years.find(y => y.id === this.selectedYearId);
-                const yearName = yearText ? yearText.tahun + ' - ' + yearText.semester : '';
+                const yearName = '{{ $semesterSumber->tahun }} - {{ $semesterSumber->semester }}';
                 
                 Swal.fire({
                     title: 'Pindahkan Semester?',
@@ -561,7 +554,7 @@
                 this.dragging = false;
             }
          }" 
-         @open-promote-siswa-modal.window="open = true"
+         @open-promote-siswa-modal.window="open = true; siswas = []; fetchPreview()"
          @mousemove.window="doDrag" 
          @mouseup.window="stopDrag"
          x-show="open" x-transition 
@@ -599,15 +592,13 @@
             <div class="p-8 flex-1 overflow-y-auto space-y-8">
                 <form x-ref="promoteForm" action="{{ route('siswas.promote-semester') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="source_tahun_id" value="{{ $previousGenapId }}">
                     <div class="max-w-xl">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Semester Sumber</label>
-                        <select name="source_tahun_id" x-model="selectedYearId" @change="fetchPreview()" 
-                                class="w-full px-4 py-3 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-inner">
-                            <option value="">-- Pilih Semester / Tahun Pelajaran --</option>
-                            <template x-for="year in years" :key="year.id">
-                                <option :value="year.id" x-text="year.tahun + ' - ' + year.semester"></option>
-                            </template>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sumber Semester</label>
+                        <div class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 shadow-inner">
+                            <p class="text-sm font-black text-slate-700">{{ $semesterSumber?->tahun }} — Semester {{ $semesterSumber?->semester }}</p>
+                            <p class="text-xs text-slate-400 mt-1">Semua siswa aktif dari semester ini akan disalin ke semester aktif</p>
+                        </div>
                     </div>
                 </form>
 
@@ -628,7 +619,7 @@
 
                         <div x-show="!loading && siswas.length === 0" class="flex-1 flex flex-col items-center justify-center py-12 text-slate-300" x-cloak>
                             <svg class="w-16 h-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                            <p class="text-sm font-bold text-slate-400">Silahkan pilih semester sumber untuk melihat preview</p>
+                            <p class="text-sm font-bold text-slate-400">Tidak ada siswa aktif di semester sumber</p>
                         </div>
 
                         <table x-show="!loading && siswas.length > 0" class="w-full text-left border-collapse" x-cloak>
@@ -668,6 +659,7 @@
             </div>
         </div>
     </div>
+    @endif
     @endhasanyrole
 
     {{-- MODAL: Naikan Kelas (Grade Promotion) --}}

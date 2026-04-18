@@ -173,7 +173,10 @@ class RombelController extends Controller
         $rombel = Rombel::findOrFail($id);
         
         \App\Models\Siswa::whereIn('id', $request->siswa_ids)
-            ->update(['rombel_id' => $rombel->id]);
+            ->update([
+                'rombel_id' => $rombel->id,
+                'rombel_saat_ini' => $rombel->nama,
+            ]);
 
         return redirect()->back()->with('success', count($request->siswa_ids) . ' siswa berhasil dipetakan ke Rombel ' . $rombel->nama);
     }
