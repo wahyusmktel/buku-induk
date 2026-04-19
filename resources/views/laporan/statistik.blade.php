@@ -12,8 +12,15 @@
 @endphp
 
 {{-- ── Hero Header ─────────────────────────────────────────────────────────── --}}
-<div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl shadow-xl p-8 mb-8 relative overflow-hidden text-white">
-    <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+<div class="relative mb-8 text-white z-20">
+    {{-- Background & Decorative Layer (Clipped) --}}
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl shadow-xl overflow-hidden">
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute right-10 top-10 w-20 h-20 bg-indigo-400/20 rounded-full blur-2xl animate-pulse pointer-events-none"></div>
+    </div>
+
+    {{-- Content Layer (Overflow Visible) --}}
+    <div class="relative z-10 p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
             <h2 class="text-3xl font-extrabold mb-2 tracking-tight">Laporan &amp; Statistik</h2>
             <p class="text-indigo-100 font-medium max-w-xl">
@@ -84,10 +91,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Decorative --}}
-    <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute right-10 top-10 w-20 h-20 bg-indigo-400/20 rounded-full blur-2xl animate-pulse pointer-events-none"></div>
 </div>
 
 {{-- ── Stat Cards ───────────────────────────────────────────────────────────── --}}
