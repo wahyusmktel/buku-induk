@@ -3,7 +3,6 @@
 @section('title', 'Tentang Aplikasi')
 
 @section('styles')
-<style>
     .about-header {
         text-align: center;
         margin-bottom: 3rem;
@@ -68,15 +67,14 @@
         .about-grid { grid-template-columns: 1fr; }
         .about-header h1 { font-size: 2.5rem; }
     }
-</style>
 @endsection
 
 @section('content')
 <main class="page-wrapper">
     <div class="glass-container">
         <div class="about-header">
-            <h1>Tentang <span>Buku Induk</span></h1>
-            <p>Sistem pencatatan dan pengelolaan data induk siswa modern yang dioptimalkan untuk kebutuhan SD Muhammadiyah Gisting.</p>
+            <h1>{!! \App\Models\Setting::getValue('landing_about_title', 'Tentang <span>Buku Induk</span>') !!}</h1>
+            <p>{{ \App\Models\Setting::getValue('landing_about_subtitle', 'Sistem pencatatan dan pengelolaan data induk siswa modern yang dioptimalkan untuk kebutuhan SD Muhammadiyah Gisting.') }}</p>
         </div>
 
         <div class="about-grid">
@@ -84,24 +82,24 @@
                 <div class="card-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
-                <h3>Aman & Terpusat</h3>
-                <p>Semua data identitas, akademik, dan riwayat siswa tersimpan dengan aman pada pangkalan data terpusat, meminimalisir risiko kehilangan data.</p>
+                <h3>{{ \App\Models\Setting::getValue('landing_f1_title', 'Aman & Terpusat') }}</h3>
+                <p>{{ \App\Models\Setting::getValue('landing_f1_desc', 'Semua data identitas, akademik, dan riwayat siswa tersimpan dengan aman pada pangkalan data terpusat, meminimalisir risiko kehilangan data.') }}</p>
             </div>
             
             <div class="about-card" style="background: rgba(254, 240, 138, 0.3); border-color: rgba(250, 204, 21, 0.4);">
                 <div class="card-icon" style="background: var(--light-yellow); color: #b45309;">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </div>
-                <h3>Akses Instan</h3>
-                <p>Pencarian, pembaruan, dan pelaporan informasi siswa bisa dilakukan kapan saja, mengefisienkan seluruh proses administrasi.</p>
+                <h3>{{ \App\Models\Setting::getValue('landing_f2_title', 'Akses Instan') }}</h3>
+                <p>{{ \App\Models\Setting::getValue('landing_f2_desc', 'Pencarian, pembaruan, dan pelaporan informasi siswa bisa dilakukan kapan saja, mengefisienkan seluruh proses administrasi.') }}</p>
             </div>
             
             <div class="about-card">
                 <div class="card-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                 </div>
-                <h3>Antarmuka Intuitif</h3>
-                <p>Desain aplikasi yang modern, nyaman dipandang, dan mudah dipahami, memberikan pengalaman penggunaan terbaik bagi staf pendidik tata usaha.</p>
+                <h3>{{ \App\Models\Setting::getValue('landing_f3_title', 'Antarmuka Intuitif') }}</h3>
+                <p>{{ \App\Models\Setting::getValue('landing_f3_desc', 'Desain aplikasi yang modern, nyaman dipandang, dan mudah dipahami, memberikan pengalaman penggunaan terbaik bagi staf pendidik tata usaha.') }}</p>
             </div>
         </div>
     </div>

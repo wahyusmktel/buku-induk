@@ -45,8 +45,11 @@ use App\Http\Controllers\CetakController;
 use App\Http\Controllers\BeasiswaController;
 use App\Http\Controllers\RegistrasiController;
 use App\Http\Controllers\TrashController;
+use App\Http\Controllers\ContactController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+Route::post('/kontak', [ContactController::class, 'store'])->name('contact.store');
 
 Route::middleware(['auth'])->group(function () {
     // Laporan & Statistik
@@ -168,9 +171,16 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
         Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->except(['create', 'show', 'edit']);
 
-        // Settings (Konfigurasi Sistem)
+        // Settings (Konfigurasi)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::get('/settings/pages', [SettingController::class, 'pages'])->name('settings.pages');
+        Route::post('/settings/pages', [SettingController::class, 'updatePages'])->name('settings.pages.update');
         Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Contact Messages (Inbox)
+        Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+        Route::patch('/contacts/{message}/read', [ContactController::class, 'markAsRead'])->name('contacts.read');
+        Route::delete('/contacts/{message}', [ContactController::class, 'destroy'])->name('contacts.destroy');
     });
 
     // Super Admin Only

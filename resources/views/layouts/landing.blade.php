@@ -283,7 +283,55 @@
 
         /* Inherit the hero specific CSS to child */
         @yield('styles')
+        
+        [x-cloak] { display: none !important; }
+
+        /* Toast Tailwind Compatibility for Landing */
+        .fixed { position: fixed; }
+        .z-50 { z-index: 50; }
+        .bottom-8 { bottom: 2rem; }
+        .right-8 { right: 2rem; }
+        .bg-slate-800 { background-color: #1e293b; }
+        .text-white { color: #fff; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .gap-3 { gap: 0.75rem; }
+        .font-semibold { font-weight: 600; }
+        .text-sm { font-size: 0.875rem; }
+        .border { border: 1px solid transparent; }
+        .border-white\/10 { border-color: rgba(255, 255, 255, 0.1); }
+        .flex-shrink-0 { flex-shrink: 0; }
+        .bg-emerald-500 { background-color: #10b981; }
+        .rounded-full { border-radius: 9999px; }
+        .p-1.5 { padding: 0.375rem; }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .shadow-emerald-500\/20 { box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2); }
+        .w-4 { width: 1rem; }
+        .h-4 { height: 1rem; }
+        .w-5 { width: 1.25rem; }
+        .h-5 { height: 1.25rem; }
+        .ml-4 { margin-left: 1rem; }
+        .text-slate-400 { color: #94a3b8; }
+        .cursor-pointer { cursor: pointer; }
+        .focus\:outline-none:focus { outline: none; }
+        .transition-colors { transition-property: color; transition-duration: 150ms; }
+        .hover\:text-white:hover { color: #fff; }
+        .transition { transition-all duration-150ms; }
+        .duration-300 { transition-duration: 300ms; }
+        .duration-200 { transition-duration: 200ms; }
+        .ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+        .ease-in { transition-timing-function: cubic-bezier(0.4, 0, 1, 1); }
+        .opacity-0 { opacity: 0; }
+        .opacity-100 { opacity: 1; }
+        .translate-y-5 { transform: translateY(1.25rem); }
+        .translate-y-0 { transform: translateY(0); }
     </style>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body>
     <!-- Animated Background -->
@@ -354,5 +402,18 @@
             }
         }
     </script>
+
+    {{-- Global Toast Notification --}}
+    @if(session('success'))
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-5" x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-5"
+         class="fixed z-50 bottom-8 right-8 bg-slate-800 text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-semibold text-sm border border-white/10"
+         x-cloak>
+        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1.5 shadow-lg shadow-emerald-500/20"><svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+        <p>{{ session('success') }}</p>
+        <button type="button" @click="show = false" class="ml-4 text-slate-400 hover:text-white transition-colors cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    @endif
 </body>
 </html>

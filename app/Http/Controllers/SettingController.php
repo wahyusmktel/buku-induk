@@ -21,6 +21,121 @@ class SettingController extends Controller
     }
 
     /**
+     * Tampilkan halaman pengaturan laman
+     */
+    public function pages()
+    {
+        $settings = Setting::pluck('value', 'key')->toArray();
+        return view('settings.pages', compact('settings'));
+    }
+
+    /**
+     * Simpan update konfigurasi laman
+     */
+    public function updatePages(Request $request)
+    {
+        // Logika penggabungan judul otomatis untuk Beranda
+        if ($request->has('hero_title_p1')) {
+            $welcomeTitle = $request->hero_title_p1 . 
+                           ' <span class="highlight-blue">' . $request->hero_title_blue . '</span>' .
+                           ($request->hero_title_p2 ? ' <br> ' . $request->hero_title_p2 : '') .
+                           ' <span class="highlight-yellow">' . $request->hero_title_yellow . '</span>';
+            $request->merge(['landing_hero_title' => $welcomeTitle]);
+        }
+        
+        // Logika penggabungan judul untuk Tentang
+        if ($request->has('about_title_p1')) {
+            $aboutTitle = $request->about_title_p1 . ' <span>' . $request->about_title_span . '</span>';
+            $request->merge(['landing_about_title' => $aboutTitle]);
+        }
+        
+        // Logika penggabungan judul untuk Kontak
+        if ($request->has('contact_title_p1')) {
+            $contactTitle = $request->contact_title_p1 . ' <span>' . $request->contact_title_span . '</span>';
+            $request->merge(['landing_contact_title' => $contactTitle]);
+        }
+
+        // Validasi input
+        $validatedData = $request->validate([
+            'landing_hero_title' => 'nullable|string',
+            'landing_hero_subtitle' => 'nullable|string',
+            'landing_hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'landing_badge1_title' => 'nullable|string',
+            'landing_badge1_subtitle' => 'nullable|string',
+            'landing_badge2_title' => 'nullable|string',
+            'landing_badge2_subtitle' => 'nullable|string',
+            
+            'landing_about_title' => 'nullable|string',
+            'landing_about_subtitle' => 'nullable|string',
+            'landing_f1_title' => 'nullable|string',
+            'landing_f1_desc' => 'nullable|string',
+            'landing_f2_title' => 'nullable|string',
+            'landing_f2_desc' => 'nullable|string',
+            'landing_f3_title' => 'nullable|string',
+            'landing_f3_desc' => 'nullable|string',
+            
+            'landing_contact_title' => 'nullable|string',
+            'landing_contact_subtitle' => 'nullable|string',
+            'landing_contact_address' => 'nullable|string',
+            'landing_contact_phone' => 'nullable|string',
+            'landing_contact_email' => 'nullable|string',
+            
+            // Kolom bagian judul (disimpan agar form bisa menampilkan kembali)
+            'hero_title_p1' => 'nullable|string',
+            'hero_title_blue' => 'nullable|string',
+            'hero_title_p2' => 'nullable|string',
+            'hero_title_yellow' => 'nullable|string',
+            'about_title_p1' => 'nullable|string',
+            'about_title_span' => 'nullable|string',
+            'contact_title_p1' => 'nullable|string',
+            'contact_title_span' => 'nullable|string',
+        ]);
+
+        // Simpan inputan string biasa
+        $textSettings = $request->except(['_token', '_method', 'landing_hero_image', 'active_tab']);
+
+        foreach ($textSettings as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+        }
+
+        // Simpan file upload (gambar hero)
+        if ($request->hasFile('landing_hero_image')) {
+            $file = $request->file('landing_hero_image');
+            
+            if ($file && $file->isValid()) {
+                // Hapus file lama jika ada
+                $oldSetting = Setting::where('key', 'landing_hero_image')->first();
+
+                if ($oldSetting && !empty($oldSetting->value)) {
+                    try {
+                        if (Storage::disk('public')->exists($oldSetting->value)) {
+                            Storage::disk('public')->delete($oldSetting->value);
+                        }
+                    } catch (\Exception $e) {}
+                }
+
+                // SImpan folder settings jika belum ada
+                if (!Storage::disk('public')->exists('settings')) {
+                    Storage::disk('public')->makeDirectory('settings');
+                }
+
+                // Simpan file baru
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(storage_path('app/public/settings'), $filename);
+                $path = 'settings/' . $filename;
+
+                Setting::updateOrCreate(['key' => 'landing_hero_image'], ['value' => $path]);
+            }
+        }
+
+        ActivityLogService::log('landing_pages_update', "Memperbarui Konten Laman Publik (" . $request->active_tab . ")", [
+            'updated_at' => now()
+        ]);
+
+        return redirect()->route('settings.pages', ['tab' => $request->active_tab])->with('success', 'Konfigurasi Laman Berhasil Diperbarui!');
+    }
+
+    /**
      * Simpan update konfigurasi
      */
     public function update(Request $request)

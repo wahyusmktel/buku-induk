@@ -238,20 +238,55 @@
                         Tahun Pelajaran
                     </a>
                     @endhasanyrole
+
+                    @hasanyrole('Super Admin|Operator')
+                    <a href="{{ route('contacts.index') }}" 
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group relative
+                              {{ request()->routeIs('contacts.*') 
+                                 ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                                 : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('contacts.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Pesan Masuk
+                        
+                        @php $unreadCount = \App\Models\ContactMessage::where('is_read', false)->count(); @endphp
+                        @if($unreadCount > 0)
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[0.65rem] font-bold text-white shadow-lg shadow-rose-200 animate-pulse">
+                            {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                        </span>
+                        @endif
+                    </a>
+                    @endhasanyrole
                 </div>
                 @endhasrole
 
                 <div class="pt-5 mt-5 border-t border-slate-100">
                     <p class="px-3 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Pengaturan</p>
 
-                    <a href="{{ route('settings.index') }}" 
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border group
-                              {{ request()->routeIs('settings.*') 
-                                 ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
-                                 : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
-                        <svg class="w-5 h-5 transition-colors {{ request()->routeIs('settings.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Konfigurasi Sistem
-                    </a>
+                    <div x-data="{ open: {{ request()->routeIs('settings.*') ? 'true' : 'false' }} }">
+                        <button @click="open = !open" 
+                                class="flex items-center justify-between w-full px-3 py-2.5 rounded-xl border group transition-all
+                                       {{ request()->routeIs('settings.*') 
+                                          ? 'bg-indigo-50/80 text-indigo-700 font-semibold border-indigo-100/50 shadow-sm' 
+                                          : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 font-medium border-transparent' }}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 transition-colors {{ request()->routeIs('settings.*') ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Konfigurasi
+                            </div>
+                            <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform duration-200 opacity-50 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-200" 
+                             x-transition:enter-start="opacity-0 -translate-y-2" 
+                             x-transition:enter-end="opacity-100 translate-y-0" 
+                             class="mt-1 ml-4 pl-4 border-l border-slate-200 space-y-1" x-cloak>
+                            <a href="{{ route('settings.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('settings.index') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                                Dokumen
+                            </a>
+                            <a href="{{ route('settings.pages') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('settings.pages') ? 'text-indigo-700 font-bold bg-indigo-50/50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50' }}">
+                                Pengaturan Laman
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
@@ -435,5 +470,18 @@
             
         </div>
     </div>
+
+    <!-- {{-- Global Toast Notification --}}
+    @if(session('success'))
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-5" x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-5"
+         class="fixed z-[9999] bottom-8 right-8 bg-slate-800 text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-semibold text-sm border border-white/10"
+         x-cloak>
+        <div class="flex-shrink-0 bg-emerald-500 rounded-full p-1.5 shadow-lg shadow-emerald-500/20"><svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+        <p>{{ session('success') }}</p>
+        <button type="button" @click="show = false" class="ml-4 text-slate-400 hover:text-white transition-colors cursor-pointer focus:outline-none"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    @endif -->
 </body>
 </html>

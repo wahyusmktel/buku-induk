@@ -3,7 +3,6 @@
 @section('title', 'Beranda')
 
 @section('styles')
-<style>
     /* Hero Section Specific */
     .hero {
         display: flex;
@@ -243,7 +242,6 @@
         .image-card { height: 300px; }
         .floating-badge { display: none; }
     }
-</style>
 @endsection
 
 @section('content')
@@ -251,8 +249,8 @@
     <div class="glass-container hero-card">
         <!-- Left Text Content -->
         <div class="hero-text">
-            <h1>Sistem <span class="highlight-blue">Informasi</span> <br> <span class="highlight-yellow">Buku Induk</span></h1>
-            <p>Platform digital modern untuk mengelola data induk siswa SD Muhammadiyah Gisting. Aman, cepat, dan mudah digunakan.</p>
+            <h1>{!! \App\Models\Setting::getValue('landing_hero_title', 'Sistem <span class="highlight-blue">Informasi</span> <br> <span class="highlight-yellow">Buku Induk</span>') !!}</h1>
+            <p>{{ \App\Models\Setting::getValue('landing_hero_subtitle', 'Platform digital modern untuk mengelola data induk siswa SD Muhammadiyah Gisting. Aman, cepat, dan mudah digunakan.') }}</p>
             
             <div class="cta-group">
                 @if (Route::has('login'))
@@ -279,13 +277,14 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
                 <div class="badge-text">
-                    <strong>Data Aman</strong>
-                    <span>Tersimpan di Cloud</span>
+                    <strong>{{ \App\Models\Setting::getValue('landing_badge1_title', 'Data Aman') }}</strong>
+                    <span>{{ \App\Models\Setting::getValue('landing_badge1_subtitle', 'Tersimpan di Cloud') }}</span>
                 </div>
             </div>
 
             <div class="image-card">
-                <img src="{{ asset('images/hero.png') }}" alt="SD Muhammadiyah Gisting Students">
+                @php $heroImg = \App\Models\Setting::getValue('landing_hero_image'); @endphp
+                <img src="{{ $heroImg ? asset('storage/' . $heroImg) : asset('images/hero.png') }}" alt="SD Muhammadiyah Gisting Students">
             </div>
 
             <div class="badge-2 floating-badge">
@@ -293,8 +292,8 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 </div>
                 <div class="badge-text">
-                    <strong>Akses Cepat</strong>
-                    <span>24/7 Tersedia</span>
+                    <strong>{{ \App\Models\Setting::getValue('landing_badge2_title', 'Akses Cepat') }}</strong>
+                    <span>{{ \App\Models\Setting::getValue('landing_badge2_subtitle', '24/7 Tersedia') }}</span>
                 </div>
             </div>
         </div>

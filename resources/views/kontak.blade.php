@@ -3,7 +3,6 @@
 @section('title', 'Hubungi Kami')
 
 @section('styles')
-<style>
     .contact-wrapper {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -115,7 +114,6 @@
         .contact-wrapper { grid-template-columns: 1fr; gap: 3rem; }
         .contact-info h1 { font-size: 2.5rem; }
     }
-</style>
 @endsection
 
 @section('content')
@@ -124,8 +122,8 @@
         <div class="contact-wrapper">
             <!-- Info Kolom Kiri -->
             <div class="contact-info">
-                <h1>Hubungi <span>Kami</span></h1>
-                <p>Ada kendala tentang aplikasi atau perihal administratif data siswa? Tim administrasi SD Muhammadiyah Gisting siap membantu.</p>
+                <h1>{!! \App\Models\Setting::getValue('landing_contact_title', 'Hubungi <span>Kami</span>') !!}</h1>
+                <p>{{ \App\Models\Setting::getValue('landing_contact_subtitle', 'Ada kendala tentang aplikasi atau perihal administratif data siswa? Tim administrasi SD Muhammadiyah Gisting siap membantu.') }}</p>
                 
                 <div class="info-list">
                     <div class="info-item">
@@ -134,7 +132,7 @@
                         </div>
                         <div class="info-content">
                             <h4>Lokasi Sekolah</h4>
-                            <p>Jl. Raya Gisting Raya No. 1, Kabupaten Tanggamus, Lampung</p>
+                            <p>{{ \App\Models\Setting::getValue('landing_contact_address', 'Jl. Raya Gisting Raya No. 1, Kabupaten Tanggamus, Lampung') }}</p>
                         </div>
                     </div>
                     
@@ -144,7 +142,7 @@
                         </div>
                         <div class="info-content">
                             <h4>Telepon Utama</h4>
-                            <p>(0722) 123456</p>
+                            <p>{{ \App\Models\Setting::getValue('landing_contact_phone', '(0722) 123456') }}</p>
                         </div>
                     </div>
 
@@ -154,28 +152,44 @@
                         </div>
                         <div class="info-content">
                             <h4>Email Resmi</h4>
-                            <p>info@sdmuhammadiyahgisting.sch.id</p>
+                            <p>{{ \App\Models\Setting::getValue('landing_contact_email', 'info@sdmuhammadiyahgisting.sch.id') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Form Kolom Kanan -->
-            <div class="contact-form">
-                <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Ini hanyalah simulasi halaman kontak.');">
+            <div class="contact-form" x-data="{ sending: false }">
+                @if(session('success'))
+                <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 p-6 rounded-2xl mb-6 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 text-emerald-600">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg">Pesan Terkirim!</h4>
+                        <p class="text-emerald-600/80 text-sm">{{ session('success') }}</p>
+                    </div>
+                </div>
+                @endif
+
+                <form action="{{ route('contact.store') }}" method="POST" @submit="sending = true">
+                    @csrf
                     <div class="form-group">
                         <label for="name">Nama Lengkap</label>
-                        <input type="text" id="name" class="form-control" placeholder="Masukkan nama..." required>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Masukkan nama..." required>
                     </div>
                     <div class="form-group">
                         <label for="email">Alamat Email</label>
-                        <input type="email" id="email" class="form-control" placeholder="Masukkan email..." required>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Masukkan email..." required>
                     </div>
                     <div class="form-group">
                         <label for="message">Pesan / Pertanyaan</label>
-                        <textarea id="message" class="form-control" placeholder="Tulis tujuan Anda di sini..." required></textarea>
+                        <textarea id="message" name="message" class="form-control" placeholder="Tulis tujuan Anda di sini..." required></textarea>
                     </div>
-                    <button type="submit" class="btn-submit">Kirim Pesan</button>
+                    <button type="submit" class="btn-submit" :disabled="sending" :class="sending ? 'opacity-70 cursor-not-allowed' : ''">
+                        <span x-show="!sending">Kirim Pesan</span>
+                        <span x-show="sending">Mengirim...</span>
+                    </button>
                 </form>
             </div>
         </div>
