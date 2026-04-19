@@ -40,7 +40,13 @@
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-8 text-white">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-8 text-white relative">
+            {{-- Back Button --}}
+            <a href="{{ route('buku-induk.show', $siswa->nisn) }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-b from-white to-slate-100 hover:to-white rounded-xl text-slate-700 text-[10px] font-black uppercase tracking-wider mb-5 transition-all shadow-sm border border-white group w-max">
+                <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Kembali
+            </a>
+            
             <h2 class="text-2xl font-extrabold tracking-tight">Lengkapi Buku Induk</h2>
             <p class="text-indigo-200 text-sm mt-1 font-medium">{{ $siswa->nama }} — NISN {{ $siswa->nisn }}</p>
             
@@ -608,7 +614,10 @@
             {{-- Submit --}}
             <div class="mt-10 pt-6 border-t border-slate-100 flex gap-3">
                 <a href="{{ route('buku-induk.show', $siswa->nisn) }}" class="flex-1 py-3 text-center text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all">Batal</a>
-                <button type="submit" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 cursor-pointer">
+                <button type="submit" class="flex-[2] py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
                     Simpan Perubahan
                 </button>
             </div>

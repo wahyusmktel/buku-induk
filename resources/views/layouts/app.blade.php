@@ -274,10 +274,12 @@
             <header class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 bg-white/70 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-10 w-full shrink-0 shadow-sm">
                 <!-- Hamburger Menu for both Desktop and Mobile -->
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-indigo-600 bg-white border border-slate-200 hover:border-indigo-200 p-2 rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-                        </svg>
+                    <button @click="sidebarOpen = !sidebarOpen" class="relative group text-slate-500 hover:text-indigo-600 bg-white border border-slate-200 hover:border-indigo-200 p-2.5 rounded-xl transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer w-10 h-10 flex items-center justify-center overflow-hidden">
+                        <div class="relative w-5 h-4 flex flex-col justify-between items-center transition-all duration-300">
+                            <span :class="sidebarOpen ? 'rotate-45 translate-y-[7px] w-5' : 'w-5'" class="h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+                            <span :class="sidebarOpen ? 'opacity-0 -translate-x-full' : 'w-5'" class="h-0.5 bg-current rounded-full transition-all duration-300"></span>
+                            <span :class="sidebarOpen ? '-rotate-45 -translate-y-[7px] w-5' : 'w-3 self-start'" class="h-0.5 bg-current rounded-full transition-all duration-300 origin-center"></span>
+                        </div>
                     </button>
                     <h1 class="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
                         @yield('header_title', 'Dashboard')

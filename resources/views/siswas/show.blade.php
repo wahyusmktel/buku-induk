@@ -12,8 +12,8 @@
 <div class="max-w-6xl mx-auto space-y-8 pb-20">
     
     <!-- Top Identity Card (Premium Banner) -->
-    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-        <div class="h-48 bg-gradient-to-br from-sky-600 via-indigo-700 to-indigo-900 relative">
+    <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100">
+        <div class="h-48 bg-gradient-to-br from-sky-600 via-indigo-700 to-indigo-900 relative rounded-t-[2rem]">
             <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w4.org/2000/svg\"%3E%3Cg fill=\"%23fff\" fill-opacity=\"1\" fill-rule=\"evenodd\"%3E%3Ccircle cx=\"3\" cy=\"3\" r=\"3\"/%3E%3Cpath d=\"M10 10c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z\"/%3E%3C/g%3E%3C/svg%3E');"></div>
             
             <div class="absolute -bottom-16 left-12 p-1.5 bg-white rounded-3xl shadow-2xl">
@@ -84,7 +84,7 @@
                         <svg class="w-3.5 h-3.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div x-show="open" x-cloak x-transition
-                         class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-30">
+                         class="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
                         <a href="{{ route('cetak.surat-aktif', $siswa->id) }}?preview=1"
                            target="_blank"
                            class="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
