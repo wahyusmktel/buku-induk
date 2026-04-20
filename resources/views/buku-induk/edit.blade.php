@@ -577,7 +577,7 @@
                                             @foreach($rows as $i => $row)
                                                 <tr class="hover:bg-slate-50/50">
                                                     <td class="px-5 py-3 text-center text-sm font-bold text-slate-400">{{ $i + 1 }}</td>
-                                                    <td class="px-5 py-3 text-sm font-bold text-slate-700">{{ $row->ekstrakurikuler?->nama_ekstrakurikuler ?? '&#8212;' }}</td>
+                                                    <td class="px-5 py-3 text-sm font-bold text-slate-700">{{ $row->ekstrakurikuler?->nama_ekstrakurikuler ?? '—' }}</td>
                                                     <td class="px-5 py-3 text-center">
                                                         @php
                                                             $badgeColor = match($row->predikat) {
@@ -590,7 +590,7 @@
                                                         @endphp
                                                         <span class="inline-block px-3 py-1 text-xs font-black rounded-lg {{ $badgeColor }}">{{ $row->predikat }}</span>
                                                     </td>
-                                                    <td class="px-5 py-3 text-sm text-slate-500">{{ $row->keterangan ?? '&#8212;' }}</td>
+                                                    <td class="px-5 py-3 text-sm text-slate-500">{{ $row->keterangan ?? '—' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
