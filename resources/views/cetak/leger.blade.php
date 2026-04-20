@@ -19,10 +19,13 @@
         }
 
         .page {
-            width: 297mm;
+            max-width: 297mm;
             min-height: 210mm;
             margin: 0 auto;
-            padding: 12mm 10mm 15mm 15mm;
+            padding-top: 10px;
+            padding-right: {{ $settings['margin_right'] ?? '1.5' }}cm;
+            padding-left: {{ $settings['margin_left'] ?? '1.5' }}cm;
+            position: relative;
         }
 
         /* HEADER */
@@ -59,41 +62,38 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 8pt;
+            font-size: 7.5pt;
         }
 
         .tabel-leger th,
         .tabel-leger td {
             border: 1px solid #333;
-            padding: 4px 3px;
+            padding: 3px 2px;
             text-align: center;
             vertical-align: middle;
+            word-wrap: break-word;
         }
 
         .tabel-leger thead th {
             background-color: #dbeafe;
             font-weight: bold;
-            font-size: 7.5pt;
+            font-size: 7pt;
         }
 
         .tabel-leger tbody td.no {
-            width: 22px;
+            width: 20px;
         }
 
         .tabel-leger tbody td.nama-siswa {
             text-align: left;
-            padding-left: 5px;
-            white-space: nowrap;
-            min-width: 120px;
+            padding-left: 4px;
         }
 
         .tabel-leger tbody td.nisn {
-            font-size: 7pt;
-            min-width: 80px;
+            font-size: 6.5pt;
         }
 
         .tabel-leger tbody td.nilai {
-            min-width: 28px;
         }
 
         .tabel-leger tbody td.jumlah,
@@ -129,8 +129,12 @@
         }
 
         .ttd-box .ttd-ruang {
-            height: 65px;
+            height: 75px;
+            position: relative;
         }
+
+        .stempel-img { height: 75px; width: auto; position: absolute; left: 0px; top: -5px; z-index: 1; }
+        .ttd-img { height: 60px; width: auto; position: absolute; left: 35px; top: 5px; z-index: 2; }
 
         .ttd-box .ttd-nama {
             font-weight: bold;
@@ -170,13 +174,24 @@
 
         @media print {
             body { margin: 0; }
-            .page { margin: 0; padding: 8mm 8mm 10mm 12mm; }
+            .page { 
+                margin-top: 10px;
+                margin-right: {{ $settings['margin_right'] ?? '1.5' }}cm;
+                margin-bottom: 0px;
+                margin-left: {{ $settings['margin_left'] ?? '1.5' }}cm;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
             .no-print { display: none !important; }
         }
 
         @page {
             size: A4 landscape;
-            margin: 0;
+            margin-top: {{ $settings['margin_top'] ?? '1.5' }}cm;
+            margin-bottom: {{ $settings['margin_bottom'] ?? '1.5' }}cm;
+            margin-left: 0;
+            margin-right: 0;
         }
     </style>
 </head>
@@ -214,6 +229,51 @@
             $kepsekNama  = $settings['kepsek_nama'] ?? '...';
             $kepsekNip   = $settings['kepsek_nip']  ?? '';
             $tahunPel    = $rombel->tahunPelajaran;
+
+            if (!function_exists('getMapelSingkatan')) {
+                function getMapelSingkatan($nama) {
+                    $namaLower = strtolower(trim($nama));
+                    $map = [
+                        'bahasa indonesia' => 'BINDO',
+                        'pendidikan agama islam dan budi pekerti' => 'PAIBP',
+                        'pendidikan agama islam' => 'PAI',
+                        'pendidikan kewarganegaraan' => 'PKN',
+                        'pendidikan pancasila dan kewarganegaraan' => 'PPKN',
+                        'pendidikan pancasila' => 'PP',
+                        'matematika' => 'MTK',
+                        'ilmu pengetahuan alam' => 'IPA',
+                        'ilmu pengetahuan sosial' => 'IPS',
+                        'bahasa inggris' => 'BING',
+                        'pendidikan jasmani olahraga dan kesehatan' => 'PJOK',
+                        'seni budaya dan prakarya' => 'SBDP',
+                        'seni budaya' => 'SB',
+                        'bahasa lampung' => 'BLPG',
+                        'muatan lokal' => 'MULOK',
+                        'pendidikan agama kristen dan budi pekerti' => 'PAKBP',
+                        'pendidikan jasmani, olahraga, dan kesehatan' => 'PJOK',
+                        'prakarya' => 'PRAK',
+                    ];
+                    
+                    if (isset($map[$namaLower])) {
+                        return $map[$namaLower];
+                    }
+
+                    $words = explode(' ', $nama);
+                    $singkatan = '';
+                    foreach ($words as $w) {
+                        $w = trim($w);
+                        if (strlen($w) > 0 && strtolower($w) != 'dan') {
+                            $singkatan .= strtoupper($w[0]);
+                        }
+                    }
+                    
+                    if (strlen($singkatan) == 1 && strlen($nama) > 2) {
+                        return strtoupper(substr($nama, 0, 3));
+                    }
+
+                    return $singkatan ?: '-';
+                }
+            }
         @endphp
 
         <div class="header">
@@ -231,24 +291,18 @@
         <table class="tabel-leger">
             <thead>
                 <tr>
-                    <th rowspan="2" class="no">No</th>
-                    <th rowspan="2" style="min-width:120px; text-align:left; padding-left:5px;">Nama Siswa</th>
-                    <th rowspan="2" style="min-width:80px;">NISN</th>
+                    <th class="no">No</th>
+                    <th style="text-align:left; padding-left:5px;">Nama Siswa</th>
+                    <th>NISN</th>
                     {{-- Kolom mata pelajaran --}}
                     @foreach($mataPelajarans as $mapel)
-                    <th style="min-width:28px; font-size:7pt;">
-                        {{-- Singkat nama mapel agar muat --}}
-                        {{ \Illuminate\Support\Str::limit($mapel->nama, 8, '') }}
+                    <th style="font-size:6.5pt;">
+                        {{ getMapelSingkatan($mapel->nama) }}
                     </th>
                     @endforeach
-                    <th rowspan="2" style="min-width:36px;">Jml</th>
-                    <th rowspan="2" style="min-width:36px;">Rata<br>-rata</th>
-                    <th rowspan="2" style="min-width:30px;">Peri-<br>ngkat</th>
-                </tr>
-                <tr>
-                    @foreach($mataPelajarans as $mapel)
-                    <th style="font-size:6.5pt; font-weight:normal; color:#1e40af;">{{ $mapel->urutan }}</th>
-                    @endforeach
+                    <th>Jml</th>
+                    <th>Rata<br>-rata</th>
+                    <th>Peri-<br>ngkat</th>
                 </tr>
             </thead>
             <tbody>
@@ -293,41 +347,96 @@
 
         {{-- KETERANGAN SINGKATAN MAPEL --}}
         @if($mataPelajarans->count())
-        <div style="margin-top: 8px; font-size: 7.5pt; color: #334155;">
-            <strong>Keterangan:</strong>
-            @foreach($mataPelajarans as $i => $mapel)
-                {{ $mapel->urutan }}={{ $mapel->nama }}{{ !$loop->last ? ';' : '' }}
-            @endforeach
+        <div style="margin-top: 12px; font-size: 7.5pt; color: #334155;">
+            <strong>Keterangan Singkatan Mata Pelajaran:</strong>
+            <table style="width: 100%; border: none; margin-top: 4px; font-size: 7.5pt;">
+                <tbody>
+                    @php 
+                        $cols = 3; 
+                        $items = $mataPelajarans->values();
+                        $rows = ceil($items->count() / $cols);
+                    @endphp
+                    @for($r = 0; $r < $rows; $r++)
+                    <tr>
+                        @for($c = 0; $c < $cols; $c++)
+                            @php $idx = $r + ($c * $rows); @endphp
+                            <td style="border: none; padding: 2px 4px 2px {{ $c == 0 ? '0' : '4px' }}; width: 33%; text-align: left; vertical-align: top;">
+                                @if(isset($items[$idx]))
+                                    <strong>{{ getMapelSingkatan($items[$idx]->nama) }}</strong> : {{ $items[$idx]->nama }}
+                                @endif
+                            </td>
+                        @endfor
+                    </tr>
+                    @endfor
+                </tbody>
+            </table>
         </div>
         @endif
 
         {{-- FOOTER TTD --}}
-        <div class="footer-ttd">
-            {{-- Wali Kelas --}}
-            <div class="ttd-box">
-                <div class="ttd-label">Mengetahui,</div>
-                <div class="ttd-jabatan">Wali Kelas {{ $rombel->nama }}</div>
-                <div class="ttd-ruang"></div>
-                <div class="ttd-nama">_______________________</div>
-                <div class="ttd-nip">NIP. -</div>
-            </div>
-
-            {{-- Kepala Sekolah --}}
-            <div class="ttd-box">
-                <div class="ttd-label">
-                    {{ $settings['buku_induk_kota'] ?? '....' }},
-                    {{ !empty($settings['buku_induk_tanggal']) ? $settings['buku_induk_tanggal'] : \Carbon\Carbon::now()->translatedFormat('d F Y') }}
-                </div>
-                <div class="ttd-jabatan">Kepala {{ $jenjang }}</div>
-                <div class="ttd-jabatan">{{ $namaSekolah }}</div>
-                <div class="ttd-ruang"></div>
-                <div class="ttd-nama">{{ $kepsekNama }}</div>
-                @if($kepsekNip)
-                <div class="ttd-nip">NIP. {{ $kepsekNip }}</div>
-                @endif
-            </div>
-        </div>
+        <table style="width: 100%; border: none; margin-top: 24px; page-break-inside: avoid;">
+            <tr>
+                <td style="width: 50%; vertical-align: top; text-align: left;">
+                    {{-- Wali Kelas --}}
+                    <div class="ttd-box" style="display: inline-block; text-align: center; width: 250px;">
+                        <div class="ttd-label">Mengetahui,</div>
+                        <div class="ttd-jabatan">Wali Kelas {{ $rombel->nama }}</div>
+                        <div class="ttd-ruang"></div>
+                        <div class="ttd-nama">_______________________</div>
+                        <div class="ttd-nip">NIP. -</div>
+                    </div>
+                </td>
+                <td style="width: 50%; vertical-align: top; text-align: right;">
+                    {{-- Kepala Sekolah --}}
+                    <div class="ttd-box" style="display: inline-block; text-align: center; width: 250px;">
+                        <div class="ttd-label">
+                            {{ $settings['buku_induk_kota'] ?? '....' }},
+                            {{ !empty($settings['buku_induk_tanggal']) ? $settings['buku_induk_tanggal'] : \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                        </div>
+                        <div class="ttd-jabatan">Kepala {{ $jenjang }}</div>
+                        <div class="ttd-jabatan">{{ $namaSekolah }}</div>
+                        <div class="ttd-ruang">
+                            @if(!empty($settings['kepsek_ttd_pdf']))
+                                <img src="{{ $settings['kepsek_ttd_pdf'] }}" class="ttd-img">
+                            @elseif(!empty($settings['kepsek_ttd']))
+                                <img src="{{ storage_path('app/public/' . $settings['kepsek_ttd']) }}" class="ttd-img">
+                            @endif
+                            @if(!empty($settings['sekolah_stempel_pdf']))
+                                <img src="{{ $settings['sekolah_stempel_pdf'] }}" class="stempel-img">
+                            @elseif(!empty($settings['sekolah_stempel']))
+                                <img src="{{ storage_path('app/public/' . $settings['sekolah_stempel']) }}" class="stempel-img">
+                            @endif
+                        </div>
+                        <div class="ttd-nama">{{ $kepsekNama }}</div>
+                        @if($kepsekNip)
+                        <div class="ttd-nip">NIP. {{ $kepsekNip }}</div>
+                        @endif
+                    </div>
+                </td>
+            </tr>
+        </table>
 
     </div>
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->get_font("Arial", "italic");
+            $size = 7.5;
+            $color = [0.4, 0.4, 0.4];
+            
+            $w = $pdf->get_width();
+            $h = $pdf->get_height();
+            $y = $h - 40;
+
+            $text_right = "Halaman {PAGE_NUM} dari {PAGE_COUNT}";
+            $width_right = $fontMetrics->get_text_width("Halaman 10 dari 10", $font, $size); 
+            $pdf->page_text($w - $width_right - 45, $y, $text_right, $font, $size, $color);
+
+            $sekolah = {!! json_encode($settings['sekolah_nama'] ?? '') !!};
+            $text_left = "Dicetak melalui Aplikasi Buku Induk" . ($sekolah ? " " . $sekolah : "");
+            $pdf->page_text(45, $y, $text_left, $font, $size, $color);
+            
+            $pdf->line(45, $y - 10, $w - 45, $y - 10, [0.8, 0.8, 0.8], 0.5);
+        }
+    </script>
 </body>
 </html>
