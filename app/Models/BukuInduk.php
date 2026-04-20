@@ -36,6 +36,7 @@ class BukuInduk extends Model
         'tgl_pindah_masuk' => 'date',
         'tgl_keluar' => 'date',
         'tgl_lulus' => 'date',
+        'tanggal_ijazah' => 'date',
         'tanggal_lahir_ayah' => 'date',
         'tanggal_lahir_ibu' => 'date',
     ];
