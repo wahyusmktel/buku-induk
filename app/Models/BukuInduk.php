@@ -171,7 +171,7 @@ class BukuInduk extends Model
 
         // ── 7. Meninggalkan Sekolah (Tamat) ──
         // Kondisi "Kecuali jika siswa sudah dalam keadaan lulus"
-        $sudahLulus = !empty($this->tgl_lulus) || $siswa->registrasi()->where('jenis_registrasi', 'Tamat Belajar')->exists();
+        $sudahLulus = $siswa->status === 'Lulus' || !empty($this->tgl_lulus) || $siswa->registrasi()->where('jenis_registrasi', 'Tamat Belajar')->exists();
         if ($sudahLulus) {
             $tamatFields = ['tgl_lulus', 'no_ijazah', 'tanggal_ijazah', 'lanjut_ke'];
             $total += count($tamatFields);
