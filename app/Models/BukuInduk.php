@@ -92,27 +92,70 @@ class BukuInduk extends Model
         $filled = 0;
         $total  = 0;
 
-        // ── 1. Identitas Murid (dari tabel siswas) — 10 field ──
+        // ── 1. Identitas Murid (dari tabel siswas) — 11 field ──
         $identitasFields = [
             'nipd', 'nisn', 'nik', 'nama', 'nama_panggilan',
-            'jk', 'tempat_lahir', 'tanggal_lahir', 'agama', 'kewarganegaraan',
+            'jk', 'tempat_lahir', 'tanggal_lahir', 'agama', 'kewarganegaraan', 'telepon'
         ];
         $total += count($identitasFields);
         $filled += collect($identitasFields)->filter(fn($f) => !empty($siswa->$f))->count();
 
-        // ── 2. Data Periodik (dari tabel data_periodik_siswas) — 7 field ──
+        // ── 2. Data Orang Tua — Ayah & Ibu (masing-masing 3 field) ──
+        $orangTuaFields = ['nama', 'pendidikan_terakhir', 'pekerjaan'];
+        $total += (count($orangTuaFields) * 2); // default ayah + ibu (6 field)
+
+        $orangTua = $siswa->dataOrangTua;
+        $periodik = $siswa->dataPeriodik;
+
+        if ($periodik && $periodik->bertempat_tinggal_pada === 'Bersama Wali') {
+            $total += 4; // wali wajib jika tinggal bersama wali (nama, hubungan, pendidikan, pekerjaan)
+        }
+
+        if ($orangTua) {
+            $ayah = $orangTua->where('jenis', 'Ayah')->first();
+            $ibu  = $orangTua->where('jenis', 'Ibu')->first();
+            
+            if ($ayah) $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ayah->$f))->count();
+            if ($ibu)  $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ibu->$f))->count();
+            
+            if ($periodik && $periodik->bertempat_tinggal_pada === 'Bersama Wali') {
+                $wali = $orangTua->where('jenis', 'Wali')->first();
+                if ($wali) {
+                    $filled += collect(['nama', 'status_hubungan_wali', 'pendidikan_terakhir', 'pekerjaan'])
+                                ->filter(fn($f) => !empty($wali->$f))->count();
+                }
+            }
+        }
+
+        // ── 3. Data Periodik (dari tabel data_periodik_siswas) — 7 field ──
         $periodikFields = [
             'jml_saudara_kandung', 'jml_saudara_tiri', 'jml_saudara_angkat',
             'bahasa_sehari_hari', 'alamat_tinggal', 'bertempat_tinggal_pada',
             'jarak_tempat_tinggal_ke_sekolah',
         ];
         $total += count($periodikFields);
-        $periodik = $siswa->dataPeriodik;
         if ($periodik) {
-            $filled += collect($periodikFields)->filter(fn($f) => !empty($periodik->$f))->count();
+            // Bisa pakai strlen/is_null karena angka 0 itu valid (seperti jumlah saudara kandung = 0)
+            $filled += collect($periodikFields)->filter(fn($f) => isset($periodik->$f) && $periodik->$f !== '')->count();
         }
 
-        // ── 3. Keadaan Jasmani (dari tabel keadaan_jasmani_siswas) — 5 field ──
+        // ── 4. Pendidikan Sebelumnya (Siswa Baru vs Pindahan) ──
+        if ($this->asal_masuk_sekolah === 'Pindahan') {
+            // Pindahan (4 field)
+            $total += 4;
+            if (!empty($this->asal_masuk_sekolah)) $filled++;
+            if (!empty($this->pindah_dari)) $filled++;
+            if (!empty($this->kelas_pindah_masuk)) $filled++;
+            if (!empty($this->tgl_pindah_masuk)) $filled++;
+        } else {
+            // Siswa Baru / Belum Tahu (3 field)
+            $total += 3;
+            if (!empty($this->asal_masuk_sekolah)) $filled++;
+            if (!empty($this->nama_tk_asal)) $filled++;
+            if (!empty($this->tgl_masuk_sekolah)) $filled++;
+        }
+
+        // ── 5. Keadaan Jasmani (dari tabel keadaan_jasmani_siswas) — 5 field ──
         $jasmaniFields = [
             'berat_badan', 'tinggi_badan', 'golongan_darah',
             'nama_riwayat_penyakit', 'kelainan_jasmani',
@@ -120,35 +163,31 @@ class BukuInduk extends Model
         $total += count($jasmaniFields);
         $jasmani = $siswa->keadaanJasmani;
         if ($jasmani) {
-            $filled += collect($jasmaniFields)->filter(fn($f) => !empty($jasmani->$f))->count();
+            $filled += collect($jasmaniFields)->filter(fn($f) => isset($jasmani->$f) && $jasmani->$f !== '')->count();
         }
 
-        // ── 4. Data Orang Tua — Ayah (3 field) + Ibu (3 field) = 6 field ──
-        $orangTuaFields = ['nama', 'pendidikan_terakhir', 'pekerjaan'];
-        $total += count($orangTuaFields) * 2; // ayah + ibu
+        // ── 6. Beasiswa (Skip - Tidak Dihitung) ──
+        // ── 10. Ekstrakurikuler (Skip - Tidak Dihitung) ──
 
-        $orangTua = $siswa->dataOrangTua;
-        if ($orangTua) {
-            $ayah = $orangTua->where('jenis', 'Ayah')->first();
-            $ibu  = $orangTua->where('jenis', 'Ibu')->first();
-            if ($ayah) {
-                $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ayah->$f))->count();
-            }
-            if ($ibu) {
-                $filled += collect($orangTuaFields)->filter(fn($f) => !empty($ibu->$f))->count();
-            }
+        // ── 7. Meninggalkan Sekolah (Tamat) ──
+        // Kondisi "Kecuali jika siswa sudah dalam keadaan lulus"
+        $sudahLulus = !empty($this->tgl_lulus) || $siswa->registrasi()->where('jenis_registrasi', 'Tamat Belajar')->exists();
+        if ($sudahLulus) {
+            $tamatFields = ['tgl_lulus', 'no_ijazah', 'tanggal_ijazah', 'lanjut_ke'];
+            $total += count($tamatFields);
+            $filled += collect($tamatFields)->filter(fn($f) => !empty($this->$f))->count();
         }
 
-        // ── 5. Pendidikan Sebelumnya (dari tabel buku_induks) — 3 field ──
-        $pendidikanFields = [
-            'asal_masuk_sekolah', 'nama_tk_asal', 'tgl_masuk_sekolah',
-        ];
-        $total += count($pendidikanFields);
-        $filled += collect($pendidikanFields)->filter(fn($f) => !empty($this->$f))->count();
-
-        // ── 6. Foto (dari tabel buku_induks) — 1 field ──
+        // ── 8. Foto Siswa ──
         $total += 1;
         if (!empty($this->foto_1)) $filled += 1;
+
+        // ── 9. Prestasi Akademik ──
+        // Dihitung sebagai 1 block terpenuhi jika memiliki catatan nilai
+        $total += 1;
+        if ($this->prestasis()->whereHas('nilais')->exists()) {
+            $filled += 1;
+        }
 
         if ($total === 0) return 0;
 
