@@ -10,6 +10,12 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto space-y-8 pb-20">
+
+    {{-- Back Button --}}
+    <a href="{{ route('siswas.index') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-b from-white to-slate-100 hover:to-white rounded-xl text-slate-700 text-[10px] font-black uppercase tracking-wider transition-all shadow-sm border border-white group w-max">
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        Kembali
+    </a>
     
     <!-- Top Identity Card (Premium Banner) -->
     <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100">

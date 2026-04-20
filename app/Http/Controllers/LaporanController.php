@@ -130,52 +130,70 @@ class LaporanController extends Controller
         $tahunId         = $request->tahun_id ?? $tahunAktif?->id;
         $tahunDipilih    = $tahunPelajarans->firstWhere('id', $tahunId);
 
-        // Rombel pada tahun yang dipilih beserta siswa dan data prestasinya
+        $rombelId = $request->rombel_id;
+        $search   = $request->q;
+
+        // Rombel dropdown options
         $rombels = Rombel::where('tahun_pelajaran_id', $tahunId)
             ->withCount(['siswas as jumlah_siswa' => fn($q) => $q->withoutGlobalScope('tahun_aktif')])
             ->orderBy('nama')
             ->get();
 
-        // Untuk setiap rombel, ambil summary prestasi siswa
-        $rombelData = $rombels->map(function (Rombel $rombel) {
-            $siswas = Siswa::withoutGlobalScope('tahun_aktif')
-                ->where('rombel_id', $rombel->id)
-                ->orderBy('nama')
-                ->get();
+        $selectedRombel = null;
+        $siswaData = collect();
+        $siswaPaginated = null;
 
-            $siswaData = $siswas->map(function (Siswa $siswa) use ($rombel) {
-                $prestasiList = collect();
+        if ($rombelId) {
+            $selectedRombel = $rombels->firstWhere('id', $rombelId);
+            if ($selectedRombel) {
+                // Fetch students inside the rombel with pagination and search
+                $siswaQuery = Siswa::withoutGlobalScope('tahun_aktif')
+                    ->where('rombel_id', $rombelId);
 
-                if ($siswa->nisn) {
-                    $bukuInduk = BukuInduk::where('nisn', $siswa->nisn)->first();
-                    if ($bukuInduk) {
-                        $prestasiList = $bukuInduk->prestasis()
-                            ->where('kelas', $rombel->tingkat)
-                            ->orderBy('semester')
-                            ->get();
-                    }
+                if ($search) {
+                    $siswaQuery->where(function ($q) use ($search) {
+                        $q->where('nama', 'like', "%{$search}%")
+                            ->orWhere('nisn', 'like', "%{$search}%")
+                            ->orWhere('nipd', 'like', "%{$search}%");
+                    });
                 }
 
-                return [
-                    'siswa'    => $siswa,
-                    'prestasi' => $prestasiList,
-                ];
-            });
+                $siswaPaginated = $siswaQuery->orderBy('nama')
+                    ->paginate(10)
+                    ->withQueryString();
 
-            return [
-                'rombel'      => $rombel,
-                'siswa_data'  => $siswaData,
-            ];
-        });
+                $siswaData = collect($siswaPaginated->items())->map(function (Siswa $siswa) use ($selectedRombel) {
+                    $prestasiList = collect();
+                    if ($siswa->nisn) {
+                        $bukuInduk = BukuInduk::where('nisn', $siswa->nisn)->first();
+                        if ($bukuInduk) {
+                            $prestasiList = $bukuInduk->prestasis()
+                                ->where('kelas', $selectedRombel->tingkat)
+                                ->orderBy('semester')
+                                ->get();
+                        }
+                    }
+                    return [
+                        'siswa'    => $siswa,
+                        'prestasi' => $prestasiList,
+                    ];
+                });
+            }
+        }
 
         $mataPelajarans = MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
 
         return view('laporan.prestasi', compact(
             'rombels',
-            'rombelData',
+            'selectedRombel',
+            'siswaData',
+            'siswaPaginated',
             'tahunPelajarans',
             'tahunDipilih',
             'mataPelajarans',
+            'tahunId',
+            'rombelId',
+            'search'
         ));
     }
 
