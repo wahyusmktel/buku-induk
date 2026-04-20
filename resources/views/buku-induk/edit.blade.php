@@ -435,7 +435,7 @@
                                     </select>
                                 </div>
                                 <div class="space-y-1.5"><label class="text-[10px] font-black text-slate-500 uppercase">Tanggal</label><input type="date" :name="'registrasi['+index+'][tanggal]'" x-model="item.tanggal" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-sm text-slate-700"></div>
-                                <div class="space-y-1.5 md:col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Keterangan / Alasan</label><input type="text" :name="'registrasi['+index+'][keterangan]'" x-model="item.keterangan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-sm text-slate-700" placeholder="Misal: Pindah ke SD N 1..."></div>
+                                <div class="space-y-1.5 md:col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Keterangan / Alasan</label><input type="text" :name="'registrasi['+index+'][alasan_catatan]'" x-model="item.alasan_catatan" class="w-full px-3 py-2 rounded-xl border border-slate-200 font-bold text-sm text-slate-700" placeholder="Misal: Pindah ke SD N 1..."></div>
                             </div>
                         </div>
                     </template>

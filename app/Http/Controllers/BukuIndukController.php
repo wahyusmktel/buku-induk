@@ -349,7 +349,7 @@ class BukuIndukController extends Controller
                             'siswa_id' => $siswa->id,
                             'jenis_registrasi' => $item['jenis_registrasi'],
                             'tanggal' => $item['tanggal'] ?? null,
-                            'keterangan' => $item['keterangan'] ?? null,
+                            'alasan_catatan' => $item['alasan_catatan'] ?? null,
                             'created_at' => now(),
                             'updated_at' => now()
                         ];
