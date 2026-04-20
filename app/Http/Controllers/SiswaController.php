@@ -519,6 +519,7 @@ class SiswaController extends Controller
         $sourceSiswas = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('tahun_pelajaran_id', $sourceTahun->id)
             ->where('status', 'Aktif')
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua', 'beasiswa', 'registrasi'])
             ->get();
 
         if ($sourceSiswas->isEmpty()) {
@@ -563,6 +564,38 @@ class SiswaController extends Controller
                 }
 
                 $newSiswa->save();
+
+                // Copy related data (except Prestasi Akademik and Ekstrakurikuler)
+                if ($oldSiswa->dataPeriodik) {
+                    $newPeriodik = $oldSiswa->dataPeriodik->replicate();
+                    $newPeriodik->siswa_id = $newSiswa->id;
+                    $newPeriodik->save();
+                }
+
+                if ($oldSiswa->keadaanJasmani) {
+                    $newJasmani = $oldSiswa->keadaanJasmani->replicate();
+                    $newJasmani->siswa_id = $newSiswa->id;
+                    $newJasmani->save();
+                }
+
+                foreach ($oldSiswa->dataOrangTua as $ortu) {
+                    $newOrtu = $ortu->replicate();
+                    $newOrtu->siswa_id = $newSiswa->id;
+                    $newOrtu->save();
+                }
+
+                foreach ($oldSiswa->beasiswa as $beasiswaItem) {
+                    $newBeasiswa = $beasiswaItem->replicate();
+                    $newBeasiswa->siswa_id = $newSiswa->id;
+                    $newBeasiswa->save();
+                }
+
+                foreach ($oldSiswa->registrasi as $registrasiItem) {
+                    $newRegistrasi = $registrasiItem->replicate();
+                    $newRegistrasi->siswa_id = $newSiswa->id;
+                    $newRegistrasi->save();
+                }
+
                 $count++;
             }
         });
@@ -643,6 +676,7 @@ class SiswaController extends Controller
         $sourceSiswas = Siswa::withoutGlobalScope('tahun_aktif')
             ->where('tahun_pelajaran_id', $sourceTahun->id)
             ->where('status', 'Aktif')
+            ->with(['dataPeriodik', 'keadaanJasmani', 'dataOrangTua', 'beasiswa', 'registrasi'])
             ->get();
 
         if ($sourceSiswas->isEmpty()) {
@@ -703,6 +737,38 @@ class SiswaController extends Controller
                     }
 
                     $newSiswa->save();
+
+                    // Copy related data (except Prestasi Akademik and Ekstrakurikuler)
+                    if ($oldSiswa->dataPeriodik) {
+                        $newPeriodik = $oldSiswa->dataPeriodik->replicate();
+                        $newPeriodik->siswa_id = $newSiswa->id;
+                        $newPeriodik->save();
+                    }
+
+                    if ($oldSiswa->keadaanJasmani) {
+                        $newJasmani = $oldSiswa->keadaanJasmani->replicate();
+                        $newJasmani->siswa_id = $newSiswa->id;
+                        $newJasmani->save();
+                    }
+
+                    foreach ($oldSiswa->dataOrangTua as $ortu) {
+                        $newOrtu = $ortu->replicate();
+                        $newOrtu->siswa_id = $newSiswa->id;
+                        $newOrtu->save();
+                    }
+
+                    foreach ($oldSiswa->beasiswa as $beasiswaItem) {
+                        $newBeasiswa = $beasiswaItem->replicate();
+                        $newBeasiswa->siswa_id = $newSiswa->id;
+                        $newBeasiswa->save();
+                    }
+
+                    foreach ($oldSiswa->registrasi as $registrasiItem) {
+                        $newRegistrasi = $registrasiItem->replicate();
+                        $newRegistrasi->siswa_id = $newSiswa->id;
+                        $newRegistrasi->save();
+                    }
+
                     $countNaik++;
                 }
             }
