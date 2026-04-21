@@ -54,6 +54,7 @@
                     ['8', 'langkah-8', 'Kelola Data Referensi Ekstrakurikuler'],
                     ['9', 'langkah-9', 'Kelola Data Pokok Siswa'],
                     ['10', 'langkah-10', 'Kelola Rombongan Belajar'],
+                    ['11', 'langkah-11', 'Cetak & Manajemen Buku Induk'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -955,6 +956,97 @@
                 <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <div class="text-sm text-amber-800 leading-relaxed">
                     <strong>Catatan:</strong> Jika Anda bermaksud membubarkan suatu rombel yang telanjur berisi anggota pada semester ini, mohon pindahkan/mengeluarkan siswa dari rombel tersebut terlebih dahulu sebelum kelas dapat dinonaktifkan/dihapus dengan aman.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 11: Buku Induk --}}
+    <div id="langkah-11" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-teal-600">11</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Cetak &amp; Manajemen Buku Induk</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pemantauan progres dan pencetakan dokumen resmi Buku Induk Siswa</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Buku Induk Siswa</strong> adalah inti pamungkas dari sistem ini. Di bagian inilah Anda memantau seluruh keutuhan serta kelengkapan data-data esensial siswa melalui deteksi <em>progress-bar</em> (persentase) akurat secara real-time. Anda ditugaskan melengkapi kekosongan berkas data demi menunjang keabsahan dokumen sebelum langsung dicetak rapih ke wujud PDF bersanad.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Buku Induk</strong> di panel sidebar kiri.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Buku Induk</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Fitur Canggih dalam Modul Buku Induk:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Live Progress Bar</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Indikator visual pintar (% kelengkapan) yang merepresentasikan warna (merah/oranye/hijau).</p>
+                    </div>
+
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Pencarian Instan</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kolom yang mentranslasikan ketikan nama/NISN menjadi filter seketika secepat kilat (no-reloading).</p>
+                    </div>
+
+                    <div class="border border-amber-100 bg-amber-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Filter Tingkat &amp; Kelas</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kombinasi Dropdown (filter ganda paralel) untuk menyoroti kelompok target spesifik.</p>
+                    </div>
+                
+                    <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Cetak Lembar Resmi</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kemampuan merangkai tata letak sistem menjadi lembar A4 PDF berstandar mutlak Buku Induk.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Mengelola Buku Induk Individu:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih profil siswa, perhatikan kolom Kelengkapan Data. Jika rentretan warnanya belum berubah progres hijau solid, maka data diri siswa tidak atau belum sempurna.', 'amber'],
+                        ['Klik tombol biru terang <strong class="text-sky-600">Buka</strong> pada akhir baris kolom interaksi tabel siswa tersebut untuk dialihkan masuk ke Rincian Identitas.', 'sky'],
+                        ['Di dalam mode rincian, klik tombol kuning/biru <strong>Lengkapi Data Induk</strong> di header-atas untuk memunculkan formulir isian multi-aspek (Biodata, Data Ortu, Kesehatan Pendaftar, dll).', 'indigo'],
+                        ['Setelah seluruh tab formulir kelengkapan diselesaikan secara seksama, simpan, dan manfaatkan opsi cetak seperti <strong class="text-emerald-700">Cetak Dokumen Lengkap</strong> di Pustaka Cetak Dokumen.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+            
+            <div class="flex items-start gap-3 bg-teal-50 border border-teal-100 rounded-xl px-5 py-4">
+                <svg class="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-teal-800 leading-relaxed">
+                    <strong>Penting:</strong> Untuk dokumen yang dikalkulasi cetak, pastikan stelan fundamental seperti rasio Kop Surat, resolusi Stempel Kepala Sekolah, ukuran Tanda Tangan, serta presisi Margin kertas telah disusun rapi di <strong>Langkah 5 (Konfigurasi Dokumen)</strong>. Hasil cetakan halaman ini menjadi jejak arsip paling berharga institusi!
                 </div>
             </div>
         </div>
