@@ -52,6 +52,11 @@
                     ['6', 'langkah-6', 'Pengaturan Tampilan Laman'],
                     ['7', 'langkah-7', 'Kelola Data Referensi Mata Pelajaran'],
                     ['8', 'langkah-8', 'Kelola Data Referensi Ekstrakurikuler'],
+                    ['9', 'langkah-9', 'Kelola Data Pokok Siswa'],
+                    ['10', 'langkah-10', 'Kelola Rombongan Belajar'],
+                    ['11', 'langkah-11', 'Cetak & Manajemen Buku Induk'],
+                    ['12', 'langkah-12', 'Data Alumni (Kelulusan)'],
+                    ['13', 'langkah-13', 'Sampah & Pemulihan Data'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -734,6 +739,491 @@
             <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 px-5 py-4">
                 <p class="text-sm font-bold text-indigo-700 mb-1">Format nilai ekstrakurikuler di dokumen</p>
                 <p class="text-xs text-slate-600 leading-relaxed">Nilai ekskul yang tercatat akan dicetak pada rapor dan Buku Induk dalam format <strong>predikat</strong>, contoh: <em>Sangat Baik</em>, <em>Baik</em>, <em>Cukup</em>. Pastikan nama ekskul sesuai dengan yang berlaku resmi di sekolah.</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 9: Data Pokok Siswa --}}
+    <div id="langkah-9" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-indigo-600">9</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Kelola Data Pokok Siswa</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pusat data biodata dan fitur mutasi tahunan/semesteran</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Data Pokok Siswa</strong> adalah tempat mengelola peserta didik yang bersekolah di instansi terkait. Anda bisa mencari siswa, mengubah tingkat kelas, serta melakukan import format Dapodik maupun Master Buku Induk yang jauh lebih terperinci.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Data Master → Data Pokok Siswa</strong> di sidebar kiri.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Data Pokok Siswa</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Fitur Import Cepat
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Import Dapodik</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Memuat dataset yang diunduh langsung dari web aplikasi Dapodik sekolah.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Master Buku Induk</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Memuat sheet lengkap dengan informasi orang tua, wali, riwayat mutasi untuk melengkapi rekaman buku induk siswa.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        Fitur Mutasi &amp; Naik Kelas
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Naikan Semester</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Saat pergantian ganjil ke genap. Copy keseluruhan siswa secara massal tanpa merubah tingkat kelas sebelumnya.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Naikan Kelas</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Mutasi tingkat di akhir tahun untuk meneruskan siswa ke tingkat berikutnya serta meluluskan siswa akhir tingkat.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Menggunakan Fitur Import Data:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pastikan Anda telah berada pada tahun pelajaran aktif.', 'sky'],
+                        ['Klik tombol <strong class="text-emerald-600">Import Data</strong> yang berada di bagian kanan atas halaman.', 'emerald'],
+                        ['Pilih format antara <strong>Master Buku Induk</strong> atau <strong>Format Dapodik</strong> sesuai basis data yang dimiliki.', 'indigo'],
+                        ['Unduh <strong>Template Excel</strong> yang disediakan pada form modal.', 'amber'],
+                        ['Lengkapi data peserta didik pada template tersebut, lalu <strong>Pilih/Tarik File</strong> ke dalam area unggah.', 'sky'],
+                        ['Klik tombol <strong>Mulai Import Data</strong> dan tunggu sistem memproses data massal tersebut.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Cara Melakukan Mutasi Siswa (Naikan Semester/Kelas):</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih opsi <strong class="text-indigo-600">Naikan Semester</strong> (ke semester genap) atau <strong class="text-amber-600">Naikan Kelas</strong> (ke tingkatan berikutnya) di pojok atas halaman.', 'indigo'],
+                        ['Sebuah form layar-penuh akan muncul, memperlihatkan preview daftar siswa aktif dari semester sebelumnya yang berpeluang di mutasi.', 'sky'],
+                        ['Periksa dengan teliti profil siswa dan jumlah data yang didapatkan pastikan kalkulasinya sinkron.', 'amber'],
+                        ['Ketuk tombol biru/emas <strong>Salin Data Siswa</strong> / <strong>Proses Naik Kelas!</strong> di ujung kanan-bawah layar guna melaksanakan mutasi massal tersebut.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl px-5 py-4">
+                <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                <div>
+                    <p class="text-sm font-bold text-rose-800 mb-0.5">Sesi Tahun Pelajaran Aktif Diperlukan</p>
+                    <p class="text-xs text-rose-600 leading-relaxed">Semua fitur modifikasi data dan import di halaman ini hanya akan terbuka jika sesi <strong>Tahun Pelajaran Saat Ini</strong> sudah terseting aktif di bagian Pengaturan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 10: Rombongan Belajar --}}
+    <div id="langkah-10" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-sky-600">10</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Kelola Rombongan Belajar</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pembentukan kelompok kelas dan anggota per semesternya</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Rombongan Belajar (Rombel)</strong> mengatur pemetaan siswa ke dalam kelas-kelas. Data rombel terikat pada satu tahun ajaran/semester yang aktif, sehingga setiap histori anggota kelas senantiasa terekam untuk cetak rapor per semester.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Data Master → Rombongan Belajar</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Rombongan Belajar</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Kemampuan Modul Rombongan Belajar:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Tambah Kelas Baru</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Menset nama kelas, wali kelas yang mendampingi, dan jenis kurikulum yang diajukan.</p>
+                    </div>
+
+                    <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V7M8 7h12m0 0v8a2 2 0 01-2 2h-2.5M12 7V4h3"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Salin Rombel &amp; Anggota</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Menciptakan tiruan susunan dan formasi siswa persis seperti kelompok belajar semester lalu.</p>
+                    </div>
+
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Manajemen Anggota</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Tombol <strong class="text-slate-700">"Lihat Anggota"</strong> akan mengarahkan ke formasi presensi serta rapot tiap-tiap kelas.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Cepat Menyalin Rombongan Belajar dari Semester Sebelumnya:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih tombol ikon dokumen <strong class="text-indigo-600">Salin Rombel</strong> di sudut kanan atas antar-muka.', 'indigo'],
+                        ['Layar pemilihan akan muncul, <strong>Pilih Semester Sumber</strong> memalui drop-down menu.', 'sky'],
+                        ['Beri tanda centang pada list nama rombongan belajar mana yang ingin Anda teruskan keberadaannya di semester yang sedang aktif.', 'emerald'],
+                        ['Lalu klik tombol <strong>Salin Rombel Terpilih</strong> supaya rancangan kelas tersebut tercipta.', 'indigo'],
+                        ['Langkah kedua krusial, kembali ketuk opsi <strong class="text-emerald-600">Salin Anggota Rombel</strong> di atas lalu ulangi alur pemilihan sumber semester agar sistem mengirim para siswa/anggota masuk ke habitat kelas-kelas barunya secara presisi dan otomasi.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Mengelola Kelas Secara Manual:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Gunakan tombol biru laut <strong class="text-sky-600">Tambah Rombel / Kelas</strong> andaikata kelas idaman Anda belum diciptakan, isi spesifikasi detail program/tingkat kurikulumnya di dalam pop-up.', 'sky'],
+                        ['Klik opsi kuning <strong>Edit</strong> yang hadir di tiap baris rombel apabila memerlukan perbaikan nomenklatur kelas dan nama wali penghampunya.', 'amber'],
+                        ['Tekan pilihan <strong>Lihat Anggota</strong> pada baris rombel yang bersangkutan untuk beralih masuk ke dalam panel detail kontrol dan mulai menambahkan partisipan kelas satu-persatu atau kelola nilai rapor.', 'indigo'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-3 items-start">
+                <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-amber-800 leading-relaxed">
+                    <strong>Catatan:</strong> Jika Anda bermaksud membubarkan suatu rombel yang telanjur berisi anggota pada semester ini, mohon pindahkan/mengeluarkan siswa dari rombel tersebut terlebih dahulu sebelum kelas dapat dinonaktifkan/dihapus dengan aman.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 11: Buku Induk --}}
+    <div id="langkah-11" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-teal-600">11</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Cetak &amp; Manajemen Buku Induk</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pemantauan progres dan pencetakan dokumen resmi Buku Induk Siswa</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Buku Induk Siswa</strong> adalah inti pamungkas dari sistem ini. Di bagian inilah Anda memantau seluruh keutuhan serta kelengkapan data-data esensial siswa melalui deteksi <em>progress-bar</em> (persentase) akurat secara real-time. Anda ditugaskan melengkapi kekosongan berkas data demi menunjang keabsahan dokumen sebelum langsung dicetak rapih ke wujud PDF bersanad.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Buku Induk</strong> di panel sidebar kiri.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Buku Induk</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Fitur Canggih dalam Modul Buku Induk:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Live Progress Bar</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Indikator visual pintar (% kelengkapan) yang merepresentasikan warna (merah/oranye/hijau).</p>
+                    </div>
+
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Pencarian Instan</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kolom yang mentranslasikan ketikan nama/NISN menjadi filter seketika secepat kilat (no-reloading).</p>
+                    </div>
+
+                    <div class="border border-amber-100 bg-amber-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Filter Tingkat &amp; Kelas</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kombinasi Dropdown (filter ganda paralel) untuk menyoroti kelompok target spesifik.</p>
+                    </div>
+                
+                    <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Cetak Lembar Resmi</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kemampuan merangkai tata letak sistem menjadi lembar A4 PDF berstandar mutlak Buku Induk.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Mengelola Buku Induk Individu:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih profil siswa, perhatikan kolom Kelengkapan Data. Jika rentretan warnanya belum berubah progres hijau solid, maka data diri siswa tidak atau belum sempurna.', 'amber'],
+                        ['Klik tombol biru terang <strong class="text-sky-600">Buka</strong> pada akhir baris kolom interaksi tabel siswa tersebut untuk dialihkan masuk ke Rincian Identitas.', 'sky'],
+                        ['Di dalam mode rincian, klik tombol kuning/biru <strong>Lengkapi Data Induk</strong> di header-atas untuk memunculkan formulir isian multi-aspek (Biodata, Data Ortu, Kesehatan Pendaftar, dll).', 'indigo'],
+                        ['Setelah seluruh tab formulir kelengkapan diselesaikan secara seksama, simpan, dan manfaatkan opsi cetak seperti <strong class="text-emerald-700">Cetak Dokumen Lengkap</strong> di Pustaka Cetak Dokumen.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="space-y-4 pt-6 border-t border-slate-100">
+                <p class="text-sm font-bold text-slate-700 mb-3">Isi Formulir Rekam Jejak Buku Induk (10 Aspek Utama):</p>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">Formulir kelengkapan buku induk mengusung tampilan berbasis Tab (Layar Bergaya Navigasi Horizontal) untuk efisiensi ruang agar form isian super-komprehensif tidak terasa menghempas pandangan mata sekaligus.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">1</span> Identitas Murid</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Merangkum data diri paling dasar (NISN, NIK, Tempat/Tgl Lahir, Agama & dsb).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">2</span> Data Orang Tua</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Kolom biografi sang Ayah, Ibu, beserta wali (<strong>Catatan Pintar:</strong> Jika pada tab periodik anak disetel tinggal dengan wali, form wali tiba-tiba jadi Wajib Diisi!).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">3</span> Data Periodik</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Mendata perihal tempat bermukim si anak (jumlah sdr, jarak ke sekolah, bahasa ibu).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">4</span> Pendidikan Sebelumnya</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Menjejak asal muasal anak baik dari lembaga tamatan pendidikan usia dini (TK) maupun berkas riwayat transisi kepindahan sekolah.</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">5</span> Jasmani & Foto</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Berisi form bobot tubuh si anak (Termasuk penyilangan tab input upload foto formal/pasphoto Buku Induk cetak minimal 2 varian).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-amber-100 text-amber-600 flex items-center justify-center text-[10px]">6</span> Dinamis: Beasiswa & Mutasi Keluar</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Kolom ini tidak dibatasi isiannya (Bisa di klik "Tambah Catatan Baru" sesuka hati). Merangkum riwayat penikmatan beasiswa PIP hingga catatan registrasi hari kelulusan / rekam jejak kepindahan (mutasi keluar sekolah anak bersama pencetakan surat Ijazah).</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-5 rounded-xl border-2 border-indigo-100 bg-white shadow-sm relative overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+                    <h5 class="text-sm font-black text-indigo-800 flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        Eksklusif (Semesteran): Input Nilai & Ekstrakurikuler
+                    </h5>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Nilai Akademik &amp; Ekskul tidak sekadar diisi biasa seperti memencet keyboard di form, namun tersistematis per-semester aktif.</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-full bg-violet-100 border border-violet-200 flex items-center justify-center text-xs font-black text-violet-600 shrink-0">A</span>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">Prestasi Akademik (Nilai Rapor)</p>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Nilai kognitif, afektif, kepribadian serta matriks ketidakhadiran direkam via <strong class="text-emerald-600">Pop-up Editor Semester Khusus.</strong> Anda bahkan bisa menyuntikkan ribuan nilai sekaligus menggunakan Excel di fitur <strong class="text-indigo-600">Import Excel Khusus Nilai</strong>. Form akan membaca referensi dari Langkah 7.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-xs font-black text-orange-600 shrink-0">B</span>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">Skor / Predikat Ekstrakurikuler</p>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Nilai non-akademik berupa predikat (Sangat Baik / A, Baik / B) diekskusi dari panel seraya membawa referensi dari Langkah 8. Sistem akan melahirkan lembar tabel histori riwayat eksplorasi non-akademik ini semester per semesternya.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex items-start gap-3 bg-teal-50 border border-teal-100 rounded-xl px-5 py-4">
+                <svg class="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-teal-800 leading-relaxed">
+                    <strong>Penting:</strong> Untuk dokumen yang dikalkulasi cetak, pastikan stelan fundamental seperti rasio Kop Surat, resolusi Stempel Kepala Sekolah, ukuran Tanda Tangan, serta presisi Margin kertas telah disusun rapi di <strong>Langkah 5 (Konfigurasi Dokumen)</strong>. Hasil cetakan halaman ini menjadi jejak arsip paling berharga institusi!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 12: Data Alumni --}}
+    <div id="langkah-12" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-violet-600">12</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Data Alumni (Kelulusan)</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pemantauan arsip daftar peserta didik yang telah berstatus Tamat Belajar/Lulus.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Data Alumni</strong> adalah etalase yang menampung seluruh riwayat memori anak didik yang telah berlabuh menjadi Alumni (Tamat Belajar). Ini bukanlah sekadar tabel daftar hitam, tapi repositori pangkalan data yang masih memampangkan rekam jejak utuh buku induk mereka meski mereka telah menempuh perjalanan baru.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Arsip Siswa → Alumni</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5zm0-14l9 5-9 5-9-5 9-5z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Data Alumni</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Elemen Penting pada Panel Data Alumni:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="border border-violet-100 bg-violet-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Filter Lacak Tahun Kelulusan</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Berfasilitas sistem <em>Dropdown Cerdas</em> (Auto-submit), dimana Anda bebas menyeleksi dan menyeret kelompok kelulusan berdasarkan sesi Tahun Pelajarannya.</p>
+                    </div>
+
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Kilas Balik Ijazah</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Tampilan tabel menyajikan relasi langsung ke rekaman Nomor Buku Ijazah dan data rujukan <em>Melanjutkan Ke instansi tingkat mana?</em>.</p>
+                    </div>
+
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Cetak Ulang Buku Induk</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kendati status mereka bukan siswa aktif, menekan tombol <span class="bg-violet-100 text-violet-700 px-1 py-0.5 rounded ml-0.5">Buka</span> akan meretas jalan ke Pustaka Cetak Induk individual mereka (Tervalidasi Abadi).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex gap-3 items-start mt-4">
+                <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-indigo-800 leading-relaxed">
+                    <strong>Informasi:</strong> Bagaimana anak berstatus Alumni? Data ini di otomatisasi oleh sistem. Anda tidak bisa mendaftarkan anak kesini secara paksa manual. Mekanismenya bermula kala siswa bersangkutan di-input dengan form status pendaftaran mutasi <strong>Tamat Belajar</strong> (Meninggalkan Sekolah) pada ruang Buku Induk. Otomatisasi pangkalan data menjustifikasinya murni sebagai Alumni!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 13: Trash / Data Terhapus --}}
+    <div id="langkah-13" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-rose-600">13</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Sampah &amp; Pemulihan Data</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pengendalian penghapusan lunak (restore) maupun penghancuran data mutlak siswa.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Platform ini menganut prinsip pengangamanan <em>Soft-Delete Architecture</em> (Penghapusan Lunak). Berarti, nyaris seluruh insiden kala Anda menghapus data di Tabel Ekosistem (Seperti Tabel Data Pokok), data tersebut rupanya tidak secara ganas lenyap selamanya dari *Server*; alih-alih data berpindah dan terkurung di ruang instalansi <strong>Sampah</strong> (Ruang Isolasi) demi memitigasi kejadian memencet tombol secara terburu rupa.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Kelola → Sampah / Terhapus</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Sampah</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">2 Aksi Mutlak di Menu Sampah:</p>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs font-black text-emerald-600 shrink-0">A</span>
+                        <div>
+                            <p class="text-sm font-bold text-emerald-700">Opsi: Pulihkan (Memanggil Balik Kehidupan)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ketuk tombol berwarna hijau daun ini agar rekam data anak kembali menyala dan kembali direkonstruksikan seutuhnya pada halaman asal (Data Pokok Siswa/Tabel Buku Induk). Ini ibarat membatalkan penghapusan data.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 flex items-center justify-center text-xs font-black text-rose-600 shrink-0">B</span>
+                        <div>
+                            <p class="text-sm font-bold text-rose-700">Opsi: Hapus Permanen (Pemusnahan Abadi)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Tombol merah menyala ini mengeksekusi penghancuran tuntas dan me-nol-kan riwayat eksistensi profil anak dari pangkalan server (Termasuk rekam Buku Induk) untuk selamanya. <strong>Opsi tak bisa dibatalkan atau diralat meski instalisasi dibayar jutaan dollar.</strong> Patut menjadi kewaspadaan luar biasa!</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

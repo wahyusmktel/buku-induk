@@ -454,33 +454,56 @@
             <div class="p-8 max-h-[70vh] overflow-y-auto">
                 <div class="space-y-6 text-slate-600 text-sm leading-relaxed">
                     
-                    <div>
-                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
-                            Import Data Dapodik
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                        <h4 class="text-indigo-800 font-bold text-base mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Penjelasan Umum
                         </h4>
-                        <p class="ml-8">Gunakan tombol <span class="font-bold text-emerald-600">Import Dapodik</span> untuk memasukkan banyak data siswa sekaligus menggunakan file Excel yang di-export langsung dari aplikasi Dapodik sekolah.</p>
-                        <p class="ml-8 mt-1 text-xs text-emerald-700 font-semibold bg-emerald-50 inline-block px-3 py-1.5 rounded-lg border border-emerald-100 mt-2">Penting: Di dalam file Excel, urutan data siswa harus dimulai pada baris ke-7 dan nama berada di kolom B.</p>
+                        <p class="text-indigo-700 text-sm">Halaman <strong>Data Pokok Siswa</strong> adalah pusat pengelolaan biodata dan riwayat akademik seluruh siswa. Anda dapat mengimpor data, memutasi siswa (kenaikan kelas/semester), serta memfilter dan melihat detail buku induk setiap siswa.</p>
                     </div>
 
-                    <div>
-                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">2</span>
-                            Syarat Tahun Pelajaran Aktif
-                        </h4>
-                        <p class="ml-8">Untuk menghindari kesalahan data, tombol Import hanya akan aktif jika terdapat <span class="font-bold text-sky-600">Tahun Pelajaran yang diset sebagai "Aktif"</span>. Pastikan Anda telah mengonfigurasinya terlebih dahulu.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
+                                Import Data Massal
+                            </h4>
+                            <p class="text-slate-600 ml-8 mb-2">Tombol <strong>Import Data</strong> memungkinkan Anda memasukkan banyak data sekaligus melalui Excel.</p>
+                            <ul class="ml-8 space-y-1.5 list-disc pl-4 text-xs text-slate-500">
+                                <li><strong>Master Buku Induk:</strong> Untuk sinkronisasi data yang sangat lengkap sesuai format spesifik buku induk.</li>
+                                <li><strong>Format Dapodik:</strong> Untuk mengambil data mentah dari Dapodik (pastikan isi data nama ada di kolom B mulai baris ke 7).</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">2</span>
+                                Naikan Semester
+                            </h4>
+                            <p class="text-slate-600 ml-8">Gunakan opsi <strong>Naikan Semester</strong> di awal semester baru (genap). Sistem akan menyalin secara otomatis data seluruh siswa aktif dari semester sebelumnya tanpa perlu mengimport ulang.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
+                                Naikan Kelas &amp; Lulus
+                            </h4>
+                            <p class="text-slate-600 ml-8 mb-2">Opsi <strong>Naikan Kelas</strong> dijalankan saat akhir tahun akademik. Siswa akan otomatis ditingkatkan kelasnya menuju tahun pelajaran baru, dan siswa kelas tingkat akhir akan berstatus Lulus.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">4</span>
+                                Filter &amp; Pencarian
+                            </h4>
+                            <p class="text-slate-600 ml-8">Gunakan kotak pencarian berdasarkan Nama, NIS, maupun NISN. Anda juga dapat menyaring menggunakan dropdown spesifik untuk tingkat kelas dan rombongan belajar.</p>
+                        </div>
                     </div>
 
-                    <div>
-                        <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
-                            Filter Data (Dropdown)
-                        </h4>
-                        <p class="ml-8">Gunakan menu dropdown di bagian atas untuk menyaring data berdasarkan <span class="font-bold text-slate-700">Status</span>, <span class="font-bold text-slate-700">Tingkat Kelas</span>, atau <span class="font-bold text-slate-700">Rombongan Belajar (Rombel)</span>. Halaman akan otomatis memuat data setiap kali Anda mengubah pilihan.</p>
+                    <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 mt-4 flex gap-3 items-start">
+                        <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <p class="text-rose-700 text-xs leading-relaxed"><strong>Penting Diperhatikan:</strong> Semua fitur mutasi dan penambahan (import) mewajibkan Anda sudah mengkonfigurasi <strong>Sesi Tahun Pelajaran Aktif</strong>. Hal ini meminimalisir salah input memori antar dua jenjang semester atau generasi angkatan.</p>
                     </div>
-
-
-
                 </div>
             </div>
 

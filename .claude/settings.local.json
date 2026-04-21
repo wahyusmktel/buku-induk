@@ -23,7 +23,9 @@
       "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/DashboardController.php)",
       "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/LaporanController.php)",
       "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/CetakController.php)",
-      "Bash(/c/xampp/php/php.exe -l app/Exports/AbsensiTemplateExport.php)"
+      "Bash(/c/xampp/php/php.exe -l app/Exports/AbsensiTemplateExport.php)",
+      "Read(//c/Program Files \\(x86\\)/Inno Setup 6/**)",
+      "Read(//c/Program Files/Inno Setup 6/**)"
     ]
   }
 }
