@@ -38,6 +38,28 @@
                     <h3 class="font-bold text-slate-700">Filter Export & Zip</h3>
                 </div>
                 <div class="p-6 space-y-5">
+                    {{-- Tipe Export --}}
+                    <div class="group">
+                        <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Tipe Dokumen Export
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label :class="form.export_type === 'buku_induk' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-slate-200 bg-slate-50/50 text-slate-600'"
+                                class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all text-center">
+                                <input type="radio" x-model="form.export_type" value="buku_induk" class="sr-only">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                <span class="text-[0.65rem] font-bold uppercase tracking-wide leading-tight">Buku Induk<br><span class="font-normal normal-case">Portrait</span></span>
+                            </label>
+                            <label :class="form.export_type === 'prestasi' ? 'border-violet-500 bg-violet-50 text-violet-700' : 'border-slate-200 bg-slate-50/50 text-slate-600'"
+                                class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 cursor-pointer transition-all text-center">
+                                <input type="radio" x-model="form.export_type" value="prestasi" class="sr-only">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                <span class="text-[0.65rem] font-bold uppercase tracking-wide leading-tight">Prestasi<br><span class="font-normal normal-case">Landscape</span></span>
+                            </label>
+                        </div>
+                    </div>
+
                     {{-- Nama File Export --}}
                     <div class="group">
                         <label class="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 transition-colors group-focus-within:text-indigo-600">
@@ -45,8 +67,8 @@
                             Nama File Export (Saran)
                         </label>
                         <div class="relative">
-                            <input type="text" x-model="form.name" 
-                                class="w-full pl-4 pr-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all placeholder:text-slate-400 font-medium" 
+                            <input type="text" x-model="form.name"
+                                class="w-full pl-4 pr-4 py-3 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-sm transition-all placeholder:text-slate-400 font-medium"
                                 placeholder="Contoh: Export Kelas VI Lulusan 2024">
                         </div>
                     </div>
@@ -147,6 +169,7 @@
                     Alpine.data('exportManager', (initialRombels) => ({
                         form: {
                             name: '',
+                            export_type: 'buku_induk',
                             tahun_id: '',
                             rombel_id: ''
                         },
@@ -154,7 +177,9 @@
 
                         get filteredRombels() {
                             if (!this.form.tahun_id) return [];
-                            return this.allRombels.filter(r => r.tahun_pelajaran_id === this.form.tahun_id);
+                            // Gunakan == (loose equality) karena tahun_id dari <select> adalah string
+                            // sementara tahun_pelajaran_id dari JSON bisa integer
+                            return this.allRombels.filter(r => String(r.tahun_pelajaran_id) == String(this.form.tahun_id));
                         },
 
                         init() {
@@ -276,6 +301,7 @@
                             <tr>
                                 <th class="px-5 py-3 w-10 text-center">No</th>
                                 <th class="px-5 py-3">Nama Export</th>
+                                <th class="px-5 py-3 text-center">Tipe</th>
                                 <th class="px-5 py-3 text-center">Status</th>
                                 <th class="px-5 py-3 text-center">Data</th>
                                 <th class="px-5 py-3 text-center">Tgl Proses</th>
@@ -289,6 +315,13 @@
                                     {{ $exportJobs->firstItem() + $loop->index }}
                                 </td>
                                 <td class="px-5 py-3 font-medium text-slate-800">{{ $job->name }}</td>
+                                <td class="px-5 py-3 text-center">
+                                    @if(($job->export_type ?? 'buku_induk') === 'prestasi')
+                                        <span class="px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-[0.65rem] font-bold uppercase tracking-wide">Prestasi</span>
+                                    @else
+                                        <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-md text-[0.65rem] font-bold uppercase tracking-wide">Buku Induk</span>
+                                    @endif
+                                </td>
                                 <td class="px-5 py-3 text-center">
                                     @if($job->status === 'completed')
                                         <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[0.65rem] font-bold uppercase tracking-wide">Selesai</span>
@@ -323,7 +356,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-8 text-center text-slate-400">
+                                <td colspan="7" class="px-5 py-8 text-center text-slate-400">
                                     <svg class="w-8 h-8 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                                     <p class="text-sm">Belum ada histori pelaporan / export massal.</p>
                                 </td>

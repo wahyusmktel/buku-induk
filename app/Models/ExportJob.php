@@ -12,6 +12,7 @@ class ExportJob extends Model
 
     protected $fillable = [
         'name',
+        'export_type',
         'total_records',
         'processed_records',
         'file_path',

@@ -38,29 +38,35 @@ class ExportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'tahun_id' => 'nullable|exists:tahun_pelajarans,id',
-            'rombel_id' => 'nullable' // jika ada data rombel
+            'name'        => 'required|string|max:255',
+            'export_type' => 'required|in:buku_induk,prestasi',
+            'tahun_id'    => 'nullable|exists:tahun_pelajarans,id',
+            'rombel_id'   => 'nullable',
         ]);
 
+        $exportType = $request->export_type ?? 'buku_induk';
+
         $job = ExportJob::create([
-            'name' => $request->name,
-            'status' => 'pending'
+            'name'        => $request->name,
+            'export_type' => $exportType,
+            'status'      => 'pending',
         ]);
 
         // Dispatch job ke Redis queue
-        ProcessBukuIndukExport::dispatch($job, $request->tahun_id, $request->rombel_id);
+        ProcessBukuIndukExport::dispatch($job, $request->tahun_id, $request->rombel_id, $exportType);
 
-        ActivityLogService::log('mass_export_start', "Memulai Export Massal: {$request->name}", [
-            'name' => $request->name,
-            'tahun_id' => $request->tahun_id,
-            'rombel_id' => $request->rombel_id
+        $label = $exportType === 'prestasi' ? 'Prestasi Belajar' : 'Buku Induk';
+        ActivityLogService::log('mass_export_start', "Memulai Export Massal {$label}: {$request->name}", [
+            'name'        => $request->name,
+            'export_type' => $exportType,
+            'tahun_id'    => $request->tahun_id,
+            'rombel_id'   => $request->rombel_id,
         ]);
 
         return response()->json([
             'success' => true,
-            'job_id' => $job->id,
-            'message' => 'Proses export dimasukkan ke dalam antrian.'
+            'job_id'  => $job->id,
+            'message' => 'Proses export dimasukkan ke dalam antrian.',
         ]);
     }
 

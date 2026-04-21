@@ -27,12 +27,14 @@ class ProcessBukuIndukExport implements ShouldQueue
     protected $exportJob;
     protected $tahunId;
     protected $rombelId;
+    protected $exportType; // 'buku_induk' | 'prestasi'
 
-    public function __construct(ExportJob $exportJob, ?string $tahunId, ?string $rombelId)
+    public function __construct(ExportJob $exportJob, ?string $tahunId, ?string $rombelId, string $exportType = 'buku_induk')
     {
-        $this->exportJob = $exportJob;
-        $this->tahunId = $tahunId;
-        $this->rombelId = $rombelId;
+        $this->exportJob  = $exportJob;
+        $this->tahunId    = $tahunId;
+        $this->rombelId   = $rombelId;
+        $this->exportType = $exportType;
     }
 
     public function handle(): void
@@ -49,13 +51,12 @@ class ProcessBukuIndukExport implements ShouldQueue
                 $latestSub->where('tahun_pelajaran_id', $this->tahunId);
             }
             if ($this->rombelId) {
-                // Relasi rombel ada di siswas via 'rombel_saat_ini' atau 'rombel_id'. Kita harus cek filter yg mana yg benar.
                 $latestSub->where('rombel_id', $this->rombelId);
             }
 
             $latestSub->groupBy('nisn');
 
-            // Kita join kembali untuk mendapatkan instance siswa utama
+            // Join kembali untuk mendapatkan instance siswa utama
             $siswas = Siswa::withoutGlobalScope('tahun_aktif')
                 ->joinSub($latestSub, 'ls', function ($join) {
                     $join->on('siswas.nisn', '=', 'ls.s_nisn')
@@ -72,6 +73,46 @@ class ProcessBukuIndukExport implements ShouldQueue
             $this->exportJob->update(['total_records' => $totalRecords, 'processed_records' => 0]);
 
             $mataPelajarans = \App\Models\MataPelajaran::where('is_aktif', true)->orderBy('urutan')->get();
+            $ekstrakurikulers = \App\Models\Ekstrakurikuler::orderBy('nama_ekstrakurikuler')->get();
+
+            // Ambil settings SEKALI untuk seluruh batch (efisiensi)
+            $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+
+            // === Pre-process gambar via GD agar DomPDF bisa render berwarna (fix PNG grayscale bug) ===
+            $imageKeys = ['sekolah_kop', 'kepsek_ttd', 'sekolah_stempel'];
+            $tempDir = storage_path('app/public/settings/_pdf_temp');
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+            foreach ($imageKeys as $key) {
+                if (!empty($settings[$key])) {
+                    $srcPath = storage_path('app/public/' . $settings[$key]);
+                    if (file_exists($srcPath)) {
+                        $ext = strtolower(pathinfo($srcPath, PATHINFO_EXTENSION));
+                        $src = null;
+                        if ($ext === 'png') {
+                            $src = @imagecreatefrompng($srcPath);
+                        } elseif (in_array($ext, ['jpg', 'jpeg'])) {
+                            $src = @imagecreatefromjpeg($srcPath);
+                        }
+                        if ($src) {
+                            $w      = imagesx($src);
+                            $h      = imagesy($src);
+                            $canvas = imagecreatetruecolor($w, $h);
+                            $white  = imagecolorallocate($canvas, 255, 255, 255);
+                            imagefill($canvas, 0, 0, $white);
+                            imagecopy($canvas, $src, 0, 0, 0, 0, $w, $h);
+
+                            $cleanPath = $tempDir . '/' . $key . '.png';
+                            imagepng($canvas, $cleanPath, 0);
+                            imagedestroy($src);
+                            imagedestroy($canvas);
+
+                            $settings[$key . '_pdf'] = $cleanPath;
+                        }
+                    }
+                }
+            }
 
             // Setup Temp Folder
             $tmpPath = storage_path('app/tmp/export_' . $this->exportJob->id);
@@ -82,10 +123,8 @@ class ProcessBukuIndukExport implements ShouldQueue
             $processed = 0;
 
             foreach ($siswas as $idx => $siswa) {
-                // Dapatkan Buku Induk nya
+                // Dapatkan Buku Induk
                 $bukuInduk = BukuInduk::where('nisn', $siswa->nisn)->first();
-
-                // Jika null (belum ada record utama), lewati atau buat skeleton kosong
                 if (!$bukuInduk) {
                     $bukuInduk = new BukuInduk();
                 }
@@ -99,45 +138,58 @@ class ProcessBukuIndukExport implements ShouldQueue
                     }
                 }
 
-                // Ambil setting kustom kertas dari database
-                $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-
-                // Render PDF via View (View yang sama dengan mode cetak browser)
-                // catatan: karena background job, pastikan asset storage_path jika ada gambar lokal
                 $is_pdf = true;
-                $pdf = Pdf::loadView('buku-induk.print', compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'is_pdf', 'settings'));
-                
-                // Menentukan Ukuran Kertas
                 $paperSize = $settings['paper_size'] ?? 'a4';
-                
-                if ($paperSize === 'custom') {
-                    // Konversi mm ke basis points (1 mm = 2.83465 pt)
-                    $width = ($settings['paper_width'] ?? 210) * 2.83465;
-                    $height = ($settings['paper_height'] ?? 297) * 2.83465;
-                    $pdf->setPaper([0, 0, $width, $height], 'portrait');
-                } elseif ($paperSize === 'folio') {
-                    // Folio F4 (8.5 x 13 inch -> 612 x 936 pt)
-                    $pdf->setPaper([0, 0, 612.00, 936.00], 'portrait');
+
+                if ($this->exportType === 'prestasi') {
+                    // ===== RENDER PRESTASI BELAJAR (Landscape) =====
+                    $pdf = Pdf::loadView(
+                        'buku-induk.print-prestasi',
+                        compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'ekstrakurikulers', 'is_pdf')
+                    )->setOption('isPhpEnabled', true)->setOption('isHtml5ParserEnabled', true);
+
+                    if ($paperSize === 'custom') {
+                        $width  = ($settings['paper_width'] ?? 210) * 2.83465;
+                        $height = ($settings['paper_height'] ?? 297) * 2.83465;
+                        $pdf->setPaper([0, 0, $width, $height], 'landscape');
+                    } elseif ($paperSize === 'folio') {
+                        $pdf->setPaper([0, 0, 612.0, 936.0], 'landscape');
+                    } else {
+                        $pdf->setPaper($paperSize, 'landscape');
+                    }
                 } else {
-                    $pdf->setPaper($paperSize, 'portrait');
+                    // ===== RENDER BUKU INDUK (Portrait) =====
+                    $pdf = Pdf::loadView(
+                        'buku-induk.print',
+                        compact('bukuInduk', 'siswa', 'akademikGrid', 'mataPelajarans', 'settings', 'is_pdf')
+                    )->setOption('isPhpEnabled', true)->setOption('isHtml5ParserEnabled', true);
+
+                    if ($paperSize === 'custom') {
+                        $width  = ($settings['paper_width'] ?? 210) * 2.83465;
+                        $height = ($settings['paper_height'] ?? 297) * 2.83465;
+                        $pdf->setPaper([0, 0, $width, $height], 'portrait');
+                    } elseif ($paperSize === 'folio') {
+                        $pdf->setPaper([0, 0, 612.0, 936.0], 'portrait');
+                    } else {
+                        $pdf->setPaper($paperSize, 'portrait');
+                    }
                 }
-                
-                $pdf->setOption('isHtml5ParserEnabled', true);
-                
-                // Naming convention file: "01. Ahmad.pdf"
-                $num = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+
+                // Naming convention: "01. Ahmad.pdf"
+                $num      = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
                 $safeName = preg_replace('/[^a-zA-Z0-9\s-]/', '', $siswa->nama);
                 $fileName = "{$num}. {$safeName}.pdf";
 
                 $pdf->save($tmpPath . '/' . $fileName);
 
-                // Update progres setiap 1
+                // Update progres setiap 1 record
                 $processed++;
                 $this->exportJob->update(['processed_records' => $processed]);
             }
 
-            // Pack to ZIP
-            $zipName = "Export_Buku_Induk_" . time() . ".zip";
+            // === Pack to ZIP ===
+            $prefix  = $this->exportType === 'prestasi' ? 'Export_Prestasi_' : 'Export_Buku_Induk_';
+            $zipName = $prefix . time() . ".zip";
             $zipPath = storage_path('app/public/exports/' . $zipName);
             
             if (!File::exists(storage_path('app/public/exports'))) {
@@ -155,19 +207,19 @@ class ProcessBukuIndukExport implements ShouldQueue
                 throw new \Exception("Gagal membuat file ZIP.");
             }
 
-            // Clean tmp
+            // Bersihkan folder tmp
             File::deleteDirectory($tmpPath);
 
             $this->exportJob->update([
                 'file_path' => 'exports/' . $zipName,
-                'status' => 'completed'
+                'status'    => 'completed',
             ]);
 
         } catch (\Exception $e) {
             Log::error('Export Massal Error: ' . $e->getMessage());
             $this->exportJob->update([
-                'status' => 'failed',
-                'error_message' => $e->getMessage()
+                'status'        => 'failed',
+                'error_message' => $e->getMessage(),
             ]);
         }
     }
