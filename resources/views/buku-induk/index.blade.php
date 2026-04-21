@@ -292,18 +292,34 @@
 
                         <td class="py-3 px-4 text-center">
                             @if($bi)
-                                <a href="{{ route('buku-induk.show', $siswa->nisn) }}"
-                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.7rem] font-bold rounded-lg
-                                          border transition-all hover:-translate-y-0.5"
-                                   style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;"
-                                   onmouseover="this.style.background='#0c4a6e';this.style.color='#fff';this.style.borderColor='#0c4a6e';this.style.boxShadow='0 4px 12px rgba(12,74,110,.3)'"
-                                   onmouseout="this.style.background='#e0f2fe';this.style.color='#0369a1';this.style.borderColor='#bae6fd';this.style.boxShadow=''">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"/>
-                                    </svg>
-                                    Buka
-                                </a>
+                                <div class="flex items-center justify-center gap-2 flex-wrap">
+                                    <a href="{{ route('buku-induk.show', $siswa->nisn) }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.7rem] font-bold rounded-lg
+                                              border transition-all hover:-translate-y-0.5"
+                                       style="background:#e0f2fe;color:#0369a1;border-color:#bae6fd;"
+                                       onmouseover="this.style.background='#0c4a6e';this.style.color='#fff';this.style.borderColor='#0c4a6e';this.style.boxShadow='0 4px 12px rgba(12,74,110,.3)'"
+                                       onmouseout="this.style.background='#e0f2fe';this.style.color='#0369a1';this.style.borderColor='#bae6fd';this.style.boxShadow=''">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"/>
+                                        </svg>
+                                        Buka
+                                    </a>
+                                    <a href="javascript:void(0)" onclick="confirmPrint('main', '{{ $siswa->nisn }}')"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[0.7rem] font-bold rounded-lg shadow-lg shadow-emerald-200 transition-all hover:-translate-y-0.5">
+                                        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                        Buku Induk
+                                    </a>
+                                    <a href="javascript:void(0)" onclick="confirmPrint('prestasi', '{{ $siswa->nisn }}')"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-[0.7rem] font-bold rounded-lg shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                                        <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                        Prestasi
+                                    </a>
+                                </div>
                             @else
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-400
                                              text-[0.7rem] font-bold rounded-lg border border-slate-100 cursor-not-allowed">
@@ -413,7 +429,17 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+function confirmPrint(type = 'main', nisn) {
+    let printUrl = type === 'main' 
+        ? "{{ route('buku-induk.print', '__NISN__') }}".replace('__NISN__', nisn) 
+        : "{{ route('buku-induk.print-prestasi', '__NISN__') }}".replace('__NISN__', nisn);
+    
+    let title = type === 'main' ? 'Cetak Buku Induk' : 'Cetak Prestasi Belajar';
+    window.open(printUrl, "_blank");
+}
+
 (function () {
     // Live search (client-side, instant)
     const liveSearch = document.getElementById('bi-live-search');
