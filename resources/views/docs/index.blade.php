@@ -52,6 +52,8 @@
                     ['6', 'langkah-6', 'Pengaturan Tampilan Laman'],
                     ['7', 'langkah-7', 'Kelola Data Referensi Mata Pelajaran'],
                     ['8', 'langkah-8', 'Kelola Data Referensi Ekstrakurikuler'],
+                    ['9', 'langkah-9', 'Kelola Data Pokok Siswa'],
+                    ['10', 'langkah-10', 'Kelola Rombongan Belajar'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -734,6 +736,226 @@
             <div class="rounded-xl border border-indigo-100 bg-indigo-50/50 px-5 py-4">
                 <p class="text-sm font-bold text-indigo-700 mb-1">Format nilai ekstrakurikuler di dokumen</p>
                 <p class="text-xs text-slate-600 leading-relaxed">Nilai ekskul yang tercatat akan dicetak pada rapor dan Buku Induk dalam format <strong>predikat</strong>, contoh: <em>Sangat Baik</em>, <em>Baik</em>, <em>Cukup</em>. Pastikan nama ekskul sesuai dengan yang berlaku resmi di sekolah.</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 9: Data Pokok Siswa --}}
+    <div id="langkah-9" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-indigo-600">9</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Kelola Data Pokok Siswa</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pusat data biodata dan fitur mutasi tahunan/semesteran</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Data Pokok Siswa</strong> adalah tempat mengelola peserta didik yang bersekolah di instansi terkait. Anda bisa mencari siswa, mengubah tingkat kelas, serta melakukan import format Dapodik maupun Master Buku Induk yang jauh lebih terperinci.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Data Master → Data Pokok Siswa</strong> di sidebar kiri.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Data Pokok Siswa</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Fitur Import Cepat
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Import Dapodik</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Memuat dataset yang diunduh langsung dari web aplikasi Dapodik sekolah.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Master Buku Induk</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Memuat sheet lengkap dengan informasi orang tua, wali, riwayat mutasi untuk melengkapi rekaman buku induk siswa.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        Fitur Mutasi &amp; Naik Kelas
+                    </h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Naikan Semester</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Saat pergantian ganjil ke genap. Copy keseluruhan siswa secara massal tanpa merubah tingkat kelas sebelumnya.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2.5 text-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span>
+                            <div>
+                                <strong class="text-slate-700">Naikan Kelas</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Mutasi tingkat di akhir tahun untuk meneruskan siswa ke tingkat berikutnya serta meluluskan siswa akhir tingkat.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Menggunakan Fitur Import Data:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pastikan Anda telah berada pada tahun pelajaran aktif.', 'sky'],
+                        ['Klik tombol <strong class="text-emerald-600">Import Data</strong> yang berada di bagian kanan atas halaman.', 'emerald'],
+                        ['Pilih format antara <strong>Master Buku Induk</strong> atau <strong>Format Dapodik</strong> sesuai basis data yang dimiliki.', 'indigo'],
+                        ['Unduh <strong>Template Excel</strong> yang disediakan pada form modal.', 'amber'],
+                        ['Lengkapi data peserta didik pada template tersebut, lalu <strong>Pilih/Tarik File</strong> ke dalam area unggah.', 'sky'],
+                        ['Klik tombol <strong>Mulai Import Data</strong> dan tunggu sistem memproses data massal tersebut.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">Cara Melakukan Mutasi Siswa (Naikan Semester/Kelas):</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih opsi <strong class="text-indigo-600">Naikan Semester</strong> (ke semester genap) atau <strong class="text-amber-600">Naikan Kelas</strong> (ke tingkatan berikutnya) di pojok atas halaman.', 'indigo'],
+                        ['Sebuah form layar-penuh akan muncul, memperlihatkan preview daftar siswa aktif dari semester sebelumnya yang berpeluang di mutasi.', 'sky'],
+                        ['Periksa dengan teliti profil siswa dan jumlah data yang didapatkan pastikan kalkulasinya sinkron.', 'amber'],
+                        ['Ketuk tombol biru/emas <strong>Salin Data Siswa</strong> / <strong>Proses Naik Kelas!</strong> di ujung kanan-bawah layar guna melaksanakan mutasi massal tersebut.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl px-5 py-4">
+                <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                <div>
+                    <p class="text-sm font-bold text-rose-800 mb-0.5">Sesi Tahun Pelajaran Aktif Diperlukan</p>
+                    <p class="text-xs text-rose-600 leading-relaxed">Semua fitur modifikasi data dan import di halaman ini hanya akan terbuka jika sesi <strong>Tahun Pelajaran Saat Ini</strong> sudah terseting aktif di bagian Pengaturan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 10: Rombongan Belajar --}}
+    <div id="langkah-10" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-sky-600">10</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Kelola Rombongan Belajar</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pembentukan kelompok kelas dan anggota per semesternya</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Rombongan Belajar (Rombel)</strong> mengatur pemetaan siswa ke dalam kelas-kelas. Data rombel terikat pada satu tahun ajaran/semester yang aktif, sehingga setiap histori anggota kelas senantiasa terekam untuk cetak rapor per semester.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Data Master → Rombongan Belajar</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Rombongan Belajar</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Kemampuan Modul Rombongan Belajar:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Tambah Kelas Baru</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Menset nama kelas, wali kelas yang mendampingi, dan jenis kurikulum yang diajukan.</p>
+                    </div>
+
+                    <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V7M8 7h12m0 0v8a2 2 0 01-2 2h-2.5M12 7V4h3"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Salin Rombel &amp; Anggota</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Menciptakan tiruan susunan dan formasi siswa persis seperti kelompok belajar semester lalu.</p>
+                    </div>
+
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Manajemen Anggota</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Tombol <strong class="text-slate-700">"Lihat Anggota"</strong> akan mengarahkan ke formasi presensi serta rapot tiap-tiap kelas.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Cepat Menyalin Rombongan Belajar dari Semester Sebelumnya:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih tombol ikon dokumen <strong class="text-indigo-600">Salin Rombel</strong> di sudut kanan atas antar-muka.', 'indigo'],
+                        ['Layar pemilihan akan muncul, <strong>Pilih Semester Sumber</strong> memalui drop-down menu.', 'sky'],
+                        ['Beri tanda centang pada list nama rombongan belajar mana yang ingin Anda teruskan keberadaannya di semester yang sedang aktif.', 'emerald'],
+                        ['Lalu klik tombol <strong>Salin Rombel Terpilih</strong> supaya rancangan kelas tersebut tercipta.', 'indigo'],
+                        ['Langkah kedua krusial, kembali ketuk opsi <strong class="text-emerald-600">Salin Anggota Rombel</strong> di atas lalu ulangi alur pemilihan sumber semester agar sistem mengirim para siswa/anggota masuk ke habitat kelas-kelas barunya secara presisi dan otomasi.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Mengelola Kelas Secara Manual:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Gunakan tombol biru laut <strong class="text-sky-600">Tambah Rombel / Kelas</strong> andaikata kelas idaman Anda belum diciptakan, isi spesifikasi detail program/tingkat kurikulumnya di dalam pop-up.', 'sky'],
+                        ['Klik opsi kuning <strong>Edit</strong> yang hadir di tiap baris rombel apabila memerlukan perbaikan nomenklatur kelas dan nama wali penghampunya.', 'amber'],
+                        ['Tekan pilihan <strong>Lihat Anggota</strong> pada baris rombel yang bersangkutan untuk beralih masuk ke dalam panel detail kontrol dan mulai menambahkan partisipan kelas satu-persatu atau kelola nilai rapor.', 'indigo'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-3 items-start">
+                <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-amber-800 leading-relaxed">
+                    <strong>Catatan:</strong> Jika Anda bermaksud membubarkan suatu rombel yang telanjur berisi anggota pada semester ini, mohon pindahkan/mengeluarkan siswa dari rombel tersebut terlebih dahulu sebelum kelas dapat dinonaktifkan/dihapus dengan aman.
+                </div>
             </div>
         </div>
     </div>
