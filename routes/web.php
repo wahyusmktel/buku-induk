@@ -15,6 +15,10 @@ Route::get('/kontak', function () {
     return view('kontak');
 });
 
+Route::get('/docs', function () {
+    return view('docs.index');
+})->name('docs.index')->middleware('auth');
+
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login')->middleware('guest');
