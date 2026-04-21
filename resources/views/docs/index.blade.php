@@ -55,6 +55,8 @@
                     ['9', 'langkah-9', 'Kelola Data Pokok Siswa'],
                     ['10', 'langkah-10', 'Kelola Rombongan Belajar'],
                     ['11', 'langkah-11', 'Cetak & Manajemen Buku Induk'],
+                    ['12', 'langkah-12', 'Data Alumni (Kelulusan)'],
+                    ['13', 'langkah-13', 'Sampah & Pemulihan Data'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -1107,6 +1109,121 @@
                 <div class="text-sm text-teal-800 leading-relaxed">
                     <strong>Penting:</strong> Untuk dokumen yang dikalkulasi cetak, pastikan stelan fundamental seperti rasio Kop Surat, resolusi Stempel Kepala Sekolah, ukuran Tanda Tangan, serta presisi Margin kertas telah disusun rapi di <strong>Langkah 5 (Konfigurasi Dokumen)</strong>. Hasil cetakan halaman ini menjadi jejak arsip paling berharga institusi!
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 12: Data Alumni --}}
+    <div id="langkah-12" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-violet-600">12</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Data Alumni (Kelulusan)</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pemantauan arsip daftar peserta didik yang telah berstatus Tamat Belajar/Lulus.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Data Alumni</strong> adalah etalase yang menampung seluruh riwayat memori anak didik yang telah berlabuh menjadi Alumni (Tamat Belajar). Ini bukanlah sekadar tabel daftar hitam, tapi repositori pangkalan data yang masih memampangkan rekam jejak utuh buku induk mereka meski mereka telah menempuh perjalanan baru.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Arsip Siswa → Alumni</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5zm0-14l9 5-9 5-9-5 9-5z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Data Alumni</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Elemen Penting pada Panel Data Alumni:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="border border-violet-100 bg-violet-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Filter Lacak Tahun Kelulusan</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Berfasilitas sistem <em>Dropdown Cerdas</em> (Auto-submit), dimana Anda bebas menyeleksi dan menyeret kelompok kelulusan berdasarkan sesi Tahun Pelajarannya.</p>
+                    </div>
+
+                    <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Kilas Balik Ijazah</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Tampilan tabel menyajikan relasi langsung ke rekaman Nomor Buku Ijazah dan data rujukan <em>Melanjutkan Ke instansi tingkat mana?</em>.</p>
+                    </div>
+
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Cetak Ulang Buku Induk</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Kendati status mereka bukan siswa aktif, menekan tombol <span class="bg-violet-100 text-violet-700 px-1 py-0.5 rounded ml-0.5">Buka</span> akan meretas jalan ke Pustaka Cetak Induk individual mereka (Tervalidasi Abadi).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex gap-3 items-start mt-4">
+                <svg class="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-indigo-800 leading-relaxed">
+                    <strong>Informasi:</strong> Bagaimana anak berstatus Alumni? Data ini di otomatisasi oleh sistem. Anda tidak bisa mendaftarkan anak kesini secara paksa manual. Mekanismenya bermula kala siswa bersangkutan di-input dengan form status pendaftaran mutasi <strong>Tamat Belajar</strong> (Meninggalkan Sekolah) pada ruang Buku Induk. Otomatisasi pangkalan data menjustifikasinya murni sebagai Alumni!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 13: Trash / Data Terhapus --}}
+    <div id="langkah-13" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-rose-600">13</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Sampah &amp; Pemulihan Data</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pengendalian penghapusan lunak (restore) maupun penghancuran data mutlak siswa.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Platform ini menganut prinsip pengangamanan <em>Soft-Delete Architecture</em> (Penghapusan Lunak). Berarti, nyaris seluruh insiden kala Anda menghapus data di Tabel Ekosistem (Seperti Tabel Data Pokok), data tersebut rupanya tidak secara ganas lenyap selamanya dari *Server*; alih-alih data berpindah dan terkurung di ruang instalansi <strong>Sampah</strong> (Ruang Isolasi) demi memitigasi kejadian memencet tombol secara terburu rupa.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Kelola → Sampah / Terhapus</strong>.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Sampah</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">2 Aksi Mutlak di Menu Sampah:</p>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs font-black text-emerald-600 shrink-0">A</span>
+                        <div>
+                            <p class="text-sm font-bold text-emerald-700">Opsi: Pulihkan (Memanggil Balik Kehidupan)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ketuk tombol berwarna hijau daun ini agar rekam data anak kembali menyala dan kembali direkonstruksikan seutuhnya pada halaman asal (Data Pokok Siswa/Tabel Buku Induk). Ini ibarat membatalkan penghapusan data.</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-4">
+                        <span class="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 flex items-center justify-center text-xs font-black text-rose-600 shrink-0">B</span>
+                        <div>
+                            <p class="text-sm font-bold text-rose-700">Opsi: Hapus Permanen (Pemusnahan Abadi)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Tombol merah menyala ini mengeksekusi penghancuran tuntas dan me-nol-kan riwayat eksistensi profil anak dari pangkalan server (Termasuk rekam Buku Induk) untuk selamanya. <strong>Opsi tak bisa dibatalkan atau diralat meski instalisasi dibayar jutaan dollar.</strong> Patut menjadi kewaspadaan luar biasa!</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
