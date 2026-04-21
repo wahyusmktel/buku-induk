@@ -1042,6 +1042,65 @@
                     @endforeach
                 </ol>
             </div>
+
+            <div class="space-y-4 pt-6 border-t border-slate-100">
+                <p class="text-sm font-bold text-slate-700 mb-3">Isi Formulir Rekam Jejak Buku Induk (10 Aspek Utama):</p>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">Formulir kelengkapan buku induk mengusung tampilan berbasis Tab (Layar Bergaya Navigasi Horizontal) untuk efisiensi ruang agar form isian super-komprehensif tidak terasa menghempas pandangan mata sekaligus.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">1</span> Identitas Murid</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Merangkum data diri paling dasar (NISN, NIK, Tempat/Tgl Lahir, Agama & dsb).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">2</span> Data Orang Tua</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Kolom biografi sang Ayah, Ibu, beserta wali (<strong>Catatan Pintar:</strong> Jika pada tab periodik anak disetel tinggal dengan wali, form wali tiba-tiba jadi Wajib Diisi!).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">3</span> Data Periodik</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Mendata perihal tempat bermukim si anak (jumlah sdr, jarak ke sekolah, bahasa ibu).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px]">4</span> Pendidikan Sebelumnya</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Menjejak asal muasal anak baik dari lembaga tamatan pendidikan usia dini (TK) maupun berkas riwayat transisi kepindahan sekolah.</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4">
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">5</span> Jasmani & Foto</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Berisi form bobot tubuh si anak (Termasuk penyilangan tab input upload foto formal/pasphoto Buku Induk cetak minimal 2 varian).</p>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50/50 rounded-xl p-4 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+                        <p class="text-sm font-bold text-slate-700 mb-1 flex items-center gap-2"><span class="w-5 h-5 rounded bg-amber-100 text-amber-600 flex items-center justify-center text-[10px]">6</span> Dinamis: Beasiswa & Mutasi Keluar</p>
+                        <p class="text-xs text-slate-500 leading-relaxed ml-7">Kolom ini tidak dibatasi isiannya (Bisa di klik "Tambah Catatan Baru" sesuka hati). Merangkum riwayat penikmatan beasiswa PIP hingga catatan registrasi hari kelulusan / rekam jejak kepindahan (mutasi keluar sekolah anak bersama pencetakan surat Ijazah).</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-5 rounded-xl border-2 border-indigo-100 bg-white shadow-sm relative overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+                    <h5 class="text-sm font-black text-indigo-800 flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        Eksklusif (Semesteran): Input Nilai & Ekstrakurikuler
+                    </h5>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Nilai Akademik &amp; Ekskul tidak sekadar diisi biasa seperti memencet keyboard di form, namun tersistematis per-semester aktif.</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-full bg-violet-100 border border-violet-200 flex items-center justify-center text-xs font-black text-violet-600 shrink-0">A</span>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">Prestasi Akademik (Nilai Rapor)</p>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Nilai kognitif, afektif, kepribadian serta matriks ketidakhadiran direkam via <strong class="text-emerald-600">Pop-up Editor Semester Khusus.</strong> Anda bahkan bisa menyuntikkan ribuan nilai sekaligus menggunakan Excel di fitur <strong class="text-indigo-600">Import Excel Khusus Nilai</strong>. Form akan membaca referensi dari Langkah 7.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-xs font-black text-orange-600 shrink-0">B</span>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">Skor / Predikat Ekstrakurikuler</p>
+                                <p class="text-xs text-slate-500 mt-1 leading-relaxed">Nilai non-akademik berupa predikat (Sangat Baik / A, Baik / B) diekskusi dari panel seraya membawa referensi dari Langkah 8. Sistem akan melahirkan lembar tabel histori riwayat eksplorasi non-akademik ini semester per semesternya.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             
             <div class="flex items-start gap-3 bg-teal-50 border border-teal-100 rounded-xl px-5 py-4">
                 <svg class="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
