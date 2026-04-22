@@ -123,7 +123,31 @@
         </div>
 
         {{-- 3. Pengaturan Ukuran & Margin Kertas --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" x-data="{ paperSize: '{{ old('paper_size', $settings['paper_size'] ?? 'a4') }}' }">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+            x-data="{
+                paperSize: '{{ old('paper_size', $settings['paper_size'] ?? 'a4') }}',
+                customW: {{ old('paper_width', $settings['paper_width'] ?? 210) }},
+                customH: {{ old('paper_height', $settings['paper_height'] ?? 297) }},
+                mTop: {{ old('margin_top', $settings['margin_top'] ?? 2.5) }},
+                mRight: {{ old('margin_right', $settings['margin_right'] ?? 2.5) }},
+                mBottom: {{ old('margin_bottom', $settings['margin_bottom'] ?? 2.5) }},
+                mLeft: {{ old('margin_left', $settings['margin_left'] ?? 2.5) }},
+                sizes: {
+                    a4:     { w: 210, h: 297,   label: 'A4' },
+                    folio:  { w: 215.9, h: 330,  label: 'F4 / Folio' },
+                    legal:  { w: 215.9, h: 355.6, label: 'Legal' },
+                    letter: { w: 215.9, h: 279.4, label: 'Letter' },
+                },
+                get pw() { return this.paperSize === 'custom' ? this.customW : (this.sizes[this.paperSize]?.w ?? 210); },
+                get ph() { return this.paperSize === 'custom' ? this.customH : (this.sizes[this.paperSize]?.h ?? 297); },
+                get paperLabel() { return this.paperSize === 'custom' ? 'Kustom' : (this.sizes[this.paperSize]?.label ?? ''); },
+                get mtMM() { return this.mTop * 10; },
+                get mrMM() { return this.mRight * 10; },
+                get mbMM() { return this.mBottom * 10; },
+                get mlMM() { return this.mLeft * 10; },
+                get contentW() { return Math.max(0, this.pw - this.mlMM - this.mrMM); },
+                get contentH() { return Math.max(0, this.ph - this.mtMM - this.mbMM); },
+            }">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -131,53 +155,141 @@
                 </div>
             </div>
             
-            <div class="p-6 space-y-6">
-                <!-- Pilihan Kertas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="paper_size" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ukuran Kertas</label>
-                        <select id="paper_size" name="paper_size" x-model="paperSize" class="w-full pl-4 pr-10 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 transition-all shadow-inner">
-                            <option value="a4">A4 (210 x 297 mm)</option>
-                            <option value="folio">F4 / Folio (215.9 x 330 mm)</option>
-                            <option value="legal">Legal (215.9 x 355.6 mm)</option>
-                            <option value="letter">Letter (215.9 x 279.4 mm)</option>
-                            <option value="custom">Kustom (Atur Manual)</option>
-                        </select>
-                        <p class="text-[0.65rem] text-slate-400 mt-1">Standar yang sering digunakan di Indonesia adalah A4 / F4(Folio).</p>
+            <div class="p-6">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    {{-- Left: Form Controls --}}
+                    <div class="flex-1 space-y-6 min-w-0">
+                        <!-- Pilihan Kertas -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="paper_size" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ukuran Kertas</label>
+                                <select id="paper_size" name="paper_size" x-model="paperSize" class="w-full pl-4 pr-10 py-2.5 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 transition-all shadow-inner">
+                                    <option value="a4">A4 (210 x 297 mm)</option>
+                                    <option value="folio">F4 / Folio (215.9 x 330 mm)</option>
+                                    <option value="legal">Legal (215.9 x 355.6 mm)</option>
+                                    <option value="letter">Letter (215.9 x 279.4 mm)</option>
+                                    <option value="custom">Kustom (Atur Manual)</option>
+                                </select>
+                                <p class="text-[0.65rem] text-slate-400 mt-1">Standar yang sering digunakan di Indonesia adalah A4 / F4(Folio).</p>
+                            </div>
+
+                            <!-- Kustom dimensi kertas -->
+                            <div x-show="paperSize === 'custom'" x-cloak class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Lebar <span class="text-xs font-normal text-slate-400">(mm)</span></label>
+                                    <input type="number" step="0.1" name="paper_width" x-model.number="customW" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tinggi <span class="text-xs font-normal text-slate-400">(mm)</span></label>
+                                    <input type="number" step="0.1" name="paper_height" x-model.number="customH" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pengaturan Margin -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Pengaturan Tepi (Margin) - dalam Centimeter (cm)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Atas (Top)</label>
+                                    <input type="number" step="0.1" name="margin_top" x-model.number="mTop" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Kanan (Right)</label>
+                                    <input type="number" step="0.1" name="margin_right" x-model.number="mRight" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Bawah (Bottom)</label>
+                                    <input type="number" step="0.1" name="margin_bottom" x-model.number="mBottom" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Kiri (Left)</label>
+                                    <input type="number" step="0.1" name="margin_left" x-model.number="mLeft" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Kustom dimensi kertas -->
-                    <div x-show="paperSize === 'custom'" x-cloak class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Lebar <span class="text-xs font-normal text-slate-400">(mm)</span></label>
-                            <input type="number" step="0.1" name="paper_width" value="{{ old('paper_width', $settings['paper_width'] ?? '210') }}" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tinggi <span class="text-xs font-normal text-slate-400">(mm)</span></label>
-                            <input type="number" step="0.1" name="paper_height" value="{{ old('paper_height', $settings['paper_height'] ?? '297') }}" :disabled="paperSize !== 'custom'" class="w-full rounded-lg border-slate-300 focus:border-sky-500 shadow-sm text-sm disabled:bg-slate-100">
-                        </div>
-                    </div>
-                </div>
+                    {{-- Right: Live Paper Preview --}}
+                    <div class="lg:w-72 flex-shrink-0">
+                        <div class="sticky top-4">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                Preview Kertas
+                            </p>
+                            <div class="bg-slate-50 rounded-2xl border border-slate-200 p-5 flex flex-col items-center">
+                                {{-- Paper Visual --}}
+                                <div class="relative flex items-center justify-center" style="width: 200px;">
+                                    {{-- Paper outline --}}
+                                    <div class="bg-white border-2 border-slate-300 rounded-sm shadow-lg relative transition-all duration-300"
+                                         :style="'width: ' + Math.round(200 * (pw / Math.max(pw, ph))) + 'px; height: ' + Math.round(200 * (ph / Math.max(pw, ph)) * 1.3) + 'px;'">
+                                        
+                                        {{-- Margin area (dashed lines) --}}
+                                        <div class="absolute border border-dashed border-indigo-300 bg-indigo-50/30 rounded-[1px] transition-all duration-300"
+                                             :style="'top: ' + (mtMM / ph * 100) + '%; left: ' + (mlMM / pw * 100) + '%; right: ' + (mrMM / pw * 100) + '%; bottom: ' + (mbMM / ph * 100) + '%;'">
+                                            {{-- Content area lines --}}
+                                            <div class="w-full h-full flex flex-col justify-between p-1.5 overflow-hidden">
+                                                <div class="space-y-1">
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-3/4"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-full"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-5/6"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-full"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-2/3"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-full"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-4/5"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-full"></div>
+                                                    <div class="h-[3px] bg-slate-200 rounded-full w-1/2"></div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                <!-- Pengaturan Margin -->
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">Pengaturan Tepi (Margin) - dalam Centimeter (cm)</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Atas (Top)</label>
-                            <input type="number" step="0.1" name="margin_top" value="{{ old('margin_top', $settings['margin_top'] ?? '2.5') }}" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
-                        </div>
-                        <div>
-                            <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Kanan (Right)</label>
-                            <input type="number" step="0.1" name="margin_right" value="{{ old('margin_right', $settings['margin_right'] ?? '2.5') }}" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
-                        </div>
-                        <div>
-                            <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Bawah (Bottom)</label>
-                            <input type="number" step="0.1" name="margin_bottom" value="{{ old('margin_bottom', $settings['margin_bottom'] ?? '2.5') }}" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
-                        </div>
-                        <div>
-                            <label class="block text-[0.65rem] font-bold text-slate-400 uppercase mb-1">Kiri (Left)</label>
-                            <input type="number" step="0.1" name="margin_left" value="{{ old('margin_left', $settings['margin_left'] ?? '2.5') }}" class="w-full px-3 py-2 text-sm rounded-xl border-slate-200 bg-slate-50/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-slate-700 text-center shadow-inner">
+                                        {{-- Top margin label --}}
+                                        <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none" :style="'top: 2px; height: ' + Math.max(0, (mtMM / ph * 100) - 1) + '%;'">
+                                            <span class="text-[8px] font-bold text-rose-400 leading-none" x-text="mTop + ' cm'"></span>
+                                        </div>
+
+                                        {{-- Bottom margin label --}}
+                                        <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-end justify-end pointer-events-none" :style="'bottom: 2px; height: ' + Math.max(0, (mbMM / ph * 100) - 1) + '%;'">
+                                            <span class="text-[8px] font-bold text-rose-400 leading-none" x-text="mBottom + ' cm'"></span>
+                                        </div>
+
+                                        {{-- Left margin label --}}
+                                        <div class="absolute top-1/2 -translate-y-1/2 flex items-center pointer-events-none" :style="'left: 1px; width: ' + Math.max(0, (mlMM / pw * 100) - 1) + '%;'">
+                                            <span class="text-[7px] font-bold text-rose-400 leading-none whitespace-nowrap origin-center -rotate-90" x-text="mLeft + ''"></span>
+                                        </div>
+
+                                        {{-- Right margin label --}}
+                                        <div class="absolute top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none" :style="'right: 1px; width: ' + Math.max(0, (mrMM / pw * 100) - 1) + '%;'">
+                                            <span class="text-[7px] font-bold text-rose-400 leading-none whitespace-nowrap origin-center rotate-90" x-text="mRight + ''"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Info below preview --}}
+                                <div class="mt-4 w-full space-y-2">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-slate-500 font-medium">Ukuran</span>
+                                        <span class="font-bold text-slate-700" x-text="paperLabel + ' (' + pw + ' × ' + ph + ' mm)'"></span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-slate-500 font-medium">Area Cetak</span>
+                                        <span class="font-bold text-indigo-600" x-text="contentW.toFixed(1) + ' × ' + contentH.toFixed(1) + ' mm'"></span>
+                                    </div>
+                                    <div class="border-t border-slate-200 pt-2 mt-2">
+                                        <div class="flex items-center gap-3 text-[10px] text-slate-400">
+                                            <span class="flex items-center gap-1"><span class="w-3 h-[2px] bg-indigo-300 border border-dashed border-indigo-400 inline-block"></span> Batas Margin</span>
+                                            <span class="flex items-center gap-1"><span class="w-3 h-[2px] bg-slate-200 inline-block rounded"></span> Area Konten</span>
+                                        </div>
+                                    </div>
+                                    {{-- Warning if margins too large --}}
+                                    <template x-if="contentW <= 0 || contentH <= 0">
+                                        <div class="flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 rounded-lg mt-1">
+                                            <svg class="w-3.5 h-3.5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                            <span class="text-[10px] font-semibold text-red-600">Margin terlalu besar! Tidak ada area cetak tersisa.</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
