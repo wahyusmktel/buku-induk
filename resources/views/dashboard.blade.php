@@ -6,12 +6,11 @@
 
 @section('content')
 <!-- Hero Welcome Section -->
-<div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl shadow-xl p-8 mb-8 relative overflow-hidden text-white">
+<div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl shadow-xl p-8 mb-6 relative overflow-hidden text-white">
     <div class="relative z-10">
         <h2 class="text-3xl font-extrabold mb-2">Selamat Datang, {{ Auth::user()->name }}!</h2>
         <p class="text-indigo-100 font-medium max-w-xl">Halaman dashboard telah dioptimalkan untuk performa maksimal. Kelola data induk siswa dengan cepat dan efisien.</p>
-        
-        <div class="flex gap-4 mt-8">
+        <div class="flex flex-wrap gap-3 mt-6">
             <a href="{{ route('siswas.index') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-md px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 border border-white/10">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                 Data Siswa
@@ -27,6 +26,66 @@
     <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
     <div class="absolute right-10 top-10 w-20 h-20 bg-indigo-400/20 rounded-full blur-2xl animate-pulse"></div>
 </div>
+
+{{-- Aksi Cepat: Tahun Pelajaran (Super Admin Only) --}}
+@hasrole('Super Admin')
+<div class="mb-6 bg-gradient-to-r from-indigo-50 via-violet-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+    <div class="flex flex-col md:flex-row md:items-center gap-4 p-5">
+        {{-- Icon & Title --}}
+        <div class="flex items-center gap-3 md:min-w-[180px]">
+            <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white shadow-md shadow-indigo-200">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-slate-800">Aksi Cepat</h3>
+                <p class="text-xs text-slate-500">Tahun Pelajaran</p>
+            </div>
+        </div>
+
+        {{-- Divider --}}
+        <div class="hidden md:block w-px h-10 bg-indigo-200/60"></div>
+
+        {{-- Status TP Aktif --}}
+        <div class="flex-shrink-0">
+            @if($tahunAktif)
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-xl">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-sm font-bold text-emerald-700">{{ $tahunAktif->tahun }} - Semester {{ $tahunAktif->semester }}</span>
+                </div>
+            @else
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-xl">
+                    <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+                    <span class="text-sm font-bold text-amber-700">Belum ada TP aktif</span>
+                </div>
+            @endif
+        </div>
+
+        {{-- Divider --}}
+        <div class="hidden md:block w-px h-10 bg-indigo-200/60"></div>
+
+        {{-- Form Beralih --}}
+        <form action="#" method="POST" id="quick-activate-form" class="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            @csrf
+            @method('PATCH')
+            <div class="relative flex-1">
+                <select name="tahun_id" id="tahun-select" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer shadow-sm hover:border-indigo-300 transition-colors">
+                    <option value="" disabled selected>Pilih Tahun Pelajaran</option>
+                    @foreach($tahunPelajarans as $tp)
+                        <option value="{{ $tp->id }}" {{ $tahunAktif && $tahunAktif->id == $tp->id ? 'disabled' : '' }}>{{ $tp->tahun }} - Semester {{ $tp->semester }}</option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+                </div>
+            </div>
+            <button type="button" id="btn-activate-tp" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold py-2.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap" disabled>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Aktifkan
+            </button>
+        </form>
+    </div>
+</div>
+@endhasrole
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <!-- Stat Card 1 -->
@@ -190,115 +249,64 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2">
-        <!-- Quick Informative Card -->
-        <div class="bg-sky-50 rounded-2xl p-6 border border-sky-100 flex gap-4 items-start">
-            <div class="p-3 bg-sky-500 rounded-xl text-white">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-                <h4 class="text-sky-900 font-bold mb-1">Tips Navigasi</h4>
-                <p class="text-sky-700 text-sm leading-relaxed">Gunakan menu di samping untuk mengakses fitur lengkap. Dashboard ini sengaja dibuat minimalis untuk memastikan kecepatan akses data yang optimal bagi manajemen sekolah.</p>
-            </div>
-        </div>
+<!-- Tips Navigasi -->
+<div class="bg-sky-50 rounded-2xl p-6 border border-sky-100 flex gap-4 items-start">
+    <div class="p-3 bg-sky-500 rounded-xl text-white">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
     </div>
-
     <div>
-        @hasrole('Super Admin')
-        <!-- Aksi Cepat: Toggle Tahun Pelajaran -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group/panel hover:shadow-md transition-shadow duration-300">
-            <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-violet-50">
-                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                    <span class="flex items-center justify-center w-6 h-6 bg-indigo-500 rounded-lg text-white">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    </span>
-                    Aksi Cepat
-                </h3>
-            </div>
-            <div class="p-5">
-                <p class="text-xs text-slate-500 font-semibold mb-1 uppercase tracking-wide">Tahun Pelajaran Aktif</p>
-                @if($tahunAktif)
-                    <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span class="text-sm font-bold text-emerald-700">{{ $tahunAktif->tahun }} - Semester {{ $tahunAktif->semester }}</span>
-                    </div>
-                @else
-                    <div class="flex items-center gap-2 mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-                        <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-                        <span class="text-sm font-bold text-amber-700">Belum ada tahun pelajaran aktif</span>
-                    </div>
-                @endif
-
-                <label for="tahun-select" class="text-xs text-slate-500 font-semibold block mb-2">Beralih ke:</label>
-                <form action="#" method="POST" id="quick-activate-form">
-                    @csrf
-                    @method('PATCH')
-                    <div class="relative">
-                        <select name="tahun_id" id="tahun-select" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none appearance-none cursor-pointer shadow-sm hover:border-indigo-300 transition-colors">
-                            <option value="" disabled selected>Pilih Tahun Pelajaran</option>
-                            @foreach($tahunPelajarans as $tp)
-                                <option value="{{ $tp->id }}" {{ $tahunAktif && $tahunAktif->id == $tp->id ? 'disabled class="opacity-50"' : '' }}>{{ $tp->tahun }} - Semester {{ $tp->semester }}</option>
-                            @endforeach
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
-                        </div>
-                    </div>
-                    <button type="button" id="btn-activate-tp" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        Aktifkan
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const select = document.getElementById('tahun-select');
-            const btn = document.getElementById('btn-activate-tp');
-            const form = document.getElementById('quick-activate-form');
-
-            select.addEventListener('change', function() {
-                btn.disabled = !this.value;
-            });
-
-            btn.addEventListener('click', function() {
-                const selectedId = select.value;
-                const selectedText = select.options[select.selectedIndex].text;
-
-                if (!selectedId) return;
-
-                Swal.fire({
-                    title: 'Konfirmasi Perubahan',
-                    html: '<div class="text-left">' +
-                        '<p class="text-slate-600 mb-3">Apakah Anda yakin ingin beralih ke tahun pelajaran:</p>' +
-                        '<div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-center">' +
-                        '<span class="text-base font-bold text-indigo-700">' + selectedText + '</span>' +
-                        '</div>' +
-                        '<p class="text-xs text-slate-400 mt-3">Data yang ditampilkan akan disesuaikan dengan tahun pelajaran yang dipilih.</p>' +
-                        '</div>',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#4f46e5',
-                    cancelButtonColor: '#64748b',
-                    confirmButtonText: 'Ya, Aktifkan',
-                    cancelButtonText: 'Batal',
-                    reverseButtons: true,
-                    focusCancel: true,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.action = '/tahun-pelajaran/' + selectedId + '/activate';
-                        form.submit();
-                    } else {
-                        select.value = '';
-                        btn.disabled = true;
-                    }
-                });
-            });
-        });
-        </script>
-        @endhasrole
+        <h4 class="text-sky-900 font-bold mb-1">Tips Navigasi</h4>
+        <p class="text-sky-700 text-sm leading-relaxed">Gunakan menu di samping untuk mengakses fitur lengkap. Dashboard ini sengaja dibuat minimalis untuk memastikan kecepatan akses data yang optimal bagi manajemen sekolah.</p>
     </div>
 </div>
+
+@hasrole('Super Admin')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('tahun-select');
+    const btn = document.getElementById('btn-activate-tp');
+    const form = document.getElementById('quick-activate-form');
+
+    if (!select || !btn || !form) return;
+
+    select.addEventListener('change', function() {
+        btn.disabled = !this.value;
+    });
+
+    btn.addEventListener('click', function() {
+        const selectedId = select.value;
+        const selectedText = select.options[select.selectedIndex].text;
+
+        if (!selectedId) return;
+
+        Swal.fire({
+            title: 'Konfirmasi Perubahan',
+            html: '<div class="text-left">' +
+                '<p class="text-slate-600 mb-3">Apakah Anda yakin ingin beralih ke tahun pelajaran:</p>' +
+                '<div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-center">' +
+                '<span class="text-base font-bold text-indigo-700">' + selectedText + '</span>' +
+                '</div>' +
+                '<p class="text-xs text-slate-400 mt-3">Data yang ditampilkan akan disesuaikan dengan tahun pelajaran yang dipilih.</p>' +
+                '</div>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Aktifkan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.action = '/tahun-pelajaran/' + selectedId + '/activate';
+                form.submit();
+            } else {
+                select.value = '';
+                btn.disabled = true;
+            }
+        });
+    });
+});
+</script>
+@endhasrole
 @endsection
