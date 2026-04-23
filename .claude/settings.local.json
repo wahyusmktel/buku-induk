@@ -25,7 +25,9 @@
       "Bash(/c/xampp/php/php.exe -l app/Http/Controllers/CetakController.php)",
       "Bash(/c/xampp/php/php.exe -l app/Exports/AbsensiTemplateExport.php)",
       "Read(//c/Program Files \\(x86\\)/Inno Setup 6/**)",
-      "Read(//c/Program Files/Inno Setup 6/**)"
+      "Read(//c/Program Files/Inno Setup 6/**)",
+      "PowerShell(php artisan make:migration add_is_aktif_to_ekstrakurikulers_table --table=ekstrakurikulers)",
+      "PowerShell(php artisan migrate)"
     ]
   }
 }

@@ -124,25 +124,58 @@
                         </td>
                         <td class="py-4 px-6 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button type="button" 
-                                    @click="editModal = true; 
-                                            editData.id = '{{ $mapel->id }}'; 
-                                            editData.nama = '{{ addslashes($mapel->nama) }}'; 
-                                            editData.kelompok = '{{ addslashes($mapel->kelompok) }}'; 
-                                            editData.urutan = '{{ $mapel->urutan }}'; 
-                                            editData.is_aktif = {{ $mapel->is_aktif ? 'true' : 'false' }};
-                                            $nextTick(() => { $refs.editForm.action = '{{ url('mata-pelajaran') }}/' + editData.id; })"
+                                <button type="button"
+                                    data-id="{{ $mapel->id }}"
+                                    data-nama="{{ $mapel->nama }}"
+                                    data-kelompok="{{ $mapel->kelompok }}"
+                                    data-urutan="{{ $mapel->urutan }}"
+                                    data-aktif="{{ $mapel->is_aktif ? '1' : '0' }}"
+                                    @click="
+                                        editModal = true;
+                                        editData.id = $el.dataset.id;
+                                        editData.nama = $el.dataset.nama;
+                                        editData.kelompok = $el.dataset.kelompok;
+                                        editData.urutan = $el.dataset.urutan;
+                                        editData.is_aktif = $el.dataset.aktif === '1';
+                                        $nextTick(() => { $refs.editForm.action = '{{ url('mata-pelajaran') }}/' + editData.id; })"
                                     class="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all cursor-pointer" title="Edit">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 </button>
-                                
-                                <form action="{{ route('mata-pelajaran.destroy', $mapel->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus mata pelajaran ini? Opsi ini akan menghapus semua riwayat nilai pada mapel ini!')">
+
+                                {{-- Toggle Aktif --}}
+                                <form id="toggle-form-{{ $mapel->id }}"
+                                      action="{{ route('mata-pelajaran.toggle-aktif', $mapel->id) }}"
+                                      method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                </form>
+                                <button type="button"
+                                    data-id="{{ $mapel->id }}"
+                                    data-nama="{{ $mapel->nama }}"
+                                    data-aktif="{{ $mapel->is_aktif ? '1' : '0' }}"
+                                    onclick="confirmToggleMapel(this.dataset.id, this.dataset.aktif === '1', this.dataset.nama)"
+                                    class="{{ $mapel->is_aktif ? 'text-emerald-500 hover:text-amber-600 hover:bg-amber-50' : 'text-slate-300 hover:text-emerald-600 hover:bg-emerald-50' }} p-1.5 rounded-lg transition-all cursor-pointer"
+                                    title="{{ $mapel->is_aktif ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                    @if($mapel->is_aktif)
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                                    @else
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                                    @endif
+                                </button>
+
+                                <form id="delete-form-{{ $mapel->id }}"
+                                      action="{{ route('mata-pelajaran.destroy', $mapel->id) }}"
+                                      method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Hapus">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
                                 </form>
+                                <button type="button"
+                                    data-id="{{ $mapel->id }}"
+                                    data-nama="{{ $mapel->nama }}"
+                                    onclick="confirmDeleteMapel(this.dataset.id, this.dataset.nama)"
+                                    class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all cursor-pointer" title="Hapus">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -228,6 +261,78 @@
             </form>
         </div>
     </div>
+
+    <!-- Toggle Aktif SweetAlert Script -->
+    <script>
+    function confirmDeleteMapel(id, nama) {
+        Swal.fire({
+            title: 'Hapus Mata Pelajaran?',
+            html: `
+                <div class="text-slate-600 text-sm mt-1">
+                    Mata pelajaran <strong class="text-slate-800">${nama}</strong> akan dihapus permanen.
+                    <br>
+                    <span class="text-rose-600 text-xs mt-2 block font-semibold">
+                        ⚠ Seluruh riwayat nilai yang terkait juga akan ikut terhapus dan tidak dapat dipulihkan.
+                    </span>
+                </div>`,
+            icon: 'error',
+            iconColor: '#e11d48',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Ya, Hapus Permanen',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                title: 'text-lg font-extrabold text-slate-800',
+                confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                actions: 'gap-3',
+            },
+            buttonsStyling: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+
+    function confirmToggleMapel(id, isAktif, nama) {
+        const deactivating = isAktif;
+        Swal.fire({
+            title: deactivating ? 'Nonaktifkan Mata Pelajaran?' : 'Aktifkan Mata Pelajaran?',
+            html: `
+                <div class="text-slate-600 text-sm mt-1">
+                    Mata pelajaran <strong class="text-slate-800">${nama}</strong>
+                    akan <strong>${deactivating ? 'dinonaktifkan' : 'diaktifkan kembali'}</strong>.
+                    ${deactivating ? '<br><span class="text-amber-600 text-xs mt-2 block">Mapel yang dinonaktifkan tidak akan muncul pada formulir input nilai baru.</span>' : ''}
+                </div>`,
+            icon: deactivating ? 'warning' : 'question',
+            iconColor: deactivating ? '#f59e0b' : '#10b981',
+            showCancelButton: true,
+            confirmButtonColor: deactivating ? '#f59e0b' : '#10b981',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: deactivating
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg> Ya, Nonaktifkan'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg> Ya, Aktifkan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                title: 'text-lg font-extrabold text-slate-800',
+                confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                actions: 'gap-3',
+            },
+            buttonsStyling: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('toggle-form-' + id).submit();
+            }
+        });
+    }
+    </script>
 
     <!-- Edit Modal -->
     <div x-show="editModal" 

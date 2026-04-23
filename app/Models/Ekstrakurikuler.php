@@ -16,5 +16,10 @@ class Ekstrakurikuler extends Model
     protected $fillable = [
         'nama_ekstrakurikuler',
         'deskripsi',
+        'is_aktif',
+    ];
+
+    protected $casts = [
+        'is_aktif' => 'boolean',
     ];
 }

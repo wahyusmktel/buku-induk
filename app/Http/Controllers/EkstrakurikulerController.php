@@ -58,6 +58,16 @@ class EkstrakurikulerController extends Controller
         return redirect()->route('ekstrakurikuler.index')->with('success', 'Data Ekstrakurikuler berhasil diperbarui.');
     }
 
+    public function toggleAktif($id)
+    {
+        $ekskul = Ekstrakurikuler::findOrFail($id);
+        $ekskul->update(['is_aktif' => !$ekskul->is_aktif]);
+
+        $status = $ekskul->is_aktif ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect()->route('ekstrakurikuler.index')->with('success', "Ekstrakurikuler \"{$ekskul->nama_ekstrakurikuler}\" berhasil {$status}.");
+    }
+
     public function destroy($id)
     {
         $ekskul = Ekstrakurikuler::findOrFail($id);

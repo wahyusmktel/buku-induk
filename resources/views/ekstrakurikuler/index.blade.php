@@ -112,6 +112,7 @@
                         <th class="py-4 px-6 text-xs font-black text-slate-500 uppercase tracking-wider w-16 text-center">No</th>
                         <th class="py-4 px-6 text-xs font-black text-slate-500 uppercase tracking-wider">Nama Ekstrakurikuler</th>
                         <th class="py-4 px-6 text-xs font-black text-slate-500 uppercase tracking-wider">Keterangan / Deskripsi</th>
+                        <th class="py-4 px-6 text-xs font-black text-slate-500 uppercase tracking-wider w-32 text-center">Status</th>
                         @hasanyrole('Super Admin|Operator|Tata Usaha')
                         <th class="py-4 px-6 text-xs font-black text-slate-500 uppercase tracking-wider text-right">Aksi</th>
                         @endhasanyrole
@@ -129,18 +130,56 @@
                         <td class="py-4 px-6">
                             <span class="text-sm text-slate-500">{{ $item->deskripsi ?? '—' }}</span>
                         </td>
+                        <td class="py-4 px-6 text-center">
+                            @if($item->is_aktif)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shadow-sm">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Aktif
+                            </span>
+                            @else
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-400">
+                                Non-aktif
+                            </span>
+                            @endif
+                        </td>
                         @hasanyrole('Super Admin|Operator|Tata Usaha')
                         <td class="py-4 px-6 text-right">
                             <div class="flex items-center justify-end gap-2" x-data>
                                 <button type="button" @click="openEdit({{ Js::from($item) }})" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer" title="Edit">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
-                                <form action="{{ route('ekstrakurikuler.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus ekstrakurikuler ini?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Hapus">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
+
+                                {{-- Toggle Aktif --}}
+                                <form id="ekskul-toggle-form-{{ $item->id }}"
+                                      action="{{ route('ekstrakurikuler.toggle-aktif', $item->id) }}"
+                                      method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
                                 </form>
+                                <button type="button"
+                                    data-id="{{ $item->id }}"
+                                    data-nama="{{ $item->nama_ekstrakurikuler }}"
+                                    data-aktif="{{ $item->is_aktif ? '1' : '0' }}"
+                                    onclick="confirmToggleEkskul(this.dataset.id, this.dataset.aktif === '1', this.dataset.nama)"
+                                    class="{{ $item->is_aktif ? 'text-emerald-500 hover:text-amber-600 hover:bg-amber-50' : 'text-slate-300 hover:text-emerald-600 hover:bg-emerald-50' }} p-2 rounded-lg transition-colors cursor-pointer"
+                                    title="{{ $item->is_aktif ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                                </button>
+
+                                {{-- Hapus --}}
+                                <form id="ekskul-delete-form-{{ $item->id }}"
+                                      action="{{ route('ekstrakurikuler.destroy', $item->id) }}"
+                                      method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                                <button type="button"
+                                    data-id="{{ $item->id }}"
+                                    data-nama="{{ $item->nama_ekstrakurikuler }}"
+                                    onclick="confirmDeleteEkskul(this.dataset.id, this.dataset.nama)"
+                                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="Hapus">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
                             </div>
                         </td>
                         @endhasanyrole
@@ -176,6 +215,78 @@
             @endif
         </div>
     </div>
+
+    {{-- SweetAlert Scripts --}}
+    <script>
+    function confirmToggleEkskul(id, isAktif, nama) {
+        const deactivating = isAktif;
+        Swal.fire({
+            title: deactivating ? 'Nonaktifkan Ekstrakurikuler?' : 'Aktifkan Ekstrakurikuler?',
+            html: `
+                <div class="text-slate-600 text-sm mt-1">
+                    Ekstrakurikuler <strong class="text-slate-800">${nama}</strong>
+                    akan <strong>${deactivating ? 'dinonaktifkan' : 'diaktifkan kembali'}</strong>.
+                    ${deactivating ? '<br><span class="text-amber-600 text-xs mt-2 block">Ekskul yang dinonaktifkan tidak akan muncul pada pilihan input nilai siswa.</span>' : ''}
+                </div>`,
+            icon: deactivating ? 'warning' : 'question',
+            iconColor: deactivating ? '#f59e0b' : '#10b981',
+            showCancelButton: true,
+            confirmButtonColor: deactivating ? '#f59e0b' : '#10b981',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: deactivating
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg> Ya, Nonaktifkan'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg> Ya, Aktifkan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                title: 'text-lg font-extrabold text-slate-800',
+                confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                actions: 'gap-3',
+            },
+            buttonsStyling: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('ekskul-toggle-form-' + id).submit();
+            }
+        });
+    }
+
+    function confirmDeleteEkskul(id, nama) {
+        Swal.fire({
+            title: 'Hapus Ekstrakurikuler?',
+            html: `
+                <div class="text-slate-600 text-sm mt-1">
+                    Ekstrakurikuler <strong class="text-slate-800">${nama}</strong> akan dihapus permanen.
+                    <br>
+                    <span class="text-rose-600 text-xs mt-2 block font-semibold">
+                        ⚠ Seluruh riwayat nilai ekskul siswa yang terkait juga akan ikut terhapus dan tidak dapat dipulihkan.
+                    </span>
+                </div>`,
+            icon: 'error',
+            iconColor: '#e11d48',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Ya, Hapus Permanen',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                title: 'text-lg font-extrabold text-slate-800',
+                confirmButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                cancelButton: 'rounded-xl font-bold text-sm px-5 py-2.5',
+                actions: 'gap-3',
+            },
+            buttonsStyling: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('ekskul-delete-form-' + id).submit();
+            }
+        });
+    }
+    </script>
 
     {{-- MODAL TAMBAH --}}
     <div x-show="addModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>

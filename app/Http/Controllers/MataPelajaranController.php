@@ -74,6 +74,21 @@ class MataPelajaranController extends Controller
         return redirect()->route('mata-pelajaran.index')->with('success', 'Mata Pelajaran berhasil diperbarui.');
     }
 
+    public function toggleAktif(MataPelajaran $mataPelajaran)
+    {
+        $mataPelajaran->update(['is_aktif' => !$mataPelajaran->is_aktif]);
+
+        $status = $mataPelajaran->is_aktif ? 'diaktifkan' : 'dinonaktifkan';
+
+        ActivityLogService::log('mapel_toggle', "Mata Pelajaran {$status}: {$mataPelajaran->nama}", [
+            'mapel_id' => $mataPelajaran->id,
+            'nama'     => $mataPelajaran->nama,
+            'is_aktif' => $mataPelajaran->is_aktif,
+        ]);
+
+        return redirect()->route('mata-pelajaran.index')->with('success', "Mata Pelajaran \"{$mataPelajaran->nama}\" berhasil {$status}.");
+    }
+
     public function destroy(MataPelajaran $mataPelajaran)
     {
         $namaMapel = $mataPelajaran->nama;

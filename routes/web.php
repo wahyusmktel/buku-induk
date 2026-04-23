@@ -173,7 +173,9 @@ Route::middleware(['auth'])->group(function () {
         
         // Mata Pelajaran Management
         Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
+        Route::patch('mata-pelajaran/{mataPelajaran}/toggle-aktif', [MataPelajaranController::class, 'toggleAktif'])->name('mata-pelajaran.toggle-aktif');
         Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->except(['create', 'show', 'edit']);
+        Route::patch('ekstrakurikuler/{id}/toggle-aktif', [EkstrakurikulerController::class, 'toggleAktif'])->name('ekstrakurikuler.toggle-aktif');
 
         // Settings (Konfigurasi)
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
