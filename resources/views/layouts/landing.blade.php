@@ -345,7 +345,12 @@
     <header>
         <nav>
             <a href="{{ url('/') }}" class="logo">
-                <div class="logo-icon">BI</div>
+                @php $logoSekolah = \App\Models\Setting::getValue('sekolah_logo'); @endphp
+                @if($logoSekolah)
+                    <img src="{{ \Storage::url($logoSekolah) }}" alt="Logo Sekolah" style="width:40px;height:40px;border-radius:12px;object-fit:contain;">
+                @else
+                    <div class="logo-icon">BI</div>
+                @endif
                 <h2>Buku Induk<span>.</span></h2>
             </a>
             

@@ -5,10 +5,12 @@
 @section('breadcrumb', 'Mata Pelajaran')
 
 @section('content')
-<div x-data="{ 
-    createModal: false, 
-    editModal: false, 
-    editData: { id: '', nama: '', kelompok: '', urutan: '', is_aktif: true } 
+<div x-data="{
+    createModal: false,
+    editModal: false,
+    guideModal: false,
+    importModal: false,
+    editData: { id: '', nama: '', kelompok: '', urutan: '', is_aktif: true }
 }">
     <div class="mb-6 flex justify-between items-center px-2">
         <div>
@@ -16,10 +18,20 @@
             <p class="text-sm font-medium text-slate-500 mt-1">Kelola daftar mata pelajaran yang digunakan pada formulir nilai rapor / prestasi.</p>
         </div>
         
-        <button @click="createModal = true" class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-sky-600/20 transition-all hover:shadow-md cursor-pointer">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Tambah Mapel
-        </button>
+        <div class="flex items-center gap-2">
+            <button @click="createModal = true" class="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-sky-600/20 transition-all hover:shadow-md cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Tambah Mapel
+            </button>
+            <button @click="importModal = true" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-emerald-600/20 transition-all hover:shadow-md cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Import Excel
+            </button>
+            <button @click="guideModal = true" class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-sky-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Panduan
+            </button>
+        </div>
     </div>
 
     @if(session('success'))
@@ -375,6 +387,88 @@
                     <button type="submit" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-xl shadow-lg transition-all cursor-pointer">Simpan Perubahan</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    {{-- MODAL IMPORT EXCEL --}}
+    <div x-show="importModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div @click.away="importModal = false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white/20">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-6 text-white relative">
+                <button @click="importModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <h3 class="text-xl font-extrabold tracking-tight">Import Mata Pelajaran</h3>
+                <p class="text-emerald-100 text-sm mt-0.5 font-medium">Upload file Excel untuk menambahkan data sekaligus</p>
+            </div>
+
+            {{-- Download template --}}
+            <div class="mx-6 mt-5 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-emerald-800">Gunakan template yang sudah disediakan</p>
+                    <p class="text-xs text-emerald-600 mt-0.5">Template berisi contoh data dan catatan pengisian yang benar.</p>
+                    <a href="{{ route('mata-pelajaran.template') }}"
+                       class="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-700 hover:text-emerald-900 underline underline-offset-2">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Unduh Template Excel
+                    </a>
+                </div>
+            </div>
+
+            <form action="{{ route('mata-pelajaran.import') }}" method="POST" enctype="multipart/form-data" class="p-6 pt-4">
+                @csrf
+                <div class="mt-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">File Excel (.xlsx / .xls / .csv)</label>
+                    <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-emerald-400 transition-colors cursor-pointer"
+                         onclick="document.getElementById('file_excel_mapel').click()">
+                        <svg class="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="text-sm font-semibold text-slate-500" id="mapel_file_label">Klik untuk pilih file atau drag & drop</p>
+                        <p class="text-xs text-slate-400 mt-1">Maksimal 4 MB</p>
+                        <input type="file" id="file_excel_mapel" name="file_excel" accept=".xlsx,.xls,.csv" class="hidden"
+                               onchange="document.getElementById('mapel_file_label').textContent = this.files[0]?.name || 'Klik untuk pilih file'">
+                    </div>
+                    @error('file_excel') <p class="mt-2 text-xs text-rose-500 font-semibold">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 space-y-1">
+                    <p class="font-bold">Ketentuan import:</p>
+                    <p>• Baris pertama adalah header (otomatis dikenali).</p>
+                    <p>• Kolom wajib: <strong>Nama Mata Pelajaran</strong> dan <strong>Kelompok / Kategori</strong>.</p>
+                    <p>• Data duplikat (nama sama) akan dilewati secara otomatis.</p>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" @click="importModal = false" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">Batal</button>
+                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg transition-all cursor-pointer">
+                        Upload & Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- MODAL PANDUAN --}}
+    <div x-show="guideModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div @click.away="guideModal = false" class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-white/20">
+            <div class="bg-gradient-to-r from-sky-600 to-blue-600 px-6 py-6 text-white relative">
+                <button @click="guideModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <h3 class="text-xl font-extrabold tracking-tight">Panduan Mata Pelajaran</h3>
+                <p class="text-sky-100 text-sm mt-0.5 font-medium">Cara mengelola data referensi mata pelajaran</p>
+            </div>
+            <div class="p-8 text-slate-600 space-y-4 text-sm">
+                <p><strong>1. Tujuan Referensi:</strong> Halaman ini adalah Master Data mata pelajaran. Saat Anda menginput nilai rapor atau prestasi akademik siswa, daftar mapel ini akan muncul secara otomatis sebagai pilihan.</p>
+                <p><strong>2. Kelompok / Kategori:</strong> Isi kolom Kelompok sesuai kurikulum yang berlaku (misal: Muatan Nasional, Muatan Lokal). Pengelompokan ini akan tampil pada laporan rapor dan Buku Induk.</p>
+                <p><strong>3. Urutan Tampil:</strong> Angka urutan menentukan posisi mapel pada tabel nilai. Semakin kecil angkanya, semakin atas posisinya.</p>
+                <p><strong>4. Aktif / Non-aktif:</strong> Mapel yang dinonaktifkan tidak akan muncul pada formulir input nilai baru, namun riwayat nilai lama tetap tersimpan.</p>
+                <p><strong>5. Hapus:</strong> Tidak disarankan menghapus mapel yang sudah memiliki data nilai siswa, karena seluruh riwayat terkait akan ikut terhapus permanen.</p>
+            </div>
+            <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <button @click="guideModal = false" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 transition-all cursor-pointer">Mengerti</button>
+            </div>
         </div>
     </div>
 </div>

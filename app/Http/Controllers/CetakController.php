@@ -37,7 +37,8 @@ class CetakController extends Controller
             return view('cetak.surat-aktif', compact('siswa', 'settings'));
         }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cetak.surat-aktif', compact('siswa', 'settings'))
+        $is_pdf = true;
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('cetak.surat-aktif', compact('siswa', 'settings', 'is_pdf'))
             ->setOption('isPhpEnabled', true)
             ->setPaper('a4', 'portrait');
 

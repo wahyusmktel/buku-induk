@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EkstrakurikulerMasterTemplateExport;
+use App\Imports\EkstrakurikulerMasterImport;
 use App\Models\Ekstrakurikuler;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EkstrakurikulerController extends Controller
 {
@@ -74,5 +77,32 @@ class EkstrakurikulerController extends Controller
         $ekskul->delete();
 
         return redirect()->route('ekstrakurikuler.index')->with('success', 'Data Ekstrakurikuler berhasil dihapus.');
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new EkstrakurikulerMasterTemplateExport(), 'template_ekstrakurikuler.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file_excel' => 'required|file|mimes:xlsx,xls,csv|max:4096',
+        ], [
+            'file_excel.required' => 'File Excel wajib dipilih.',
+            'file_excel.mimes'    => 'Format file harus .xlsx, .xls, atau .csv.',
+            'file_excel.max'      => 'Ukuran file maksimal 4 MB.',
+        ]);
+
+        $import = new EkstrakurikulerMasterImport();
+        Excel::import($import, $request->file('file_excel'));
+
+        $msg = "Import selesai: {$import->successCount} data berhasil ditambahkan";
+        if ($import->skipCount > 0) {
+            $msg .= ", {$import->skipCount} baris dilewati (duplikat/kosong)";
+        }
+        $msg .= '.';
+
+        return redirect()->route('ekstrakurikuler.index')->with('success', $msg);
     }
 }

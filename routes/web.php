@@ -172,8 +172,13 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/tahun-pelajaran/{id}', [TahunPelajaranController::class, 'destroy'])->name('tahun-pelajaran.destroy');
         
         // Mata Pelajaran Management
+        Route::get('mata-pelajaran/template-excel', [MataPelajaranController::class, 'downloadTemplate'])->name('mata-pelajaran.template');
+        Route::post('mata-pelajaran/import', [MataPelajaranController::class, 'import'])->name('mata-pelajaran.import');
         Route::resource('mata-pelajaran', MataPelajaranController::class)->except(['create', 'show', 'edit']);
         Route::patch('mata-pelajaran/{mataPelajaran}/toggle-aktif', [MataPelajaranController::class, 'toggleAktif'])->name('mata-pelajaran.toggle-aktif');
+        // Ekstrakurikuler Management
+        Route::get('ekstrakurikuler/template-excel', [EkstrakurikulerController::class, 'downloadTemplate'])->name('ekstrakurikuler.template');
+        Route::post('ekstrakurikuler/import', [EkstrakurikulerController::class, 'import'])->name('ekstrakurikuler.import');
         Route::resource('ekstrakurikuler', EkstrakurikulerController::class)->except(['create', 'show', 'edit']);
         Route::patch('ekstrakurikuler/{id}/toggle-aktif', [EkstrakurikulerController::class, 'toggleAktif'])->name('ekstrakurikuler.toggle-aktif');
 

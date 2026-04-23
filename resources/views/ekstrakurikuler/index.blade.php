@@ -9,10 +9,11 @@
 @endsection
 
 @section('content')
-<div class="space-y-6" x-data="{ 
-    addModal: {{ $errors->any() && !old('edit_id') ? 'true' : 'false' }}, 
+<div class="space-y-6" x-data="{
+    addModal: {{ $errors->any() && !old('edit_id') ? 'true' : 'false' }},
     editModal: {{ old('edit_id') ? 'true' : 'false' }},
     guideModal: false,
+    importModal: false,
     editData: { id: '{{ old('edit_id') }}', nama_ekstrakurikuler: '{{ old('nama_ekstrakurikuler') }}', deskripsi: '{{ old('deskripsi') }}' },
     openEdit(item) {
         this.editData = { ...item };
@@ -47,6 +48,10 @@
             <button @click="addModal = true; editModal = false" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all focus:ring-4 focus:ring-indigo-500/20 cursor-pointer">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Tambah Ekskul
+            </button>
+            <button @click="importModal = true" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-emerald-600/20 transition-all hover:shadow-md cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                Import Excel
             </button>
             @endhasanyrole
             <button @click="guideModal = true" class="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all cursor-pointer">
@@ -338,6 +343,65 @@
                 <div class="mt-8 flex justify-end gap-3">
                     <button type="button" @click="editModal = false" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">Batal</button>
                     <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg transition-colors cursor-pointer">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- MODAL IMPORT EXCEL --}}
+    <div x-show="importModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div @click.away="importModal = false" class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white/20">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-6 text-white relative">
+                <button @click="importModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <h3 class="text-xl font-extrabold tracking-tight">Import Ekstrakurikuler</h3>
+                <p class="text-emerald-100 text-sm mt-0.5 font-medium">Upload file Excel untuk menambahkan data sekaligus</p>
+            </div>
+
+            {{-- Download template --}}
+            <div class="mx-6 mt-5 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-emerald-800">Gunakan template yang sudah disediakan</p>
+                    <p class="text-xs text-emerald-600 mt-0.5">Template berisi contoh data dan catatan pengisian yang benar.</p>
+                    <a href="{{ route('ekstrakurikuler.template') }}"
+                       class="inline-flex items-center gap-1.5 mt-2 text-xs font-bold text-emerald-700 hover:text-emerald-900 underline underline-offset-2">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Unduh Template Excel
+                    </a>
+                </div>
+            </div>
+
+            <form action="{{ route('ekstrakurikuler.import') }}" method="POST" enctype="multipart/form-data" class="p-6 pt-4">
+                @csrf
+                <div class="mt-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">File Excel (.xlsx / .xls / .csv)</label>
+                    <div class="relative border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-emerald-400 transition-colors cursor-pointer"
+                         onclick="document.getElementById('file_excel_ekskul').click()">
+                        <svg class="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="text-sm font-semibold text-slate-500" id="ekskul_file_label">Klik untuk pilih file atau drag & drop</p>
+                        <p class="text-xs text-slate-400 mt-1">Maksimal 4 MB</p>
+                        <input type="file" id="file_excel_ekskul" name="file_excel" accept=".xlsx,.xls,.csv" class="hidden"
+                               onchange="document.getElementById('ekskul_file_label').textContent = this.files[0]?.name || 'Klik untuk pilih file'">
+                    </div>
+                    @error('file_excel') <p class="mt-2 text-xs text-rose-500 font-semibold">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 space-y-1">
+                    <p class="font-bold">Ketentuan import:</p>
+                    <p>• Baris pertama adalah header (otomatis dikenali).</p>
+                    <p>• Kolom wajib: <strong>Nama Ekstrakurikuler</strong>. Kolom deskripsi opsional.</p>
+                    <p>• Data duplikat (nama sama) akan dilewati secara otomatis.</p>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" @click="importModal = false" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">Batal</button>
+                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg transition-all cursor-pointer">
+                        Upload & Import
+                    </button>
                 </div>
             </form>
         </div>

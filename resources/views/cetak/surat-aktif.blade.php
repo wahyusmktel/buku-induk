@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Keterangan Aktif - {{ $siswa->nama }}</title>
     <style>
+        @page {
+            size: A4 portrait;
+            margin-top: {{ $settings['margin_top'] ?? '2.5' }}cm;
+            margin-bottom: {{ $settings['margin_bottom'] ?? '2.5' }}cm;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        @page :first {
+            margin-top: 0;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,16 +27,25 @@
             font-size: 12pt;
             color: #000;
             background: #fff;
+            margin: 0;
+            padding: 0;
         }
 
-        .page {
-            width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            padding: 20mm 25mm 20mm 30mm;
+        .kop-surat-full {
+            width: 100%;
+            display: block;
+            margin: 0;
+            padding: 0;
         }
 
-        /* KOP SURAT */
+        .content-wrapper {
+            margin-top: 5px;
+            margin-right: {{ $settings['margin_right'] ?? '2.5' }}cm;
+            margin-bottom: 0;
+            margin-left: {{ $settings['margin_left'] ?? '2.5' }}cm;
+        }
+
+        /* KOP SURAT HTML (fallback jika tidak ada gambar kop) */
         .kop {
             display: flex;
             align-items: center;
@@ -85,6 +105,7 @@
         .judul {
             text-align: center;
             margin-bottom: 6px;
+            margin-top: 20px;
         }
 
         .judul h2 {
@@ -146,36 +167,51 @@
         }
 
         /* TTD SECTION */
-        .ttd-section {
-            display: flex;
-            justify-content: flex-end;
+        .signature-wrapper {
+            page-break-inside: avoid;
+            break-inside: avoid;
             margin-top: 20px;
+            text-align: right;
+            width: 100%;
+            clear: both;
         }
 
-        .ttd-block {
-            text-align: center;
-            width: 260px;
+        .signature-box {
+            display: inline-block;
+            width: 280px;
+            text-align: left;
+            position: relative;
         }
 
-        .ttd-block .ttd-kota-tgl {
-            margin-bottom: 6px;
+        .signature-box p {
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 12pt;
         }
 
-        .ttd-block .ttd-jabatan {
-            font-weight: bold;
+        .signature-space {
+            position: relative;
+            height: 95px;
+            width: 100%;
         }
 
-        .ttd-block .ttd-ruang {
-            height: 80px;
+        .stempel-img {
+            height: 95px;
+            width: auto;
+            position: absolute;
+            left: 5px;
+            top: 0;
+            z-index: 1;
         }
 
-        .ttd-block .ttd-nama {
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        .ttd-block .ttd-nip {
-            font-size: 10.5pt;
+        .ttd-img {
+            height: 78px;
+            width: auto;
+            position: absolute;
+            left: 45px;
+            top: 8px;
+            z-index: 2;
         }
 
         /* PRINT STYLES */
@@ -183,63 +219,73 @@
             body {
                 margin: 0;
             }
-            .page {
-                margin: 0;
-                padding: 15mm 20mm 15mm 25mm;
-            }
             .no-print {
                 display: none !important;
             }
         }
 
-        @page {
-            size: A4 portrait;
-            margin: 0;
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
         }
     </style>
 </head>
 <body>
 
-    {{-- Tombol aksi (hanya saat preview HTML) --}}
-    @if(request('preview'))
-    <div class="no-print" style="position: fixed; top: 12px; right: 12px; z-index: 100; display: flex; gap: 8px;">
-        <a href="{{ request()->fullUrlWithQuery(['preview' => null]) }}"
-           style="background:#2563eb;color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-family:sans-serif;font-size:13px;font-weight:bold;">
-            Unduh PDF
-        </a>
-        <button onclick="window.print()"
-                style="background:#16a34a;color:#fff;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:sans-serif;font-size:13px;font-weight:bold;">
-            Cetak
-        </button>
-    </div>
+    @if(!isset($is_pdf) || !$is_pdf)
+    <button class="print-btn no-print" onclick="window.print()">Cetak Surat</button>
     @endif
 
-    <div class="page">
+    {{-- KOP SURAT: gambar jika tersedia, fallback ke kop HTML --}}
+    @if(!empty($settings['sekolah_kop_pdf']))
+        <img src="{{ $settings['sekolah_kop_pdf'] }}" class="kop-surat-full">
+    @elseif(!empty($settings['sekolah_kop']))
+        <img src="{{ storage_path('app/public/' . $settings['sekolah_kop']) }}" class="kop-surat-full">
+    @else
+        <div style="margin: 20mm 25mm 0 30mm;">
+            <div class="kop">
+                @if(!empty($settings['sekolah_logo']) && file_exists(storage_path('app/public/' . $settings['sekolah_logo'])))
+                    <img src="{{ storage_path('app/public/' . $settings['sekolah_logo']) }}"
+                         alt="Logo" class="kop-logo">
+                @else
+                    <div class="kop-logo-placeholder">LOGO</div>
+                @endif
 
-        {{-- KOP SURAT --}}
-        <div class="kop">
-            @if(!empty($settings['sekolah_logo']) && file_exists(storage_path('app/public/' . $settings['sekolah_logo'])))
-                <img src="{{ storage_path('app/public/' . $settings['sekolah_logo']) }}"
-                     alt="Logo" class="kop-logo">
-            @else
-                <div class="kop-logo-placeholder">LOGO</div>
-            @endif
-
-            <div class="kop-text">
-                @php
-                    $jenjang = $settings['jenjang_pendidikan'] ?? 'SD';
-                    $namaSekolah = $settings['sekolah_nama'] ?? 'Nama Sekolah';
-                @endphp
-                <div class="instansi">PEMERINTAH KOTA/KABUPATEN</div>
-                <div class="instansi">DINAS PENDIDIKAN</div>
-                <div class="nama-sekolah">{{ $jenjang }} {{ $namaSekolah }}</div>
-                <div class="alamat">
-                    {{ $settings['sekolah_alamat'] ?? '' }}
-                    @if(!empty($settings['buku_induk_kota'])) &mdash; {{ $settings['buku_induk_kota'] }} @endif
+                <div class="kop-text">
+                    @php
+                        $jenjang = $settings['jenjang_pendidikan'] ?? 'SD';
+                        $namaSekolah = $settings['sekolah_nama'] ?? 'Nama Sekolah';
+                    @endphp
+                    <div class="instansi">PEMERINTAH KOTA/KABUPATEN</div>
+                    <div class="instansi">DINAS PENDIDIKAN</div>
+                    <div class="nama-sekolah">{{ $jenjang }} {{ $namaSekolah }}</div>
+                    <div class="alamat">
+                        {{ $settings['sekolah_alamat'] ?? '' }}
+                        @if(!empty($settings['buku_induk_kota'])) &mdash; {{ $settings['buku_induk_kota'] }} @endif
+                    </div>
                 </div>
             </div>
+            <div class="kop-garis-bawah"></div>
         </div>
-        <div class="kop-garis-bawah"></div>
+    @endif
+
+    <div class="content-wrapper">
+
+        @php
+            $jenjang = $settings['jenjang_pendidikan'] ?? 'SD';
+            $namaSekolah = $settings['sekolah_nama'] ?? 'Nama Sekolah';
+        @endphp
 
         {{-- JUDUL --}}
         <div class="judul">
@@ -323,22 +369,57 @@
         </p>
 
         {{-- TANDA TANGAN --}}
-        <div class="ttd-section">
-            <div class="ttd-block">
-                <div class="ttd-kota-tgl">
-                    {{ $settings['buku_induk_kota'] ?? '....' }},
+        <div class="signature-wrapper">
+            <div class="signature-box">
+                <p>
+                    {{ $settings['buku_induk_kota'] ?? '..........' }},
                     {{ !empty($settings['buku_induk_tanggal']) ? $settings['buku_induk_tanggal'] : \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                </p>
+                <p>Kepala {{ $jenjang }}</p>
+                <p>{{ $namaSekolah }}</p>
+
+                <div class="signature-space">
+                    @if(!empty($settings['kepsek_ttd_pdf']))
+                        <img src="{{ $settings['kepsek_ttd_pdf'] }}" class="ttd-img">
+                    @elseif(!empty($settings['kepsek_ttd']))
+                        <img src="{{ storage_path('app/public/' . $settings['kepsek_ttd']) }}" class="ttd-img">
+                    @endif
+                    @if(!empty($settings['sekolah_stempel_pdf']))
+                        <img src="{{ $settings['sekolah_stempel_pdf'] }}" class="stempel-img">
+                    @elseif(!empty($settings['sekolah_stempel']))
+                        <img src="{{ storage_path('app/public/' . $settings['sekolah_stempel']) }}" class="stempel-img">
+                    @endif
                 </div>
-                <div class="ttd-jabatan">Kepala {{ $jenjang }}</div>
-                <div class="ttd-jabatan">{{ $namaSekolah }}</div>
-                <div class="ttd-ruang"></div>
-                <div class="ttd-nama">{{ $kepsekNama }}</div>
+
+                <p><strong><u>{{ $kepsekNama }}</u></strong></p>
                 @if($kepsekNip)
-                <div class="ttd-nip">NIP. {{ $kepsekNip }}</div>
+                <p>NIP. {{ $kepsekNip }}</p>
                 @endif
             </div>
         </div>
 
     </div>
+
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->get_font("Times New Roman", "italic");
+            $size = 7.5;
+            $color = [0.4, 0.4, 0.4];
+
+            $w = $pdf->get_width();
+            $h = $pdf->get_height();
+            $y = $h - 40;
+
+            $text_right = "Halaman {PAGE_NUM} dari {PAGE_COUNT}";
+            $width_right = $fontMetrics->get_text_width("Halaman 10 dari 10", $font, $size);
+            $pdf->page_text($w - $width_right - 45, $y, $text_right, $font, $size, $color);
+
+            $sekolah = {!! json_encode($settings['sekolah_nama'] ?? '') !!};
+            $text_left = "Dicetak melalui Aplikasi Buku Induk" . ($sekolah ? " " . $sekolah : "");
+            $pdf->page_text(45, $y, $text_left, $font, $size, $color);
+
+            $pdf->line(45, $y - 10, $w - 45, $y - 10, [0.8, 0.8, 0.8], 0.5);
+        }
+    </script>
 </body>
 </html>
