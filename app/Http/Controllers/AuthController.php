@@ -2,57 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Services\ActivityLogService;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle an authentication attempt.
-     */
+    // Maksimal percobaan login sebelum dikunci
+    private const MAX_ATTEMPTS = 5;
+
+    // Durasi kunci setelah melebihi MAX_ATTEMPTS (detik) — 15 menit
+    private const DECAY_SECONDS = 900;
+
     public function authenticate(Request $request)
     {
+        // Redirect user yang sudah terautentikasi
+        if (Auth::check()) {
+            return redirect()->intended('/dashboard');
+        }
+
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'email'    => ['required', 'string', 'email', 'max:255'],
+            'password' => ['required', 'string', 'max:255'],
         ]);
 
         $this->ensureIsNotRateLimited($request);
 
-        // Auth::attempt automatically uses secure Brcypt/Argon2 hashing for password comparison
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            // Prevent Session Fixation by forcibly regenerating session ID
+        // Auth::attempt menggunakan Bcrypt/Argon2 secara otomatis — aman dari timing attack
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            // Cegah Session Fixation dengan regenerasi session ID
             $request->session()->regenerate();
-            
-            // Clear rate limiting log on successful login
+
             RateLimiter::clear($this->throttleKey($request));
 
-            ActivityLogService::log('login', "User berhasil login: " . Auth::user()->name, [
-                'email' => Auth::user()->email
+            ActivityLogService::log('login', 'User berhasil login: ' . Auth::user()->name, [
+                'email' => Auth::user()->email,
             ]);
 
             return redirect()->intended('/dashboard');
         }
 
-        // Add hit to rate limiter on failed login
-        RateLimiter::hit($this->throttleKey($request));
+        // Catat kegagalan ke rate limiter dengan decay eksplisit
+        RateLimiter::hit($this->throttleKey($request), self::DECAY_SECONDS);
 
+        // Pesan error generik — tidak membedakan "email tidak ada" vs "password salah"
+        // untuk mencegah user enumeration
         throw ValidationException::withMessages([
             'email' => 'Kredensial yang diberikan tidak cocok dengan catatan kami.',
         ]);
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function ensureIsNotRateLimited(Request $request)
+    protected function ensureIsNotRateLimited(Request $request): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey($request), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey($request), self::MAX_ATTEMPTS)) {
             return;
         }
 
@@ -66,23 +71,24 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
-    protected function throttleKey(Request $request)
+    protected function throttleKey(Request $request): string
     {
-        return strtolower($request->input('email')).'|'.$request->ip();
+        // Str::transliterate menormalisasi karakter Unicode lookalike (misal α→a)
+        // sehingga variasi Unicode tidak bisa mem-bypass throttle per-email
+        return Str::transliterate(Str::lower($request->input('email', ''))) . '|' . $request->ip();
     }
 
-    /**
-     * Log the user out of the application.
-     */
     public function logout(Request $request)
     {
-        ActivityLogService::log('logout', "User telah logout: " . Auth::user()->name);
+        // Guard null: jika session sudah expired sebelum POST diterima,
+        // Auth::user() bisa null dan akan menyebabkan fatal error
+        if (Auth::check()) {
+            ActivityLogService::log('logout', 'User telah logout: ' . Auth::user()->name);
+        }
 
         Auth::logout();
 
+        // Invalidasi session dan regenerasi CSRF token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
