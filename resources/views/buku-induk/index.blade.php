@@ -377,7 +377,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-extrabold tracking-tight">Panduan Buku Induk</h3>
-                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi & Penjelasan Halaman Buku Induk Siswa</p>
+                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi dan Petunjuk Penggunaan Halaman Buku Induk Siswa</p>
                     </div>
                 </div>
             </div>
@@ -390,31 +390,31 @@
                             <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">1</span>
                             Data Berdasarkan Tahun Pelajaran Aktif
                         </h4>
-                        <p class="ml-8">Sistem ini beroperasi dengan algoritma berbasis sesi eksklusif. Artinya, layar utama ini <strong>HANYA</strong> menampakkan daftar nama peserta didik yang berstatus <em>'Aktif'</em> di dalam poros <strong>Tahun Pelajaran & Semester yang saat ini sedang aktif secara global</strong> oleh Admin. Jika Anda merasa data kosong atau keliru, mohon verifikasikan bahwa prasyarat sesi akademik tahun yang tepat telah tersetting hidup (keterangan referensi ini tercetak nyata tepat di sudut kiri-atas halaman).</p>
+                        <p class="ml-8">Halaman ini menampilkan daftar siswa yang berstatus **Aktif** pada **Tahun Pelajaran dan Semester** yang saat ini sedang berjalan. Jika data tidak muncul, pastikan pengaturan sesi akademik sudah benar (informasi sesi aktif dapat dilihat pada pojok kiri atas halaman).</p>
                     </div>
 
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                             <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">2</span>
-                            Monitoring Kelengkapan Berkas Akurat (Progress-Bar)
+                            Monitoring Kelengkapan Berkas (Progress Bar)
                         </h4>
-                        <p class="ml-8">Dalam rangka mengefisiensi monitoring kelengkapan dokumentasi siswa tanpa Anda harus membedahnya satu-demi-satu, pangkalan data dibekali indikator persentase interaktif instan. Barisan <span class="bg-emerald-100 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Warna Hijau (100%-80%)</span> menyatakan status berkas komplit siap diekskusi cetak, lalu teguran <span class="bg-amber-100 border border-amber-200 text-amber-600 px-1.5 py-0.5 rounded font-bold">Warna Oranye (79%-40%)</span> menuntut atensi bahwa data masih krusial diisi (peringatan dini), dan indikator bahaya <span class="bg-rose-100 border border-rose-200 text-rose-600 px-1.5 py-0.5 rounded font-bold">Warna Merah</span> memvonis profil buku induk yang bersangkutan sungguh kosong lompong belum disentuh administrasi.</p>
+                        <p class="ml-8">Gunakan indikator persentase untuk memantau kelengkapan berkas siswa secara cepat. <span class="bg-emerald-100 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Warna Hijau (80% - 100%)</span> menandakan berkas sudah lengkap dan siap dicetak. <span class="bg-amber-100 border border-amber-200 text-amber-600 px-1.5 py-0.5 rounded font-bold">Warna Oranye (40% - 79%)</span> menunjukkan data masih perlu dilengkapi, dan <span class="bg-rose-100 border border-rose-200 text-rose-600 px-1.5 py-0.5 rounded font-bold">Warna Merah</span> menandakan data masih kosong.</p>
                     </div>
 
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                             <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs">3</span>
-                            Pencarian Instan (Live-Search) & Filter Ganda
+                            Pencarian Cepat dan Filter Data
                         </h4>
-                        <p class="ml-8">Manfaatkan penyelarasan <strong>Opsi Tingkat</strong> (misal: Tingkat 1) dan turunan kombinasinya <strong>Opsi Rombel</strong> (misal: Kelas 1A) guna melangsingkan penyajian anggota klasikal tertentu. Otoritas panel bekerja dengan otomatisasi pemicu (Auto-Submit). Kemudian secara revolusioner, <strong>Boks Pencarian Identitas (Kaca Pembesar)</strong> ditenagai teknologi <em>live-search engine</em> client-side; sehingga ketikan NISN atau Nama Anak akan langsung merekonstruksi tabel daftar tanpa me-refresh dan membebani server secuil pun.</p>
+                        <p class="ml-8">Gunakan filter **Tingkat** dan **Rombongan Belajar** untuk menyaring data siswa. Anda juga dapat mencari siswa menggunakan **Nama** atau **NISN** pada kotak pencarian; hasil akan muncul secara langsung tanpa perlu memuat ulang halaman.</p>
                     </div>
 
                     <div>
                         <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                             <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">4</span>
-                            Buka, Detailkan & Cetak Lembar Dokumen
+                            Kelola Detail dan Cetak Dokumen
                         </h4>
-                        <p class="ml-8">Sentuh pelatuk aksi berlabel <span class="font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 shadow-sm">Buka</span> (ber-ikon panah melingkar) di muara baris identitas siswa bersangkutan yang meretas jalan menuju halaman inti Buku Induk individual mereka. Di ruang ekosistem eksklusif tersebut, Anda terfasilitasi melakukan pendataan mendalam mencakup 9 Aspek tab utama (Sosiodemografi ortu, rekam beasiswa, anatomi badan dan lainya). Jika dirasa persentase paripurna, langsung peritahkan sistem menata dan melahirkan struktur cetak <strong>PDF Format Paten Berstandar</strong>, tuntas tak tertandingi tanpa perlu pengeditan ms.word secara usang lagi.</p>
+                        <p class="ml-8">Klik tombol <span class="font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200 shadow-sm">Buka</span> untuk masuk ke halaman detail Buku Induk siswa. Anda dapat melengkapi data pada berbagai kategori (seperti data keluarga, beasiswa, kesehatan, dll). Jika data sudah lengkap, Anda dapat langsung mencetak dokumen dalam format **PDF standar** secara otomatis.</p>
                     </div>
 
                 </div>
@@ -422,7 +422,7 @@
 
             <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end">
                 <button @click="guideModal = false" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
-                    Mengerti
+                    Saya Mengerti
                 </button>
             </div>
         </div>
