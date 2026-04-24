@@ -302,8 +302,8 @@
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-xl font-extrabold tracking-tight">Panduan Daftar Rombel</h3>
-                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi & Cara Kerja Halaman Rombongan Belajar</p>
+                        <h3 class="text-xl font-extrabold tracking-tight">Panduan Rombongan Belajar</h3>
+                        <p class="text-sky-100 text-sm mt-0.5 font-medium">Informasi dan Petunjuk Penggunaan Halaman Rombongan Belajar</p>
                     </div>
                 </div>
             </div>
@@ -316,7 +316,7 @@
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Penjelasan Umum
                         </h4>
-                        <p class="text-sky-700 text-sm">Halaman <strong>Rombongan Belajar</strong> digunakan untuk memanajemen daftar ruangan kelas di tahun pelajaran ini. Data rombel secara kuat terikat dengan periode tahun pelajaran yang sedang aktif.</p>
+                        <p class="text-sky-700 text-sm">Halaman <strong>Rombongan Belajar</strong> digunakan untuk mengelola daftar kelas pada tahun pelajaran saat ini. Seluruh data rombongan belajar berkaitan erat dengan periode tahun pelajaran yang sedang aktif.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -325,15 +325,15 @@
                                 <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">1</span>
                                 Pembuatan Rombel Baru
                             </h4>
-                            <p class="text-slate-600 ml-8">Pilih tombol biru <strong class="text-sky-600">Tambah Rombel / Kelas</strong> secara manual untuk menetapkan nama daftar absensi, jenis kurikulum (misal Merdeka, 2013), tingkat, dan wali kelasnya.</p>
+                            <p class="text-slate-600 ml-8">Gunakan tombol <strong>Tambah Rombel / Kelas</strong> untuk menambahkan kelas secara manual. Anda dapat menentukan nama rombongan belajar, kurikulum (misal: Merdeka, K13), tingkat kelas, dan guru wali kelas.</p>
                         </div>
 
                         <div>
                             <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                                 <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">2</span>
-                                Salin Rombel Semester Lanjut
+                                Salin Rombel Semester
                             </h4>
-                            <p class="text-slate-600 ml-8">Apabila jenis penamaan kelas tidak banyak berubah, gunakan modul <strong class="text-indigo-600">Salin Rombel</strong> untuk menghidupkan kembali data formasi rombel dari database ke periode saat ini secara instan, tanpa mengetik ulang daftarnya.</p>
+                            <p class="text-slate-600 ml-8">Gunakan fitur <strong>Salin Rombel</strong> jika struktur kelas tidak mengalami banyak perubahan. Fitur ini mempermudah Anda dalam menduplikasi data rombongan belajar dari periode sebelumnya ke periode aktif saat ini.</p>
                         </div>
 
                         <div>
@@ -341,15 +341,15 @@
                                 <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs">3</span>
                                 Salin Anggota Rombel
                             </h4>
-                            <p class="text-slate-600 ml-8">Digunakan pada saat Anda selesai menyalin rombel, klik opsi <strong class="text-emerald-600">Salin Anggota Rombel</strong> agar sistem auto-memasukkan populasi siswa dari semester lama ke dalam kelas-kelas barunya masing-masing.</p>
+                            <p class="text-slate-600 ml-8">Setelah data rombongan belajar disalin, gunakan fitur <strong>Salin Anggota Rombel</strong> untuk memindahkan daftar siswa dari semester sebelumnya ke kelas masing-masing secara otomatis.</p>
                         </div>
 
                         <div>
                             <h4 class="text-slate-800 font-bold text-base mb-2 flex items-center gap-2">
                                 <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs">4</span>
-                                Mengelola Anggota Spesifik
+                                Kelola Anggota Spesifik
                             </h4>
-                            <p class="text-slate-600 ml-8 text-xs leading-relaxed">Ketuk aksi <strong class="font-bold border border-sky-200 px-1.5 py-0.5 rounded text-sky-600 bg-white">Lihat Anggota</strong> pada baris nama kelas di tabel untuk beralih mengontrol anggota siswa, mendownload data ekskul, presensi per siswa, dan mencetak rapor.</p>
+                            <p class="text-slate-600 ml-8 text-xs leading-relaxed">Klik tombol <strong>Lihat Anggota</strong> pada tabel untuk mengelola daftar siswa di kelas tersebut. Di halaman ini, Anda dapat memantau presensi, mengunduh data ekstrakurikuler, dan mencetak rapor.</p>
                         </div>
                     </div>
                 </div>
@@ -357,7 +357,7 @@
 
             <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end">
                 <button @click="guideModal = false" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
-                    Mengerti
+                    Saya Mengerti
                 </button>
             </div>
         </div>
