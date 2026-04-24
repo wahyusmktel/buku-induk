@@ -59,6 +59,11 @@
                     ['13', 'langkah-13', 'Arsip & Pemulihan Data'],
                     ['14', 'langkah-14', 'Laporan & Statistik'],
                     ['15', 'langkah-15', 'Ekspor Massal Data'],
+                    ['16', 'langkah-16', 'Riwayat Aktivitas (Log Audit)'],
+                    ['17', 'langkah-17', 'Manajemen Pengguna'],
+                    ['18', 'langkah-18', 'Manajemen Peran (Hak Akses)'],
+                    ['19', 'langkah-19', 'Pesan Masuk (Kontak)'],
+                    ['20', 'langkah-20', 'Pusat Bantuan & Dokumentasi'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -1346,6 +1351,198 @@
                 <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 <div class="text-sm text-amber-800 leading-relaxed">
                     <strong>Peringatan Proses Memakan Waktu:</strong> Mengingat kompleksitas penghitungan data dan konversi format, proses ekspor mungkin memerlukan waktu beberapa menit terutama untuk dataset dengan ribuan baris. Anda diperbolehkan meninggalkan halaman ini dan kembali lagi nanti untuk memeriksa status kesiapan berkas pada tabel riwayat.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 16: Riwayat Aktivitas --}}
+    <div id="langkah-16" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-slate-600">16</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Riwayat Aktivitas (Log Audit)</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pemantauan jejak digital operasional sistem secara real-time.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Riwayat Aktivitas</strong> merupakan fitur transparansi yang berfungsi mencatat setiap tindakan krusial yang dilakukan oleh pengguna di dalam sistem. Setiap aksi seperti penambahan data, perubahan informasi, maupun penghapusan rekam jejak akan terdokumentasi secara otomatis, mencakup informasi mengenai siapa pelakunya, kapan waktu kejadiannya, serta alamat protokol internet (IP) yang digunakan, guna menjamin akuntabilitas manajemen data sekolah.
+            </p>
+            
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Riwayat Aktivitas</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="bg-sky-50 border border-sky-100 rounded-xl p-5 flex gap-4 items-start">
+                <svg class="w-6 h-6 text-sky-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-sky-900 leading-relaxed">
+                    <p class="font-bold mb-1">Kegunaan Audit Log:</p>
+                    Informasi ini sangat membantu Administrator dalam menelusuri asal-muasal terjadinya kesalahan input atau perubahan data yang tidak sah, sehingga pemulihan data dapat dilakukan dengan lebih presisi berdasarkan lini masa aktivitas yang terekam.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 17: Manajemen Pengguna --}}
+    <div id="langkah-17" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-sky-600">17</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Manajemen Pengguna</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pengelolaan akun personil administrasi dan operasional sekolah.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Manajemen Pengguna</strong> memungkinkan Administrator untuk mengatur siapa saja yang berhak mengakses sistem informasi ini. Anda dapat mendaftarkan akun baru bagi Guru atau Tenaga Kependidikan, memperbarui profil mereka, serta menonaktifkan akun bagi personil yang sudah tidak bertugas kembali di institusi pendidikan.
+            </p>
+
+            {{-- Placeholder Screenshot --}}
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Manajemen Pengguna</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Fitur Utama Pengelolaan Akun:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 border border-slate-100 bg-slate-50/50 rounded-xl">
+                        <p class="text-sm font-bold text-slate-700 mb-1">Registrasi &amp; Aktivasi</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Pendaftaran akun menggunakan alamat surel (email) resmi dan penentuan kata sandi awal yang aman.</p>
+                    </div>
+                    <div class="p-4 border border-slate-100 bg-slate-50/50 rounded-xl">
+                        <p class="text-sm font-bold text-slate-700 mb-1">Kendali Status Akun</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Fitur untuk membekukan akun sementara waktu tanpa menghapus data sejarah aktivitas pengguna tersebut.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 18: Manajemen Peran --}}
+    <div id="langkah-18" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-indigo-600">18</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Manajemen Peran (Hak Akses)</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Penetapan batasan kewenangan fitur bagi setiap tingkatan pengguna.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Manajemen Peran</strong> berfungsi untuk mendefinisikan batasan akses (*permission*) bagi setiap kategori pengguna. Dengan pengaturan yang tepat, Anda dapat memastikan bahwa pengguna hanya dapat mengakses fitur yang relevan dengan tugas pokok dan fungsinya, seperti membatasi staf tata usaha agar hanya bisa menginput data tanpa diperbolehkan menghapus data permanen.
+            </p>
+
+            {{-- Placeholder Screenshot --}}
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Manajemen Peran</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-5 flex gap-4 items-start">
+                <svg class="w-6 h-6 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div class="text-sm text-amber-900 leading-relaxed">
+                    <p class="font-bold mb-1">Prinsip Keamanan:</p>
+                    Sangat dianjurkan untuk menerapkan prinsip hak akses minimum, di mana pengguna hanya diberikan izin akses secukupnya untuk menyelesaikan pekerjaannya guna menjaga kerahasiaan data siswa.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 19: Pesan Masuk --}}
+    <div id="langkah-19" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-rose-600">19</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Pesan Masuk (Kontak)</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Pengelolaan komunikasi dan aspirasi dari pengunjung laman publik.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Seluruh aspirasi, pertanyaan, maupun permohonan informasi yang dikirimkan oleh publik melalui formulir kontak pada halaman beranda akan ditampung di dalam modul <strong>Pesan Masuk</strong>. Administrator dapat meninjau rincian pengirim serta isi pesan untuk kemudian ditindaklanjuti secara internal maupun eksternal.
+            </p>
+
+            {{-- Placeholder Screenshot --}}
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Pesan Masuk</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3 p-4 rounded-xl border border-rose-100 bg-rose-50/30">
+                <div class="w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] font-bold animate-pulse">99+</div>
+                <div class="text-xs text-slate-600 leading-relaxed">
+                    <strong>Indikator Notifikasi:</strong> Jumlah pesan yang belum dibaca akan ditampilkan dalam bentuk angka merah pada bilah sisi navigasi untuk memberikan pengingat visual bagi staf administrasi.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 20: Pusat Bantuan --}}
+    <div id="langkah-20" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-teal-600">20</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Pusat Bantuan &amp; Dokumentasi</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Panduan teknis dan operasional penggunaan aplikasi secara menyeluruh.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Halaman <strong>Dokumentasi</strong> yang sedang Anda pelajari saat ini dirancang sebagai panduan tunggal yang komprehensif bagi seluruh pengguna sistem. Anda sangat disarankan untuk menelaah setiap langkah yang tersedia guna memahami alur kerja aplikasi secara utuh, mulai dari proses prapengaturan hingga manajemen data alumni.
+            </p>
+
+            {{-- Placeholder Screenshot --}}
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Dokumentasi</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-5 rounded-xl border border-teal-100 bg-teal-50/40">
+                    <p class="text-sm font-bold text-teal-800 mb-1">Navigasi Daftar Isi</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">Gunakan fitur Daftar Isi di bagian atas halaman untuk melakukan lompatan cepat ke topik panduan tertentu tanpa perlu menggulirkan layar secara manual.</p>
+                </div>
+                <div class="p-5 rounded-xl border border-indigo-100 bg-indigo-50/40">
+                    <p class="text-sm font-bold text-indigo-800 mb-1">Cetak Panduan Fisik</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">Tersedia tombol <strong>Cetak / Simpan PDF</strong> bagi Anda yang memerlukan salinan panduan ini dalam bentuk fisik atau dokumen luring demi kenyamanan operasional.</p>
                 </div>
             </div>
         </div>
