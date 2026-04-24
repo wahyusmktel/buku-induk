@@ -342,7 +342,7 @@
                                 <svg class="w-4 h-4 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div class="text-sm text-indigo-900 font-bold italic leading-relaxed">
-                                Fitur ini memproses pemutakhiran data secara menyeluruh (Buku Induk + Data Pokok Siswa). Mohon teliti sebelum mengunggah berkas.
+                                Fitur ini memproses pemutakhiran data secara menyeluruh (Buku Induk + Data Pokok Siswa). Data yang sudah tersedia pada tabel akan diperbarui secara otomatis jika terdapat dalam berkas Excel yang diunggah. Mohon teliti sebelum melanjutkan proses.
                             </div>
                         </div>
                         <a href="{{ asset('templates/master_buku_induk_template.xlsx') }}" class="inline-flex items-center gap-2 text-xs font-black text-indigo-700 hover:text-indigo-900 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-indigo-100 transition-all hover:translate-x-1">
