@@ -23,9 +23,9 @@
                         </div>
                         <span class="text-indigo-200 text-sm font-semibold uppercase tracking-widest">Panduan Pengguna</span>
                     </div>
-                    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Cara Memulai Menggunakan Aplikasi</h1>
+                    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Panduan Penggunaan Aplikasi</h1>
                     <p class="text-indigo-100 text-base max-w-xl leading-relaxed">
-                        Panduan langkah demi langkah untuk mengakses dan masuk ke Sistem Informasi Buku Induk SD Muhammadiyah Gisting.
+                        Panduan langkah demi langkah dalam mengakses dan mengelola Sistem Informasi Buku Induk SD Muhammadiyah Gisting.
                     </p>
                 </div>
                 <button onclick="window.print()"
@@ -56,7 +56,7 @@
                     ['10', 'langkah-10', 'Kelola Rombongan Belajar'],
                     ['11', 'langkah-11', 'Cetak & Manajemen Buku Induk'],
                     ['12', 'langkah-12', 'Data Alumni (Kelulusan)'],
-                    ['13', 'langkah-13', 'Sampah & Pemulihan Data'],
+                    ['13', 'langkah-13', 'Arsip & Pemulihan Data'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -81,7 +81,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Mengakses Halaman Utama</h2>
-                <p class="text-slate-500 text-sm mt-0.5">Halaman pertama yang akan Anda temui saat membuka aplikasi</p>
+                <p class="text-slate-500 text-sm mt-0.5">Tampilan awal saat pertama kali membuka aplikasi</p>
             </div>
         </div>
 
@@ -187,8 +187,8 @@
                 <span class="text-xl font-extrabold text-emerald-600">2</span>
             </div>
             <div>
-                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Masuk ke Sistem (Login)</h2>
-                <p class="text-slate-500 text-sm mt-0.5">Gunakan akun yang telah diberikan oleh Administrator</p>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Masuk ke Sistem</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Gunakan akun yang telah terdaftar di sistem</p>
             </div>
         </div>
 
@@ -197,8 +197,8 @@
             {{-- Penjelasan --}}
             <div>
                 <p class="text-slate-600 leading-relaxed">
-                    Setelah mengklik tombol <strong>Login</strong> di halaman utama, Anda akan diarahkan ke <strong>Halaman Login</strong>.
-                    Di sini Anda perlu memasukkan kredensial (data masuk) yang telah diberikan oleh Administrator sekolah.
+                    Setelah mengeklik tombol <strong>Masuk</strong> di halaman utama, Anda akan diarahkan ke <strong>Halaman Masuk</strong>.
+                    Di sini Anda perlu memasukkan kredensial (nama pengguna dan kata sandi) yang telah diberikan oleh Administrator sekolah.
                 </p>
             </div>
 
@@ -308,13 +308,13 @@
                 <span class="text-xl font-extrabold text-violet-600">3</span>
             </div>
             <div>
-                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Mengenal Dashboard</h2>
-                <p class="text-slate-500 text-sm mt-0.5">Halaman ikhtisar setelah berhasil login</p>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Mengenal Dasbor</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Halaman ringkasan informasi sistem</p>
             </div>
         </div>
         <div class="px-8 py-6 space-y-6">
             <p class="text-slate-600 leading-relaxed">
-                Setelah login berhasil, Anda akan diarahkan ke <strong>Dashboard</strong>. Halaman ini menampilkan ringkasan data dan kondisi sistem secara menyeluruh sehingga Anda dapat langsung memantau keadaan terkini tanpa harus membuka halaman lain.
+                Setelah berhasil masuk, Anda akan diarahkan ke halaman <strong>Dasbor</strong>. Halaman ini menampilkan ringkasan data dan kondisi sistem secara menyeluruh sehingga Anda dapat langsung memantau keadaan terkini.
             </p>
 
             {{-- Placeholder Screenshot --}}
@@ -756,7 +756,7 @@
         </div>
         <div class="px-8 py-6 space-y-6">
             <p class="text-slate-600 leading-relaxed">
-                Halaman <strong>Data Pokok Siswa</strong> adalah tempat mengelola peserta didik yang bersekolah di instansi terkait. Anda bisa mencari siswa, mengubah tingkat kelas, serta melakukan import format Dapodik maupun Master Buku Induk yang jauh lebih terperinci.
+                Halaman <strong>Data Pokok Siswa</strong> digunakan untuk mengelola data peserta didik. Anda dapat mencari data siswa, memperbarui tingkat kelas, serta melakukan impor data melalui format Dapodik maupun Master Buku Induk.
             </p>
             <p class="text-sm text-slate-500">Akses melalui menu: <strong>Data Master → Data Pokok Siswa</strong> di sidebar kiri.</p>
 
@@ -774,21 +774,21 @@
                 <div>
                     <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        Fitur Import Cepat
+                        Fitur Impor Data
                     </h3>
                     <ul class="space-y-3">
                         <li class="flex items-start gap-2.5 text-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span>
                             <div>
-                                <strong class="text-slate-700">Import Dapodik</strong>
-                                <p class="text-slate-500 text-xs mt-0.5">Memuat dataset yang diunduh langsung dari web aplikasi Dapodik sekolah.</p>
+                                <strong class="text-slate-700">Impor Dapodik</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Mengunggah dataset yang diunduh langsung dari aplikasi Dapodik sekolah.</p>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5 text-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0 mt-1.5"></span>
                             <div>
                                 <strong class="text-slate-700">Master Buku Induk</strong>
-                                <p class="text-slate-500 text-xs mt-0.5">Memuat sheet lengkap dengan informasi orang tua, wali, riwayat mutasi untuk melengkapi rekaman buku induk siswa.</p>
+                                <p class="text-slate-500 text-xs mt-0.5">Mengunggah data lengkap termasuk informasi orang tua, wali, dan riwayat mutasi siswa.</p>
                             </div>
                         </li>
                     </ul>
@@ -802,15 +802,15 @@
                         <li class="flex items-start gap-2.5 text-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span>
                             <div>
-                                <strong class="text-slate-700">Naikan Semester</strong>
-                                <p class="text-slate-500 text-xs mt-0.5">Saat pergantian ganjil ke genap. Copy keseluruhan siswa secara massal tanpa merubah tingkat kelas sebelumnya.</p>
+                                <strong class="text-slate-700">Naik Semester</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Digunakan saat pergantian semester ganjil ke genap untuk menyalin data siswa secara massal.</p>
                             </div>
                         </li>
                         <li class="flex items-start gap-2.5 text-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span>
                             <div>
-                                <strong class="text-slate-700">Naikan Kelas</strong>
-                                <p class="text-slate-500 text-xs mt-0.5">Mutasi tingkat di akhir tahun untuk meneruskan siswa ke tingkat berikutnya serta meluluskan siswa akhir tingkat.</p>
+                                <strong class="text-slate-700">Naik Kelas</strong>
+                                <p class="text-slate-500 text-xs mt-0.5">Digunakan untuk memproses kenaikan tingkat kelas di akhir tahun ajaran atau memproses kelulusan.</p>
                             </div>
                         </li>
                     </ul>
@@ -818,15 +818,15 @@
             </div>
 
             <div>
-                <p class="text-sm font-bold text-slate-700 mb-3">Cara Menggunakan Fitur Import Data:</p>
+                <p class="text-sm font-bold text-slate-700 mb-3">Cara Menggunakan Fitur Impor Data:</p>
                 <ol class="space-y-3">
                     @foreach([
                         ['Pastikan Anda telah berada pada tahun pelajaran aktif.', 'sky'],
-                        ['Klik tombol <strong class="text-emerald-600">Import Data</strong> yang berada di bagian kanan atas halaman.', 'emerald'],
+                        ['Klik tombol <strong class="text-emerald-600">Impor Data</strong> yang berada di bagian kanan atas halaman.', 'emerald'],
                         ['Pilih format antara <strong>Master Buku Induk</strong> atau <strong>Format Dapodik</strong> sesuai basis data yang dimiliki.', 'indigo'],
-                        ['Unduh <strong>Template Excel</strong> yang disediakan pada form modal.', 'amber'],
-                        ['Lengkapi data peserta didik pada template tersebut, lalu <strong>Pilih/Tarik File</strong> ke dalam area unggah.', 'sky'],
-                        ['Klik tombol <strong>Mulai Import Data</strong> dan tunggu sistem memproses data massal tersebut.', 'emerald'],
+                        ['Unduh <strong>Templat Excel</strong> yang disediakan pada jendela unggah.', 'amber'],
+                        ['Lengkapi data peserta didik pada templat tersebut, lalu unggah berkas ke area yang tersedia.', 'sky'],
+                        ['Klik tombol <strong>Mulai Impor Data</strong> dan tunggu sistem memproses data tersebut.', 'emerald'],
                     ] as $i => $step)
                     <li class="flex items-start gap-3">
                         <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
@@ -856,8 +856,8 @@
             <div class="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl px-5 py-4">
                 <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                 <div>
-                    <p class="text-sm font-bold text-rose-800 mb-0.5">Sesi Tahun Pelajaran Aktif Diperlukan</p>
-                    <p class="text-xs text-rose-600 leading-relaxed">Semua fitur modifikasi data dan import di halaman ini hanya akan terbuka jika sesi <strong>Tahun Pelajaran Saat Ini</strong> sudah terseting aktif di bagian Pengaturan.</p>
+                    <p class="text-sm font-bold text-rose-800 mb-0.5">Tahun Pelajaran Aktif Diperlukan</p>
+                    <p class="text-xs text-rose-600 leading-relaxed">Semua fitur modifikasi dan impor data hanya akan tersedia jika <strong>Tahun Pelajaran</strong> sudah disetel dalam status aktif.</p>
                 </div>
             </div>
         </div>
@@ -976,7 +976,7 @@
         </div>
         <div class="px-8 py-6 space-y-6">
             <p class="text-slate-600 leading-relaxed">
-                Halaman <strong>Buku Induk Siswa</strong> adalah inti pamungkas dari sistem ini. Di bagian inilah Anda memantau seluruh keutuhan serta kelengkapan data-data esensial siswa melalui deteksi <em>progress-bar</em> (persentase) akurat secara real-time. Anda ditugaskan melengkapi kekosongan berkas data demi menunjang keabsahan dokumen sebelum langsung dicetak rapih ke wujud PDF bersanad.
+                Halaman <strong>Buku Induk Siswa</strong> adalah bagian utama dari sistem ini. Di sini Anda dapat memantau kelengkapan data siswa melalui <strong>Bilah Kemajuan</strong> secara real-time. Pastikan seluruh data dilengkapi agar dokumen yang dihasilkan dalam format PDF menjadi valid dan resmi.
             </p>
             <p class="text-sm text-slate-500">Akses melalui menu: <strong>Buku Induk</strong> di panel sidebar kiri.</p>
 
@@ -998,16 +998,16 @@
                         <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <p class="text-sm font-bold text-slate-700 mb-1">Live Progress Bar</p>
-                        <p class="text-xs text-slate-500 leading-relaxed">Indikator visual pintar (% kelengkapan) yang merepresentasikan warna (merah/oranye/hijau).</p>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Bilah Kemajuan</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Indikator visual kelengkapan data (merah/oranye/hijau) untuk setiap siswa.</p>
                     </div>
 
                     <div class="border border-sky-100 bg-sky-50/50 rounded-xl p-4">
                         <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center mb-3">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </div>
-                        <p class="text-sm font-bold text-slate-700 mb-1">Pencarian Instan</p>
-                        <p class="text-xs text-slate-500 leading-relaxed">Kolom yang mentranslasikan ketikan nama/NISN menjadi filter seketika secepat kilat (no-reloading).</p>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Pencarian Langsung</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Fitur pencarian instan berdasarkan Nama atau NISN tanpa perlu memuat ulang halaman.</p>
                     </div>
 
                     <div class="border border-amber-100 bg-amber-50/50 rounded-xl p-4">
@@ -1179,48 +1179,47 @@
         </div>
     </div>
 
-    {{-- Langkah 13: Trash / Data Terhapus --}}
     <div id="langkah-13" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
         <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
             <div class="w-12 h-12 rounded-2xl bg-rose-100 flex items-center justify-center flex-shrink-0">
                 <span class="text-xl font-extrabold text-rose-600">13</span>
             </div>
             <div>
-                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Sampah &amp; Pemulihan Data</h2>
-                <p class="text-slate-500 text-sm mt-0.5">Pengendalian penghapusan lunak (restore) maupun penghancuran data mutlak siswa.</p>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Arsip Terhapus & Pemulihan</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Manajemen pemulihan atau penghapusan permanen data siswa.</p>
             </div>
         </div>
         <div class="px-8 py-6 space-y-6">
             <p class="text-slate-600 leading-relaxed">
-                Platform ini menganut prinsip pengangamanan <em>Soft-Delete Architecture</em> (Penghapusan Lunak). Berarti, nyaris seluruh insiden kala Anda menghapus data di Tabel Ekosistem (Seperti Tabel Data Pokok), data tersebut rupanya tidak secara ganas lenyap selamanya dari *Server*; alih-alih data berpindah dan terkurung di ruang instalansi <strong>Sampah</strong> (Ruang Isolasi) demi memitigasi kejadian memencet tombol secara terburu rupa.
+                Sistem ini menerapkan mekanisme penghapusan lunak (<em>Soft-Delete</em>). Artinya, saat Anda menghapus data (seperti Data Pokok Siswa), data tersebut tidak langsung terhapus secara permanen dari server. Data akan dipindahkan ke folder <strong>Arsip Terhapus</strong> untuk memitigasi kesalahan penghapusan yang tidak disengaja.
             </p>
-            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Kelola → Sampah / Terhapus</strong>.</p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Kelola → Arsip Terhapus</strong>.</p>
 
             <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
                 <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
                     <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
                         <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </div>
-                    <p class="text-sm font-semibold text-slate-500">Screenshot Halaman Sampah</p>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Arsip Terhapus</p>
                     <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
                 </div>
             </div>
 
             <div>
-                <p class="text-sm font-bold text-slate-700 mb-3">2 Aksi Mutlak di Menu Sampah:</p>
+                <p class="text-sm font-bold text-slate-700 mb-3">Dua Tindakan Utama di Menu Arsip Terhapus:</p>
                 <ul class="space-y-4">
                     <li class="flex items-start gap-3">
                         <span class="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs font-black text-emerald-600 shrink-0">A</span>
                         <div>
-                            <p class="text-sm font-bold text-emerald-700">Opsi: Pulihkan (Memanggil Balik Kehidupan)</p>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Ketuk tombol berwarna hijau daun ini agar rekam data anak kembali menyala dan kembali direkonstruksikan seutuhnya pada halaman asal (Data Pokok Siswa/Tabel Buku Induk). Ini ibarat membatalkan penghapusan data.</p>
+                            <p class="text-sm font-bold text-emerald-700">Opsi: Pulihkan (Mengembalikan Data)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Klik tombol berwarna hijau untuk mengaktifkan kembali data siswa ke halaman asal (Data Pokok Siswa/Buku Induk). Ini akan membatalkan status penghapusan data.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-4">
                         <span class="w-8 h-8 rounded-full bg-rose-100 border border-rose-200 flex items-center justify-center text-xs font-black text-rose-600 shrink-0">B</span>
                         <div>
-                            <p class="text-sm font-bold text-rose-700">Opsi: Hapus Permanen (Pemusnahan Abadi)</p>
-                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Tombol merah menyala ini mengeksekusi penghancuran tuntas dan me-nol-kan riwayat eksistensi profil anak dari pangkalan server (Termasuk rekam Buku Induk) untuk selamanya. <strong>Opsi tak bisa dibatalkan atau diralat meski instalisasi dibayar jutaan dollar.</strong> Patut menjadi kewaspadaan luar biasa!</p>
+                            <p class="text-sm font-bold text-rose-700">Opsi: Hapus Permanen (Penghapusan Selamanya)</p>
+                            <p class="text-xs text-slate-600 mt-1 leading-relaxed">Tombol merah ini akan menghapus seluruh data siswa (termasuk catatan Buku Induk) dari server secara permanen. <strong>Tindakan ini tidak dapat dibatalkan.</strong> Gunakan dengan penuh kewaspadaan.</p>
                         </div>
                     </li>
                 </ul>
