@@ -160,7 +160,7 @@
                         </a>
                         @hasanyrole('Super Admin|Operator|Tata Usaha')
                         <a href="{{ route('trash.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('trash.*') ? 'text-rose-700 font-bold bg-rose-50/50' : 'text-slate-500 hover:text-rose-600 hover:bg-slate-50' }}">
-                            Sampah / Terhapus
+                            Arsip Terhapus
                         </a>
                         @endhasanyrole
                     </div>

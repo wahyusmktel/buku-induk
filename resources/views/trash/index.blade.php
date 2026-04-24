@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Sampah / Data Terhapus')
-@section('header_title', 'Sampah')
+@section('title', 'Arsip Data Terhapus')
+@section('header_title', 'Arsip Terhapus')
 @section('breadcrumb')
     <span class="text-slate-500">Kelola</span>
     <span class="text-slate-300 mx-1">/</span>
-    <span class="text-slate-800">Sampah / Data Terhapus</span>
+    <span class="text-slate-800">Arsip Data Terhapus</span>
 @endsection
 
 @section('content')
@@ -14,9 +14,9 @@
     {{-- ── Page Header ── --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-            <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Sampah / Data Terhapus</h2>
+            <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Arsip Data Terhapus</h2>
             <p class="text-xs text-slate-400 mt-0.5">
-                Data siswa yang telah dihapus dan dapat dipulihkan kembali.
+                Daftar data yang telah dihapus dan dapat dipulihkan kembali.
             </p>
         </div>
         <div class="flex gap-2 flex-wrap">
@@ -106,12 +106,12 @@
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
             </div>
-            <h3 class="text-sm font-bold text-slate-700">Tidak Ada Data di Sampah</h3>
+            <h3 class="text-sm font-bold text-slate-700">Tidak Ada Data Terhapus</h3>
             <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
                 @if(request('q'))
                     Tidak ada data yang cocok dengan pencarian "{{ request('q') }}".
                 @else
-                    Semua data siswa masih aktif. Tidak ada yang dihapus.
+                    Semua data siswa masih aktif. Tidak ada yang diarsipkan.
                 @endif
             </p>
         </div>
