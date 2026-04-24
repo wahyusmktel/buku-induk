@@ -58,6 +58,7 @@
                     ['12', 'langkah-12', 'Data Alumni (Kelulusan)'],
                     ['13', 'langkah-13', 'Arsip & Pemulihan Data'],
                     ['14', 'langkah-14', 'Laporan & Statistik'],
+                    ['15', 'langkah-15', 'Ekspor Massal Data'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -1291,6 +1292,60 @@
                 <div class="text-sm text-indigo-900 leading-relaxed">
                     <p class="font-bold mb-1">Informasi Fundamental:</p>
                     Kualitas dan akurasi informasi yang disajikan pada halaman statistik ini sangat bergantung pada integritas data yang diinput melalui modul <strong>Data Pokok Siswa</strong> serta <strong>Buku Induk</strong>. Oleh sebab itu, sangat dianjurkan bagi petugas administrasi untuk senantiasa melakukan pemutakhiran data secara berkala demi menjamin validitas laporan yang dihasilkan bagi kepentingan manajerial institusi.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 15: Ekspor Massal --}}
+    <div id="langkah-15" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-amber-600">15</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Ekspor Massal Data</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Fasilitas pengunduhan dataset besar untuk keperluan cadangan atau pelaporan eksternal.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Ekspor Massal</strong> disediakan untuk memfasilitasi pengguna dalam mengekstraksi data dari sistem ke dalam format berkas eksternal (PDF) dalam skala besar. Fitur ini sangat krusial untuk keperluan pencadangan data mandiri, penyusunan laporan fisik, maupun sinkronisasi data dengan aplikasi pendidikan lainnya. Mengingat volume data yang diolah cukup besar, sistem menggunakan mekanisme antrean yang aman agar tidak mengganggu performa aplikasi secara keseluruhan.
+            </p>
+            <p class="text-sm text-slate-500">Akses melalui menu: <strong>Ekspor Massal</strong> pada bilah sisi navigasi.</p>
+
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Halaman Ekspor Massal</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-bold text-slate-700 mb-3">Langkah-langkah Melakukan Ekspor Data:</p>
+                <ol class="space-y-3">
+                    @foreach([
+                        ['Pilih tipe dokumen yang akan di export secara masal (contoh: Buku Induk, Prestasi).', 'sky'],
+                        ['Tentukan parameter filter seperti <strong>Tahun Pelajaran</strong> atau <strong>Tingkat Kelas</strong> guna mengerucutkan dataset agar sesuai dengan kebutuhan Anda.', 'indigo'],
+                        ['Klik tombol <strong class="text-indigo-600">Mulai Proses Ekspor</strong> untuk menginstruksikan sistem dalam merangkai berkas.', 'indigo'],
+                        ['Pantau status pada tabel <strong>Riwayat Ekspor</strong>. Sistem akan memberikan indikator jika berkas sedang diproses atau telah siap diunduh.', 'amber'],
+                        ['Klik ikon unduh pada kolom aksi untuk menyimpan berkas ke perangkat komputer Anda.', 'emerald'],
+                    ] as $i => $step)
+                    <li class="flex items-start gap-3">
+                        <span class="w-6 h-6 rounded-full bg-{{ $step[1] }}-100 border border-{{ $step[1] }}-200 flex items-center justify-center text-xs font-extrabold text-{{ $step[1] }}-600 flex-shrink-0 mt-0.5">{{ $i + 1 }}</span>
+                        <p class="text-sm text-slate-600 leading-relaxed">{!! $step[0] !!}</p>
+                    </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-5 py-4">
+                <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <div class="text-sm text-amber-800 leading-relaxed">
+                    <strong>Peringatan Proses Memakan Waktu:</strong> Mengingat kompleksitas penghitungan data dan konversi format, proses ekspor mungkin memerlukan waktu beberapa menit terutama untuk dataset dengan ribuan baris. Anda diperbolehkan meninggalkan halaman ini dan kembali lagi nanti untuk memeriksa status kesiapan berkas pada tabel riwayat.
                 </div>
             </div>
         </div>
