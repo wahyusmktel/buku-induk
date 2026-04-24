@@ -131,12 +131,15 @@
                         </div>
                         Master Buku Induk
                     </button>
-                    <button @click="open = false; importModal = true; fileName = ''; fileSelected = false" 
-                            class="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-3 transition-colors">
-                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center">
+                    <button disabled 
+                            class="w-full text-left px-4 py-3 text-sm font-bold text-slate-400 bg-slate-50/30 cursor-not-allowed flex items-center gap-3 transition-colors group">
+                        <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-400 flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
                         </div>
-                        Format Dapodik
+                        <div class="flex flex-col">
+                            <span class="leading-tight">Format Dapodik</span>
+                            <span class="text-[10px] text-rose-500 font-medium italic">Non-aktif Sementara</span>
+                        </div>
                     </button>
                 </div>
             </div>
