@@ -57,6 +57,7 @@
                     ['11', 'langkah-11', 'Cetak & Manajemen Buku Induk'],
                     ['12', 'langkah-12', 'Data Alumni (Kelulusan)'],
                     ['13', 'langkah-13', 'Arsip & Pemulihan Data'],
+                    ['14', 'langkah-14', 'Laporan & Statistik'],
                 ];
                 @endphp
                 @foreach($toc as $item)
@@ -1223,6 +1224,74 @@
                         </div>
                     </li>
                 </ul>
+            </div>
+        </div>
+    </div>
+
+    {{-- Langkah 14: Laporan & Statistik --}}
+    <div id="langkah-14" class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden print:shadow-none print:border print:border-slate-300 print:mb-8">
+        <div class="flex items-center gap-4 px-8 py-6 border-b border-slate-100">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-extrabold text-indigo-600">14</span>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Laporan &amp; Statistik</h2>
+                <p class="text-slate-500 text-sm mt-0.5">Visualisasi data dan analisis perkembangan peserta didik secara komprehensif.</p>
+            </div>
+        </div>
+        <div class="px-8 py-6 space-y-6">
+            <p class="text-slate-600 leading-relaxed">
+                Modul <strong>Laporan &amp; Statistik</strong> merupakan instrumen strategis yang dirancang khusus untuk mentransformasikan kumpulan data mentah menjadi informasi visual yang substantif, sistematis, serta mudah diinterpretasikan oleh pihak manajemen sekolah maupun pemangku kepentingan terkait lainnya. Melalui pemanfaatan fitur ini, Anda diberikan keleluasaan untuk memantau beragam aspek krusial, mulai dari persebaran demografis peserta didik, fluktuasi tren prestasi akademik lintas semester, hingga rekapitulasi data historis lulusan yang disajikan dalam format grafik dinamis serta tabel periodik yang akurat.
+            </p>
+            <p class="text-sm text-slate-500">Akses modul ini melalui menu navigasi utama: <strong>Laporan &amp; Statistik</strong> yang terletak pada bilah sisi samping.</p>
+
+            {{-- Placeholder Screenshot --}}
+            <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden">
+                <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-500">Tangkapan Layar Laporan &amp; Statistik</p>
+                    <p class="text-xs text-slate-400 mt-1">[ Gambar akan ditambahkan ]</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-sm font-bold text-slate-700">Tiga Kategori Laporan Utama yang Tersedia:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Statistik Siswa</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Sub-modul ini secara spesifik memvisualisasikan data populasi siswa dalam bentuk diagram lingkaran dan batang yang mencakup proporsi berdasarkan jenis kelamin, status keaktifan, hingga distribusi murid pada setiap tingkatan kelas secara real-time.</p>
+                    </div>
+
+                    <div class="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Prestasi Belajar</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Fasilitas ini ditujukan untuk memantau kualitas pendidikan melalui pemetaan capaian nilai rata-rata peserta didik, baik secara kolektif per mata pelajaran maupun per rombongan belajar, guna mengevaluasi efektivitas kurikulum yang diterapkan.</p>
+                    </div>
+
+                    <div class="border border-violet-100 bg-violet-50/50 rounded-xl p-4">
+                        <div class="w-8 h-8 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center mb-3">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5zm0-14l9 5-9 5-9-5 9-5z"/></svg>
+                        </div>
+                        <p class="text-sm font-bold text-slate-700 mb-1">Data Alumni</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">Bagian ini merangkum catatan historis mengenai kuantitas lulusan dari tahun ke tahun, sekaligus menyajikan informasi mengenai keterhubungan data ijazah dan riwayat keberlanjutan jenjang pendidikan formal para alumni.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 flex gap-4 items-start mt-4">
+                <svg class="w-6 h-6 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="text-sm text-indigo-900 leading-relaxed">
+                    <p class="font-bold mb-1">Informasi Fundamental:</p>
+                    Kualitas dan akurasi informasi yang disajikan pada halaman statistik ini sangat bergantung pada integritas data yang diinput melalui modul <strong>Data Pokok Siswa</strong> serta <strong>Buku Induk</strong>. Oleh sebab itu, sangat dianjurkan bagi petugas administrasi untuk senantiasa melakukan pemutakhiran data secara berkala demi menjamin validitas laporan yang dihasilkan bagi kepentingan manajerial institusi.
+                </div>
             </div>
         </div>
     </div>
