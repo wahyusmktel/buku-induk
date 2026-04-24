@@ -5,7 +5,34 @@
 @section('breadcrumb', 'Data Pokok Siswa')
 
 @section('content')
-<div x-data="{ importModal: false, masterImportModal: false, guideModal: false, fileName: '', fileSelected: false, loading: false }">
+<div x-data="{ 
+    importModal: false, 
+    masterImportModal: false, 
+    guideModal: false, 
+    fileName: '', 
+    fileSelected: false, 
+    loading: false,
+    isMax: false,
+    posX: 0,
+    posY: 0,
+    dragging: false,
+    startX: 0,
+    startY: 0,
+    startDrag(e) {
+        if(this.isMax) return;
+        this.dragging = true;
+        this.startX = e.clientX - this.posX;
+        this.startY = e.clientY - this.posY;
+    },
+    doDrag(e) {
+        if(!this.dragging) return;
+        this.posX = e.clientX - this.startX;
+        this.posY = e.clientY - this.startY;
+    },
+    stopDrag() {
+        this.dragging = false;
+    }
+}" @mousemove.window="doDrag" @mouseup.window="stopDrag">
     @if(!$tahunAktif)
     <div class="mb-8 bg-rose-50 border-2 border-rose-200 border-dashed rounded-3xl p-8 text-center shadow-sm">
         <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -272,75 +299,106 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-indigo-900/60 backdrop-blur-sm" x-cloak>
+         class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-indigo-950/60 backdrop-blur-sm" x-cloak>
         
-        <div @click.away="masterImportModal = false" 
-             class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all border border-white/20">
+        <div :class="{
+                'w-full h-full max-w-none max-h-none rounded-none m-0': isMax,
+                'w-full max-w-lg max-h-[90vh] rounded-3xl': !isMax,
+                'transition-all duration-300': !dragging 
+             }" 
+             :style="(!isMax && posX !== undefined) ? `transform: translate(${posX}px, ${posY}px)` : ''"
+             class="bg-white shadow-2xl overflow-hidden border border-white/20 flex flex-col transform transition-all">
             
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-700 px-6 py-8 text-white relative">
-                <button @click="masterImportModal = false" class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            {{-- Header Draggable --}}
+            <div @mousedown="startDrag($event)" 
+                 class="bg-gradient-to-r from-indigo-600 to-blue-700 px-6 py-6 text-white relative flex items-center justify-between shrink-0 cursor-move select-none">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-tight">Import Master Buku Induk</h3>
+                        <p class="text-indigo-100 text-xs font-medium opacity-80 italic">Drag header untuk menggeser posisi</p>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-extrabold tracking-tight">Master Import Buku Induk</h3>
-                <p class="text-indigo-100 text-sm mt-1 font-medium italic opacity-90">Sangat disarankan untuk input data manual secara massal.</p>
+                
+                <div class="flex items-center gap-1">
+                    <button type="button" @click="isMax = !isMax; if(!isMax) { posX = 0; posY = 0; }" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg x-show="!isMax" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                        <svg x-show="isMax" class="w-4 h-4" x-cloak fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4m0-4l-5 5m11-5h4v4m0-4l5 5M4 10V6h4m-4 0l5 5m11 5V6h-4m4 0l-5 5"/></svg>
+                    </button>
+                    <button @click="masterImportModal = false" class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-white">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </div>
 
-            <form action="{{ route('siswas.master-import') }}" method="POST" enctype="multipart/form-data" class="p-8" @submit="loading = true">
+            <form action="{{ route('siswas.master-import') }}" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 overflow-hidden" @submit="loading = true">
                 @csrf
-                <div class="space-y-6">
-                    <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
-                        <div class="flex gap-4 items-start mb-3">
-                            <svg class="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <div class="text-sm text-indigo-800 font-medium italic leading-relaxed">
-                                Gunakan fitur ini untuk melakukan pemutakhiran data secara menyeluruh (Buku Induk + Data Siswa). 
+                <div class="p-8 space-y-6 overflow-y-auto flex-1">
+                    <div class="p-5 bg-indigo-50 border border-indigo-100 rounded-2xl">
+                        <div class="flex gap-4 items-start mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="text-sm text-indigo-900 font-bold italic leading-relaxed">
+                                Fitur ini memproses pemutakhiran data secara menyeluruh (Buku Induk + Data Pokok Siswa). Mohon teliti sebelum mengunggah berkas.
                             </div>
                         </div>
-                        <a href="{{ asset('templates/master_buku_induk_template.xlsx') }}" class="inline-flex items-center gap-2 text-xs font-black text-indigo-700 hover:text-indigo-900 bg-white px-4 py-2 rounded-xl shadow-sm border border-indigo-100 transition-all hover:translate-x-1">
+                        <a href="{{ asset('templates/master_buku_induk_template.xlsx') }}" class="inline-flex items-center gap-2 text-xs font-black text-indigo-700 hover:text-indigo-900 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-indigo-100 transition-all hover:translate-x-1">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            Download Template Excel
+                            Unduh Template Excel Baru
                         </a>
                     </div>
 
                     <div class="relative group" x-data="{ localFileName: '', localFileSelected: false }">
-                        <label for="master_excel_file" class="block text-sm font-bold text-slate-700 mb-3 ml-1 uppercase tracking-wide">Select Template File</label>
+                        <label for="master_excel_file" class="block text-xs font-black text-slate-400 mb-3 ml-1 uppercase tracking-widest">Pilih Berkas Excel</label>
                         
-                        <div class="border-2 border-dashed border-slate-200 group-hover:border-indigo-500 rounded-2xl p-8 transition-all bg-slate-50/50 group-hover:bg-white flex flex-col items-center justify-center gap-3 relative overflow-hidden" 
+                        <div class="border-2 border-dashed border-slate-200 group-hover:border-indigo-500 rounded-3xl p-10 transition-all bg-slate-50/50 group-hover:bg-white flex flex-col items-center justify-center gap-3 relative overflow-hidden" 
                              :class="{ 'border-indigo-500 bg-indigo-50/20': localFileSelected }">
                             
                             <input type="file" name="file" id="master_excel_file" required x-ref="masterRef"
                                    class="absolute inset-0 opacity-0 cursor-pointer z-10"
                                    @change="if($event.target.files[0]) { localFileName = $event.target.files[0].name; localFileSelected = true }">
                             
-                            <div x-show="!localFileSelected" class="flex flex-col items-center pointer-events-none">
-                                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-1">
-                                    <svg class="w-8 h-8 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <div x-show="!localFileSelected" class="flex flex-col items-center pointer-events-none text-center">
+                                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform">
+                                    <svg class="w-8 h-8 text-slate-300 group-hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
-                                <span class="text-sm font-bold text-slate-500 group-hover:text-indigo-700 text-center">Drag filled template here</span>
+                                <span class="text-sm font-bold text-slate-500 group-hover:text-indigo-700">Tarik berkas atau klik di sini</span>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Format: .xlsx (Excel)</p>
                             </div>
                             
                             <div x-show="localFileSelected" class="flex flex-col items-center text-center">
-                                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center shadow-sm mb-1 animate-pulse">
-                                    <svg class="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 mb-2 animate-bounce">
+                                    <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 </div>
                                 <span class="text-sm font-bold text-slate-800 px-4 break-all" x-text="localFileName"></span>
+                                <p class="text-[10px] text-indigo-500 font-bold mt-1 uppercase">Berkas Siap Diproses</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-8 flex gap-3">
-                    <button type="button" @click="masterImportModal = false" :disabled="loading" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all">
+                <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex gap-3 shrink-0">
+                    <button type="button" @click="masterImportModal = false" :disabled="loading" class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-2xl transition-all cursor-pointer">
                         Batal
                     </button>
-                    <button type="submit" :disabled="loading" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <button type="submit" :disabled="loading" class="flex-[2] py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-wait">
                         <template x-if="!loading">
-                            <span>Proses Import Master</span>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                <span>Mulai Import Master</span>
+                            </div>
                         </template>
                         <template x-if="loading">
-                            <span>Memproses...</span>
+                            <div class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Memproses Data...</span>
+                            </div>
                         </template>
                     </button>
                 </div>
